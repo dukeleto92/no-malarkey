@@ -5,13 +5,13 @@ campaignTrail_temp.election_json = [
         "fields": {
             "year": 2020,
             "summary": "<p>On October 21, 2015, Vice President Joe Biden bucked conventional wisdom by announcing his campaign for the 2016 Democratic presidential nomination. In his address from the Rose Garden, he cited the death of his son Beau and rising right-wing populism as reasons for seeking the nomination. Biden's entry into the race immediately set up a three-way dogfight between himself, former Secretary of State Hillary Clinton, and Senator Bernie Sanders.</p><p>Despite beginning in third place, Biden quickly gained ground among both anti-Clinton voters and black voters in the Democratic primary electorate. He finally secured a majority of delegates after his win in the June 7th California primary, securing the nomination. Biden selected Massachusetts senator Elizabeth Warren, a progressive, as his running mate.</p><p>On the Republican side, businessman and reality television star Donald Trump shocked the political establishment by securing the Republican presidential nomination. Trump selected Indiana Governor Mike Pence as his running mate. Trump ran a stridently anti-immigration and anti-free trade campaign, tapping into simmering resentment over the deindustrialization of the United States.</p><p>Biden ran a labor-focused campaign, securing multiple endorsements from key unions in the Midwest. His campaign platform promised to add a public option to the Affordable Care Act, a trillion-dollar infrastructure package, comprehensive immigration reform, and a renegotiation of the Trans-Pacific Partnership.</p><p>Biden led in polls throughout the race, and on election night won all the Obama 2012 states in addition to North Carolina. Democrats recaptured the Senate with a 50-50 tie, including victories by Katie McGinty in Pennsylvania and Jason Kander in Missouri. Democrats made gains in the House, but Republicans ultimately retained the chamber. Trump refused to concede and later alleged massive voter fraud.</p><p>In the lame duck period, the Senate confirmed Merrick Garland to the Supreme Court, giving liberals a 5-4 majority.</p>",
-            "image_url": "https://www.jetsimon.com/public/static/images/2020-election-photo.jpg",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520943781%29.jpg/960px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520943781%29.jpg",
             "winning_electoral_vote_number": 270,
             "advisor_url": "https://www.jetsimon.com/public/static/images/dillon-stepien.jpg",
             "recommended_reading": "<ul>\n<li><a href=https://www.chicagotribune.com/opinion/editorials/ct-edit-chicago-tribune-biden-endorsement-20200925-lnyxsb5qvrftnjjmj3rnzj33jy-story.html>Our Case For Joe Biden</a></li>\n<li><a href=https://nationalinterest.org/feature/case-trump-166808>The Case For Trump</a></li>\n<li><a href=https://www.npr.org/2020/11/18/935730100/how-biden-won-ramping-up-the-base-and-expanding-margins-in-the-suburbs>How Biden Won: Ramping Up The Base And Expanding Margins In The Suburbs</a></li>\n<li><a href=https://www.prospectmagazine.co.uk/politics/donald-trump-joe-biden-us-election-almost-win-votes-concede>Why Did Trump Almost Win?</a></li>\n<li><a href=https://www.hoover.org/research/no-evidence-voter-fraud-guide-statistical-claims-about-2020-election>No Evidence For Voter Fraud: A Guide To Statistical Claims About The 2020 Election</a></li>\n</ul>",
             "has_visits": 1,
             "no_electoral_majority_image": "https://www.jetsimon.com/public/static/images/2012-no-majority.jpg",
-            "creator": "Dan Bryan",
+            "creator": "alexd9229",
             "display_year": "2020"
         }
     }
@@ -29,10 +29,10 @@ campaignTrail_temp.candidate_json = [
             "state": "Delaware",
             "priority": 1,
             "description": "<p>By rights, he shouldn't even be here. Even his old boss told him to give up the ghost. He was too old. It was time to step aside and heal from Beau's passing, and speaking of passing, how about passing the torch? Did he really want to end his political career by coming in third place in the Iowa caucus as a sitting vice president? It would all be too humiliating.</p><p>Scranton Joe didn't listen. Triangulating between Hillary's neoliberalism and Bernie's socialism, he won the marathon race for the 2016 Democratic Party presidential nomination. He vanquished the Orange Menace, taking him behind the gym, so to speak.</p><p>President Biden inherits an unsettled country. The recovery from the Great Recession was uneven. Wealth inequality is the highest it has been since the Gilded Age, and getting worse. The American military is overstretched and spread thin. Meanwhile, the unadulterated rage of the Republican Party base - harnessed recently if unsuccessfully by the personified id called Donald Trump - looks for a new vessel to pour itself into.</p><p>Good luck, Mr. President.</p>",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 1,
-            "image_url": "https://www.jetsimon.com/public/static/images/joe-biden-2020.jpg",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/President_Biden_addresses_the_nation_from_the_Oval_Office.jpg/960px-President_Biden_addresses_the_nation_from_the_Oval_Office.jpg",
             "electoral_victory_message": "<h3>Congratulations! You have won the 2020 election.</h3><p>Things may have been closer and more contested than you hoped for, but the final result remains. Can you help bring the country back together after a tumultuous few years? Or will you be seen as a lame duck from the first day -- unable to keep the two wings of your party coordinated? Time will tell.</p>",
             "electoral_loss_message": "<h3>Sorry! You have lost the 2020 election.</h3><p>After an election in which many of your supporters claimed democracy itself was at stake, what happens now? Perhaps the party will need to go in a completely different direction in 2024. As for yourself, it seems that your long, illustrious political career has surely drawn to a close.</p>",
             "no_electoral_majority_message": "<h3>Sorry! You have lost the 2020 election.</h3><p>In spite of the 269-269 tie in the electoral college, Republicans control a majority of state delegations in the House of Representatives. After an election in which many of your supporters claimed democracy itself was at stake, what happens now? Perhaps the party will need to go in a completely different direction in 2024.</p>",
@@ -121,8 +121,8 @@ campaignTrail_temp.candidate_json = [
             "state": "California",
             "priority": 5,
             "description": "'",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
             "image_url": "https://www.jetsimon.com/public/static/images/kamala-harris-2020.jpg",
             "electoral_victory_message": "'",
@@ -144,8 +144,8 @@ campaignTrail_temp.candidate_json = [
             "state": "Washington DC",
             "priority": 6,
             "description": "'",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
             "image_url": "https://www.jetsimon.com/public/static/images/susan-rice-2020.jpg",
             "electoral_victory_message": "'",
@@ -167,8 +167,8 @@ campaignTrail_temp.candidate_json = [
             "state": "California",
             "priority": 7,
             "description": "'",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
             "image_url": "https://www.jetsimon.com/public/static/images/karen-bass-2020.jpg",
             "electoral_victory_message": "'",
@@ -190,8 +190,8 @@ campaignTrail_temp.candidate_json = [
             "state": "Michigan",
             "priority": 8,
             "description": "'",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
             "image_url": "https://www.jetsimon.com/public/static/images/gretchen-whitmer-2020.jpg",
             "electoral_victory_message": "'",
@@ -213,8 +213,8 @@ campaignTrail_temp.candidate_json = [
             "state": "Massachusetts",
             "priority": 9,
             "description": "'",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
             "image_url": "https://www.jetsimon.com/public/static/images/elizabeth-warren-2020.jpg",
             "electoral_victory_message": "'",
@@ -328,8 +328,8 @@ campaignTrail_temp.candidate_json = [
             "state": "Florida",
             "priority": 14,
             "description": " ",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
             "image_url": "https://www.jetsimon.com/public/static/images/val-demings-2020.jpg",
             "electoral_victory_message": " ",
@@ -351,8 +351,8 @@ campaignTrail_temp.candidate_json = [
             "state": "Illinois",
             "priority": 15,
             "description": " ",
-            "color_hex": "#0000FF",
-            "secondary_color_hex": "#90C0FF",
+            "color_hex": "#224192",
+            "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
             "image_url": "https://www.jetsimon.com/public/static/images/tammy-duckworth-2020.jpg",
             "electoral_victory_message": " ",
@@ -400,7 +400,7 @@ campaignTrail_temp.running_mate_json = [
     }
 ]
 
-campaignTrail_temp.credits = "Dan Bryan"
+campaignTrail_temp.credits = "alexd9229"
 
 campaignTrail_temp.global_parameter_json = [
     {
@@ -463,10 +463,10 @@ campaignTrail_temp.temp_election_list = [
 ]
 
 jet_data = {
-    "headerColor": "#700016",
-    "windowColor": "#BFE6FF",
+    "headerColor": "#224192",
+    "windowColor": "#DCE7F8",
     "containerColor": "#FFFFFF",
-    "innerWindowColor": "#E8FBFF",
+    "innerWindowColor": "#EAF1FB",
     "bannerImageUrl": "https://jetsimon.com/public/placeholderbanner.png",
     "backgroundImageUrl": "https://coolbackgrounds.io/images/backgrounds/white/pure-white-background-85a2a7fd.jpg",
     "endingTextColor": "#000000",
@@ -477,9 +477,9 @@ jet_data = {
 
 
 
-nct_stuff.themes[nct_stuff.selectedTheme].coloring_title = "#700016";
+nct_stuff.themes[nct_stuff.selectedTheme].coloring_title = "#224192";
 
-nct_stuff.themes[nct_stuff.selectedTheme].coloring_window = "#BFE6FF";
+nct_stuff.themes[nct_stuff.selectedTheme].coloring_window = "#DCE7F8";
 
 document.getElementsByClassName("game_header")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_title;
 
@@ -491,6 +491,6 @@ document.getElementById("header").src = "https://jetsimon.com/public/placeholder
 
 document.body.background = "https://coolbackgrounds.io/images/backgrounds/white/pure-white-background-85a2a7fd.jpg";
 
-document.head.innerHTML += "<style>#results_container {color:#000000;} .inner_window_w_desc {background-color:#E8FBFF!important;}</style>";
+document.head.innerHTML += "<style>#results_container {color:#000000;} .inner_window_w_desc {background-color:#EAF1FB!important;} #game_window {height:fit-content!important; min-height:540px;} .inner_window_w_desc, .inner_window {height:fit-content!important; overflow:visible;} #candidate_info_holder {height:fit-content!important;}</style>";
 
 //#endcode

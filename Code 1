@@ -216,7 +216,7 @@ campaignTrail_temp.candidate_json = [
             "color_hex": "#224192",
             "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
-            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg/640px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg/960px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg",
             "electoral_victory_message": "'",
             "electoral_loss_message": "'",
             "no_electoral_majority_message": "'",

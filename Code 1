@@ -5,7 +5,7 @@ campaignTrail_temp.election_json = [
         "fields": {
             "year": 2020,
             "summary": "<p>On October 21, 2015, Vice President Joe Biden bucked conventional wisdom by announcing his campaign for the 2016 Democratic presidential nomination. In his address from the Rose Garden, he cited the death of his son Beau and rising right-wing populism as reasons for seeking the nomination. Biden's entry into the race immediately set up a three-way dogfight between himself, former Secretary of State Hillary Clinton, and Senator Bernie Sanders.</p><p>Despite beginning in third place, Biden quickly gained ground among both anti-Clinton voters and black voters in the Democratic primary electorate. He finally secured a majority of delegates after his win in the June 7th California primary, securing the nomination. Biden selected Massachusetts senator Elizabeth Warren, a progressive, as his running mate.</p><p>On the Republican side, businessman and reality television star Donald Trump shocked the political establishment by securing the Republican presidential nomination. Trump selected Indiana Governor Mike Pence as his running mate. Trump ran a stridently anti-immigration and anti-free trade campaign, tapping into simmering resentment over the deindustrialization of the United States.</p><p>Biden ran a labor-focused campaign, securing multiple endorsements from key unions in the Midwest. His campaign platform promised to add a public option to the Affordable Care Act, a trillion-dollar infrastructure package, comprehensive immigration reform, and a renegotiation of the Trans-Pacific Partnership.</p><p>Biden led in polls throughout the race, and on election night won all the Obama 2012 states in addition to North Carolina. Democrats recaptured the Senate with a 50-50 tie, including victories by Katie McGinty in Pennsylvania and Jason Kander in Missouri. Democrats made gains in the House, but Republicans ultimately retained the chamber. Trump refused to concede and later alleged massive voter fraud.</p><p>In the lame duck period, the Senate confirmed Merrick Garland to the Supreme Court, giving liberals a 5-4 majority.</p>",
-            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520943781%29.jpg/960px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520943781%29.jpg",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Joe_Biden_%2848554152307%29.jpg/960px-Joe_Biden_%2848554152307%29.jpg",
             "winning_electoral_vote_number": 270,
             "advisor_url": "https://www.jetsimon.com/public/static/images/dillon-stepien.jpg",
             "recommended_reading": "<ul>\n<li><a href=https://www.chicagotribune.com/opinion/editorials/ct-edit-chicago-tribune-biden-endorsement-20200925-lnyxsb5qvrftnjjmj3rnzj33jy-story.html>Our Case For Joe Biden</a></li>\n<li><a href=https://nationalinterest.org/feature/case-trump-166808>The Case For Trump</a></li>\n<li><a href=https://www.npr.org/2020/11/18/935730100/how-biden-won-ramping-up-the-base-and-expanding-margins-in-the-suburbs>How Biden Won: Ramping Up The Base And Expanding Margins In The Suburbs</a></li>\n<li><a href=https://www.prospectmagazine.co.uk/politics/donald-trump-joe-biden-us-election-almost-win-votes-concede>Why Did Trump Almost Win?</a></li>\n<li><a href=https://www.hoover.org/research/no-evidence-voter-fraud-guide-statistical-claims-about-2020-election>No Evidence For Voter Fraud: A Guide To Statistical Claims About The 2020 Election</a></li>\n</ul>",
@@ -467,7 +467,7 @@ jet_data = {
     "windowColor": "#DCE7F8",
     "containerColor": "#FFFFFF",
     "innerWindowColor": "#EAF1FB",
-    "bannerImageUrl": "https://jetsimon.com/public/placeholderbanner.png",
+    "bannerImageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png",
     "backgroundImageUrl": "https://coolbackgrounds.io/images/backgrounds/white/pure-white-background-85a2a7fd.jpg",
     "endingTextColor": "#000000",
     "customQuote": ""
@@ -487,7 +487,7 @@ $("#game_window")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selected
 
 $(".container")[0].style.backgroundColor = "#FFFFFF";
 
-document.getElementById("header").src = "https://jetsimon.com/public/placeholderbanner.png";
+document.getElementById("header").src = "https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png";
 
 document.body.background = "https://coolbackgrounds.io/images/backgrounds/white/pure-white-background-85a2a7fd.jpg";
 

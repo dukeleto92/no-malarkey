@@ -216,7 +216,7 @@ campaignTrail_temp.candidate_json = [
             "color_hex": "#224192",
             "secondary_color_hex": "#A7B7E3",
             "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/elizabeth-warren-2020.jpg",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg/640px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg",
             "electoral_victory_message": "'",
             "electoral_loss_message": "'",
             "no_electoral_majority_message": "'",
@@ -468,7 +468,7 @@ jet_data = {
     "containerColor": "#FFFFFF",
     "innerWindowColor": "#EAF1FB",
     "bannerImageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png",
-    "backgroundImageUrl": "https://coolbackgrounds.io/images/backgrounds/white/pure-white-background-85a2a7fd.jpg",
+    "backgroundImageUrl": "",
     "endingTextColor": "#000000",
     "customQuote": ""
 }
@@ -489,8 +489,27 @@ $(".container")[0].style.backgroundColor = "#FFFFFF";
 
 document.getElementById("header").src = "https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png";
 
-document.body.background = "https://coolbackgrounds.io/images/backgrounds/white/pure-white-background-85a2a7fd.jpg";
+document.body.background = "";
 
-document.head.innerHTML += "<style>#results_container {color:#000000;} .inner_window_w_desc {background-color:#EAF1FB!important;} #game_window {height:fit-content!important; min-height:540px;} .inner_window_w_desc, .inner_window {height:fit-content!important; overflow:visible;} #candidate_info_holder {height:fit-content!important;}</style>";
+document.head.innerHTML += "<style>" +
+    "@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap');" +
+    /* Deep navy page frame, like the campaign site */
+    "body { background: #0B1F4E !important; }" +
+    /* Banner: white BIDEN 2020 wordmark on a solid campaign-blue field with the red 'E' stripe underline */
+    "#header { background-color: #224192; object-fit: contain; padding: 12px 0; box-sizing: border-box; border-bottom: 6px solid #EB2026; }" +
+    ".game_header { border-bottom: 6px solid #EB2026; }" +
+    /* Campaign typography (Montserrat is the closest free match to Brother 1816) */
+    ".game_header, h1, h2, h3, button, select { font-family: 'Montserrat', Arial, sans-serif; }" +
+    "button { background-color: #224192; color: #FFFFFF; border: none; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 20px; margin: 2px; cursor: pointer; }" +
+    "button:hover { background-color: #EB2026; }" +
+    "select { border: 2px solid #224192; border-radius: 3px; padding: 4px 8px; background: #FFFFFF; color: #224192; font-weight: 600; }" +
+    /* Crop photos to their frames instead of stretching them */
+    "img:not(#header) { object-fit: cover; }" +
+    /* Let windows grow with their text instead of overflowing */
+    "#game_window { height: fit-content !important; min-height: 540px; }" +
+    ".inner_window_w_desc { background-color: #EAF1FB !important; height: fit-content !important; overflow: visible; }" +
+    ".inner_window, #candidate_info_holder { height: fit-content !important; }" +
+    "#results_container { color: #000000; }" +
+    "</style>";
 
 //#endcode

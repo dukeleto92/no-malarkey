@@ -328,7 +328,7 @@ function nmAfterQ3() {
     var win = nm.healthcare_result === "win";
     nmSetFeedback(8071, win ? NM_FB.q4a1_win : NM_FB.q4a1_loss);
     nmSetFeedback(8072, win ? NM_FB.q4a2_win : NM_FB.q4a2_loss);
-    campaignTrail_temp.question_number = 6;
+    campaignTrail_temp.question_number = 5; // next shown = index 6 (Q4)
 }
 
 // After Q6: pre-write Q7 A2 feedback (reads rec_foreign(prior) and delivery(prior))
@@ -361,8 +361,10 @@ cyoAdventure = function (a) {
         case 8014: nmAdd("rec_progressive", 1); nmAdd("rec_social", 1); break;
 
         // ---- Q2 — Healthcare I: routes Q3 ----
-        case 8021: nmAdd("rec_progressive", 1); nm.route = "3a"; campaignTrail_temp.question_number = 2; break;
-        case 8022: nmAdd("rec_progressive", 2); nm.route = "3b"; campaignTrail_temp.question_number = 3; break;
+        // NOTE: the engine increments question_number AFTER cyoAdventure runs,
+        // so a jump to index X is written as question_number = X - 1.
+        case 8021: nmAdd("rec_progressive", 1); nm.route = "3a"; campaignTrail_temp.question_number = 1; break;
+        case 8022: nmAdd("rec_progressive", 2); nm.route = "3b"; campaignTrail_temp.question_number = 2; break;
         case 8023:
             nm.route = "3c";
             // Pre-roll the Q3c RNG beats so the correct feedback can be written now
@@ -370,9 +372,9 @@ cyoAdventure = function (a) {
             nm.q3c_a3_success = Math.random() < 0.55;
             nmSetFeedback(8052, nm.q3c_a2_success ? NM_FB.q3c_a2_win : NM_FB.q3c_a2_fail);
             nmSetFeedback(8053, nm.q3c_a3_success ? NM_FB.q3c_a3_win : NM_FB.q3c_a3_fail);
-            campaignTrail_temp.question_number = 4;
+            campaignTrail_temp.question_number = 3;
             break;
-        case 8024: nmAdd("rec_progressive", -1); nm.route = "3d"; campaignTrail_temp.question_number = 5; break;
+        case 8024: nmAdd("rec_progressive", -1); nm.route = "3d"; campaignTrail_temp.question_number = 4; break;
 
         // ---- Q3a — Public Option ----
         case 8031: nmAdd("delivery", 1); nmAdd("rec_healthcare", 1); nmAdd("rec_progressive", -1); nm.healthcare_result = "win"; nmAfterQ3(); break;
@@ -428,7 +430,7 @@ cyoAdventure = function (a) {
             // The doc's dangling fourth FX-ELSE is dead code and is dropped per bible §9.4
             if (nm.rec_foreign >= 2) {
                 nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
-                campaignTrail_temp.question_number = 14;
+                campaignTrail_temp.question_number = 13; // next shown = index 14 (terminal)
             } else if (nm.delivery >= 1) {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
             } else {
@@ -467,13 +469,17 @@ cyoAdventure = function (a) {
         case 8134: nmAdd("rec_legitimacy", 1); break;
 
         // ---- Q11 — Executive Time (last drafted question; ends the run for now) ----
-        case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; campaignTrail_temp.question_number = 15; break;
-        case 8142: nmAdd("delivery", 2); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; campaignTrail_temp.question_number = 15; break;
-        case 8143: nm.midterm_push = true; campaignTrail_temp.question_number = 15; break;
-        case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); campaignTrail_temp.question_number = 15; break;
+        // Jump lands question_number exactly on question_count (15) after the
+        // increment — election night fires only on strict equality.
+        case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; campaignTrail_temp.question_number = 14; break;
+        case 8142: nmAdd("delivery", 2); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; campaignTrail_temp.question_number = 14; break;
+        case 8143: nm.midterm_push = true; campaignTrail_temp.question_number = 14; break;
+        case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); campaignTrail_temp.question_number = 14; break;
 
         // ---- A HOUSE OF DYNAMITE terminal ----
-        case 8151: campaignTrail_temp.question_number = 99; break; // hard stop
+        // No jump needed: index 14 + 1 = 15 = question_count, so the game ends.
+        // TODO: replace election night with a proper ending screen at the pivot build.
+        case 8151: break;
     }
 };
 

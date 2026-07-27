@@ -3954,3 +3954,13 @@ campaignTrail_temp.answer_feedback_json = [
 
 campaignTrail_temp.jet_data = [{}
 ]
+
+/* Code 2 is evaluated after the engine loads the base-game questionset for the
+   picked ticket, so these overrides win over the site's built-in 2020 data.
+   Ticket is locked to Biden/Warren; the campaign sign reads "Biden 2020". */
+campaignTrail_temp.cyoa = true;
+campaignTrail_temp.running_mate_id = 308;
+campaignTrail_temp.candidate_last_name = "Biden";
+campaignTrail_temp.running_mate_last_name = "2020";
+campaignTrail_temp.candidate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/President_Biden_addresses_the_nation_from_the_Oval_Office.jpg/960px-President_Biden_addresses_the_nation_from_the_Oval_Office.jpg";
+campaignTrail_temp.running_mate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg/960px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg";

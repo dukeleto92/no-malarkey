@@ -238,6 +238,14 @@ document.head.innerHTML += "<style>" +
     "#game_window { height: fit-content !important; min-height: 540px; }" +
     ".inner_window_w_desc { background-color: #EAF1FB !important; height: fit-content !important; overflow: visible; }" +
     ".inner_window, #candidate_info_holder { height: fit-content !important; }" +
+    /* Map screens: the fit-content game window breaks the base %-height chain, so give the
+       map container explicit dimensions — the usmap plugin computes its scale from them */
+    "#main_content_area { height: auto !important; overflow: hidden; }" +
+    "#map_container { width: 72% !important; height: 540px !important; }" +
+    /* Overlays (advisor feedback, election night): grow with their text instead of a fixed
+       62% height, so the buttons flow below long feedback instead of overlapping it */
+    ".overlay_window { height: fit-content !important; min-height: 0 !important; padding-bottom: .5em; }" +
+    ".overlay_window_content { height: fit-content !important; }" +
     "#results_container { color: #000000; }" +
     "</style>";
 

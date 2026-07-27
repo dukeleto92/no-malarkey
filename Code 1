@@ -232,10 +232,15 @@ document.head.innerHTML += "<style>" +
     "img:not(#header) { object-fit: cover; }" +
     /* Ticket banner photos: fixed portrait frames regardless of source image size */
     "#candidate_pic, #running_mate_pic { width: 135px !important; height: 164px !important; object-fit: cover; }" +
+    /* Campaign sign: the real Biden 2020 wordmark on the campaign-blue field with the red border */
+    "#campaign_sign { background: #224192 url('https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png') center / auto 68% no-repeat; height: 92px; border-color: #EB2026; }" +
+    "#campaign_sign p { display: none; }" +
     /* Advisor feedback photo: crop to its 208x128 box instead of squashing */
     "#visit_content img { object-fit: cover; }" +
     /* Let windows grow with their text instead of overflowing */
-    "#game_window { height: fit-content !important; min-height: 540px; }" +
+    /* flow-root makes the window contain the floated ticket photos so they
+       stay inside its bottom border */
+    "#game_window { height: fit-content !important; min-height: 540px; display: flow-root; }" +
     ".inner_window_w_desc { background-color: #EAF1FB !important; height: fit-content !important; overflow: visible; }" +
     ".inner_window, #candidate_info_holder { height: fit-content !important; }" +
     /* Map screens: the fit-content game window breaks the base %-height chain, so give the

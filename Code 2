@@ -6932,5 +6932,5 @@ campaignTrail_temp.running_mate_id = 308;
 campaignTrail_temp.running_mate_state_id = 1120; // Massachusetts (Warren)
 campaignTrail_temp.candidate_last_name = "Biden";
 campaignTrail_temp.running_mate_last_name = "2020";
-campaignTrail_temp.candidate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/President_Biden_addresses_the_nation_from_the_Oval_Office.jpg/960px-President_Biden_addresses_the_nation_from_the_Oval_Office.jpg";
-campaignTrail_temp.running_mate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg/960px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg";
+campaignTrail_temp.candidate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/President_Joe_Biden_delivers_remarks_from_the_Oval_Office_4.jpg/960px-President_Joe_Biden_delivers_remarks_from_the_Oval_Office_4.jpg";
+campaignTrail_temp.running_mate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg/960px-Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg";

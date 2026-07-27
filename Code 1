@@ -66,144 +66,6 @@ campaignTrail_temp.candidate_json = [
     },
     {
         "model": "campaign_trail.candidate",
-        "pk": 302,
-        "fields": {
-            "first_name": "Jo",
-            "last_name": "Jorgensen",
-            "election": 21,
-            "party": "Libertarian",
-            "state": "South Carolina",
-            "priority": 3,
-            "description": "'",
-            "color_hex": "#FFFF00",
-            "secondary_color_hex": "#FFFFC0",
-            "is_active": 0,
-            "image_url": "'",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "'",
-            "candidate_score": 1,
-            "running_mate": false
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 303,
-        "fields": {
-            "first_name": "Howie",
-            "last_name": "Hawkins/Other",
-            "election": 21,
-            "party": "Green",
-            "state": "New York",
-            "priority": 4,
-            "description": "'",
-            "color_hex": "#00C100",
-            "secondary_color_hex": "#A1FFA1",
-            "is_active": 0,
-            "image_url": "'",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "'",
-            "candidate_score": 1,
-            "running_mate": false
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 304,
-        "fields": {
-            "first_name": "Kamala",
-            "last_name": "Harris",
-            "election": 21,
-            "party": "Democrat",
-            "state": "California",
-            "priority": 5,
-            "description": "'",
-            "color_hex": "#224192",
-            "secondary_color_hex": "#A7B7E3",
-            "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/kamala-harris-2020.jpg",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "<p>Kamala Harris is a Senator from California who made her own run for President in 2020. She would be acceptable to moderates and financial supporters, has some appeal to progressives, and brings diversity to the ticket. She's not the preferred choice of most progressives.</p>",
-            "candidate_score": 0,
-            "running_mate": true
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 305,
-        "fields": {
-            "first_name": "Susan",
-            "last_name": "Rice",
-            "election": 21,
-            "party": "Democrat",
-            "state": "Washington DC",
-            "priority": 6,
-            "description": "'",
-            "color_hex": "#224192",
-            "secondary_color_hex": "#A7B7E3",
-            "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/susan-rice-2020.jpg",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "<p>Susan Rice was a UN Ambassador and a National Security Advisor to Barack Obama, and brings decades of foreign policy experience. She would be a true center-left pick, but has never run for elected office. Her foreign policy record would also be a turnoff to progressives.</p>",
-            "candidate_score": 0,
-            "running_mate": true
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 306,
-        "fields": {
-            "first_name": "Karen",
-            "last_name": "Bass",
-            "election": 21,
-            "party": "Democrat",
-            "state": "California",
-            "priority": 7,
-            "description": "'",
-            "color_hex": "#224192",
-            "secondary_color_hex": "#A7B7E3",
-            "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/karen-bass-2020.jpg",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "<p>Karen Bass is a Congresswoman from California and Chair of the Congressional Black Caucus. She has taken more progressive policy stances (including support for Medicare For All) than some of the other candidates, with the attendant supporters and detractors.</p>",
-            "candidate_score": 0,
-            "running_mate": true
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 307,
-        "fields": {
-            "first_name": "Gretchen",
-            "last_name": "Whitmer",
-            "election": 21,
-            "party": "Democrat",
-            "state": "Michigan",
-            "priority": 8,
-            "description": "'",
-            "color_hex": "#224192",
-            "secondary_color_hex": "#A7B7E3",
-            "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/gretchen-whitmer-2020.jpg",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "<p>Gretchen Whitmer is the Governor of Michigan who could bring some undecideds over the line in that state and region. She is seen as a mainstream Democrat with solid experience. Choosing her would anger some supporters who expect an African-American running-mate after this summer's protests.</p>",
-            "candidate_score": 0,
-            "running_mate": true
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
         "pk": 308,
         "fields": {
             "first_name": "Elizabeth",
@@ -247,121 +109,6 @@ campaignTrail_temp.candidate_json = [
             "candidate_score": 0,
             "running_mate": true
         }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 310,
-        "fields": {
-            "first_name": "Nikki",
-            "last_name": "Haley",
-            "election": 21,
-            "party": "Republican",
-            "state": "South Carolina",
-            "priority": 11,
-            "description": "'",
-            "color_hex": "#FF0000",
-            "secondary_color_hex": "#FFA0A0",
-            "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/nikki-haley-2020.jpg",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "<p>Nikki Haley has served as the Governor of South Carolina, and as a UN Ambassador. She could help you moderate your image and try to close the female vote. Choosing her would probably lead to hard feelings between yourself and Pence, but would your voters care?</p>",
-            "candidate_score": 0,
-            "running_mate": true
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 311,
-        "fields": {
-            "first_name": "Spike",
-            "last_name": "Cohen",
-            "election": 21,
-            "party": "Libertarian",
-            "state": "Maryland",
-            "priority": 12,
-            "description": "'",
-            "color_hex": "#FFFF00",
-            "secondary_color_hex": "#FFFFC0",
-            "is_active": 0,
-            "image_url": "'",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "'",
-            "candidate_score": 0,
-            "running_mate": true
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 312,
-        "fields": {
-            "first_name": "Angela",
-            "last_name": "Walker",
-            "election": 21,
-            "party": "Green",
-            "state": "Wisconsin",
-            "priority": 13,
-            "description": "'",
-            "color_hex": "#00C100",
-            "secondary_color_hex": "#A1FFA1",
-            "is_active": 0,
-            "image_url": "'",
-            "electoral_victory_message": "'",
-            "electoral_loss_message": "'",
-            "no_electoral_majority_message": "'",
-            "description_as_running_mate": "'",
-            "candidate_score": 0,
-            "running_mate": false
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 313,
-        "fields": {
-            "first_name": "Val",
-            "last_name": "Demings",
-            "election": 21,
-            "party": "Democrat",
-            "state": "Florida",
-            "priority": 14,
-            "description": " ",
-            "color_hex": "#224192",
-            "secondary_color_hex": "#A7B7E3",
-            "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/val-demings-2020.jpg",
-            "electoral_victory_message": " ",
-            "electoral_loss_message": " ",
-            "no_electoral_majority_message": " ",
-            "description_as_running_mate": "<p>Val Demings is a Congresswoman and former police chief from Florida. She could allow Biden to select a black running mate with more moderate credentials than some of the other choices. However, she has had a limited national profile and may be a disappointment to the more progressive wing of the party.<p>",
-            "candidate_score": 0,
-            "running_mate": true
-        }
-    },
-    {
-        "model": "campaign_trail.candidate",
-        "pk": 314,
-        "fields": {
-            "first_name": "Tammy",
-            "last_name": "Duckworth",
-            "election": 21,
-            "party": "Democrat",
-            "state": "Illinois",
-            "priority": 15,
-            "description": " ",
-            "color_hex": "#224192",
-            "secondary_color_hex": "#A7B7E3",
-            "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/tammy-duckworth-2020.jpg",
-            "electoral_victory_message": " ",
-            "electoral_loss_message": " ",
-            "no_electoral_majority_message": " ",
-            "description_as_running_mate": "<p>Tammy Duckworth is a Senator from Illinois who served in Iraq and has been active in foreign policy issues. She could help in the Midwest, but was also born in Thailand (as a U.S. citizen) and will need to deflect questions about her eligibility. Additionally, many party activists are expecting an African-American to be selected as well.</p>",
-            "candidate_score": 0,
-            "running_mate": true
-        }
     }
 ]
 
@@ -380,22 +127,6 @@ campaignTrail_temp.running_mate_json = [
         "fields": {
             "candidate": 301,
             "running_mate": 309
-        }
-    },
-    {
-        "model": "campaign_trail.running_mate",
-        "pk": 206,
-        "fields": {
-            "candidate": 301,
-            "running_mate": 310
-        }
-    },
-    {
-        "model": "campaign_trail.running_mate",
-        "pk": 207,
-        "fields": {
-            "candidate": 302,
-            "running_mate": 311
         }
     }
 ]
@@ -420,7 +151,7 @@ campaignTrail_temp.global_parameter_json = [
             "issue_stance_6_max": 0.71,
             "global_variance": 0.01,
             "state_variance": 0.005,
-            "question_count": 25,
+            "question_count": 15,
             "default_map_color_hex": "#C9C9C9",
             "no_state_map_color_hex": "#999999"
         }
@@ -432,10 +163,7 @@ campaignTrail_temp.opponents_default_json = [
         "election": 21,
         "candidates": [
             300,
-            301,
-            302,
-            303,
-            312
+            301
         ]
     }
 ]
@@ -445,10 +173,7 @@ campaignTrail_temp.opponents_weighted_json = [
         "election": 21,
         "candidates": [
             300,
-            301,
-            302,
-            303,
-            312
+            301
         ]
     }
 ]
@@ -511,5 +236,267 @@ document.head.innerHTML += "<style>" +
     ".inner_window, #candidate_info_holder { height: fit-content !important; }" +
     "#results_container { color: #000000; }" +
     "</style>";
+
+/* ============================================================
+   NO MALARKEY — govern-phase engine (Q1–Q11)
+   Source: scenario bible v0.6 + drafted questions doc.
+   Tally tiers per bible §2; FX blocks per the doc's A-lines.
+   Q12 (Governing Style) is not yet drafted — slot reserved.
+   ============================================================ */
+
+campaignTrail_temp.cyoa = true;
+
+/* questions_json indices (priority order):
+   0 Q1 Inaugural · 1 Q2 Healthcare I · 2 Q3a · 3 Q3b · 4 Q3c · 5 Q3d ·
+   6 Q4 Infrastructure · 7 Q5 TPP · 8 Q6 Afghanistan · 9 Q7 North Korea ·
+   10 Q8 Guns · 11 Q9 RBG vacancy · 12 Q10 Crossfire Hurricane ·
+   13 Q11 Executive Time · 14 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2) */
+
+var nm = {
+    // Tier A — bounded positional axes, clamp -2..+2 (bible §2)
+    rec_progressive: 0,
+    rec_social: 0,
+    rec_foreign: 0,
+    warren_relationship: 0,
+    // Tier B — graded accumulators, unclamped, banded at read time
+    delivery: 0,
+    rec_legitimacy: 0,
+    // Tier C — flavor tallies, clamp -3..+3
+    rec_labor: 1, // "starts strong" (bible §2); exact start value TBD with thresholds
+    rec_healthcare: 0,
+    rec_infrastructure: 0,
+    rec_immigration: 0,
+    rec_trade: 0,
+    // hidden counter (bible §3.2) — sources: Q1 A3, Q3a A2, Q12 (planned)
+    hosts_burned: 0,
+    // result flags (bible §3.1)
+    route: null,
+    healthcare_result: null,
+    guns_result: null,
+    scotus_result: null,
+    norms_weaponized: false,
+    harris_scotus: false,
+    nato_tour: false, // see bible §9.2 — may become ukraine_trip
+    debt_relief: false,
+    midterm_push: false,
+    // RNG pre-rolls for Q3c, rolled when Q2 routes there so feedback can be pre-written
+    q3c_a2_success: null,
+    q3c_a3_success: null,
+    terminal: null
+};
+window.nm = nm; // console debugging
+
+var NM_TIER_A = ["rec_progressive", "rec_social", "rec_foreign", "warren_relationship"];
+var NM_TIER_C = ["rec_labor", "rec_healthcare", "rec_infrastructure", "rec_immigration", "rec_trade"];
+
+function nmAdd(tally, amt) {
+    nm[tally] += amt;
+    if (NM_TIER_A.indexOf(tally) !== -1) nm[tally] = Math.max(-2, Math.min(2, nm[tally]));
+    if (NM_TIER_C.indexOf(tally) !== -1) nm[tally] = Math.max(-3, Math.min(3, nm[tally]));
+}
+
+function nmSetFeedback(answerPk, text) {
+    var fb = campaignTrail_temp.answer_feedback_json;
+    for (var i = 0; i < fb.length; i++) {
+        if (fb[i].fields.answer === answerPk) fb[i].fields.answer_feedback = text;
+    }
+}
+
+/* Conditional advisor-feedback variants. The correct variant is written into
+   answer_feedback_json one question ahead, once the state it depends on is final. */
+var NM_FB = {
+    q3c_a2_fail: "In a 5-4 decision, the Supreme Court strips out the state-level public option. In his majority opinion, Chief Justice Roberts decries “a violation of Congress's Article I powers.” Justice Garland joins in the concurrence, which pains you.",
+    q3c_a3_fail: "Justice Breyer concurs with Justice Kennedy's majority opinion defanging the order: “The President is not a king and is not entitled to interpret statutes to his personal liking.” Pfeiffer insists that you need to expand the court.",
+    q3c_a2_win: "In a 5-4 decision, the Supreme Court upholds your executive order. In his majority opinion, Justice Garland dismisses Texas attorney general Ken Paxton's lawsuit as “unconvincing.”",
+    q3c_a3_win: "Justice Garland notes in his majority opinion that “Congress clearly intended to grant the executive this power when it passed the statute.” Lovett credits your “crafty” legal workaround on Keepin' It 1600.",
+    q4a1_win: "It takes weeks of negotiations, but you end up with a $1.2 trillion bill that includes $500 billion of new spending on top of existing federal allocations. Ryan was about to chicken out, but it turns out even Republicans hate potholes.",
+    q4a1_loss: "The deficit hawks in the House continue to be a headache. After weeks of back and forth, you end up with a top-line number just under a trillion, but funded mostly by private investment via tax credits. Lovett mourns that “We're still living in Reagan's America.”",
+    q4a2_win: "Ryan is hesitant at first, but is ultimately convinced by internal Republican polling showing that voters want action on infrastructure. Congress passes a bill totaling $210 billion to repair aging roads and bridges, plus another $200 billion for a “vital infrastructure fund” to finance a variety of nationally significant transportation projects. Favreau and Pfeiffer compare it unfavorably to Obama's 2009 stimulus package.",
+    q4a2_loss: "No dice. Ryan says he's more convinced than ever that Americans want free-market solutions, not more government spending. Favreau rants that you've “lost a step” as Vietor sagely nods along.",
+    q7a2_contained: "The strikes decimate Kim's nuclear program overnight, and the feared retaliation never materializes. The DIA assesses that North Korea will be unable to build another nuclear weapon “for the foreseeable future.” Vietor claims that you just got lucky.",
+    q7a2_escalation: "The Air Force gets the silos, but not all the trucks. Kim empties his artillery into the Seoul suburbs before Beijing can drag both sides to a ceasefire. Three days, thousands dead, markets in freefall, and Congress demanding to know who authorized a war. Keepin' It 1600 starts featuring a recurring guest named Will Menaker, who seems angrier than the hosts and keeps calling you “the Butcher of Scranton.” Was he one of Barack's guys?",
+    q7a2_terminal: "The Air Force…they didn't get all the trucks. It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
+    q8a2_strong: "The full court press works. Moderate Republicans in the House, fearful of their suburban constituents, force Speaker Ryan's hand. You sign a bill that bans high-capacity magazines and implements universal background checks. Even Favreau is impressed: “Tommy, this is exactly why we supported him. Imagine what we could have done if Obama had a Congress this pliant?”",
+    q8a2_partial: "Ryan realizes he has to do something to stop the runaway momentum. He agrees to bring a bill to the floor, but cuts out the proposed bans on high-capacity magazines and assault weapons. The bill that passes bans bump stocks and expands background checks to gun shows and Internet sales. Lovett calls it “better than nothing, but when Warren is president, we can and should expect better.”",
+    q8a2_failure: "No dice. The NRA matches your push with a backlash so fierce that even frontline Republicans are cowed. Your proposals meet the same fate as Barack's did: a slow, agonizing death in the House. Vietor angrily notes that you apparently learned nothing in your time in the Obama administration.",
+    q9a3_win: "Senate Republicans, even the moderates, are apoplectic when you announce Alexander's nomination. Nevertheless, your base is thrilled, and Schumer gets Alexander through by the skin of her teeth - with Vice President Warren breaking the tie.",
+    q9a3_sunk: "Even Schumer can't save you on this one. Republicans blast Alexander as completely unqualified and manage to enlist Joe Manchin in sinking her nomination. Tail between your legs, you offer up Sri Srinivasan as a replacement, and he is confirmed. Favreau mourns a “lost opportunity” for progressive change."
+};
+
+// After Q3 resolves: pre-write Q4 A1/A2 feedback (reads healthcare_result: win vs else), jump to Q4
+function nmAfterQ3() {
+    var win = nm.healthcare_result === "win";
+    nmSetFeedback(8071, win ? NM_FB.q4a1_win : NM_FB.q4a1_loss);
+    nmSetFeedback(8072, win ? NM_FB.q4a2_win : NM_FB.q4a2_loss);
+    campaignTrail_temp.question_number = 6;
+}
+
+// After Q6: pre-write Q7 A2 feedback (reads rec_foreign(prior) and delivery(prior))
+// Terminal gate is >= +2, not == +2, per bible §10.3
+function nmAfterQ6() {
+    var text = nm.rec_foreign >= 2 ? NM_FB.q7a2_terminal :
+               (nm.delivery >= 1 ? NM_FB.q7a2_contained : NM_FB.q7a2_escalation);
+    nmSetFeedback(8102, text);
+}
+
+// After Q7: pre-write Q8 A2 feedback (reads delivery(prior) bands: >=2 / 0..1 / <0)
+function nmAfterQ7() {
+    var text = nm.delivery >= 2 ? NM_FB.q8a2_strong :
+               (nm.delivery >= 0 ? NM_FB.q8a2_partial : NM_FB.q8a2_failure);
+    nmSetFeedback(8112, text);
+}
+
+// After Q8: pre-write Q9 A3 feedback (reads delivery(prior): >=2 confirmed / <2 sunk)
+function nmAfterQ8() {
+    nmSetFeedback(8123, nm.delivery >= 2 ? NM_FB.q9a3_win : NM_FB.q9a3_sunk);
+}
+
+cyoAdventure = function (a) {
+    var ans = campaignTrail_temp.player_answers[campaignTrail_temp.player_answers.length - 1];
+    switch (ans) {
+        // ---- Q1 — Inaugural Address ----
+        case 8011: nmAdd("rec_legitimacy", 1); break;
+        case 8012: nmAdd("rec_progressive", 1); nmAdd("rec_labor", 1); break;
+        case 8013: nmAdd("rec_progressive", -1); nmAdd("rec_legitimacy", 1); nm.hosts_burned++; break;
+        case 8014: nmAdd("rec_progressive", 1); nmAdd("rec_social", 1); break;
+
+        // ---- Q2 — Healthcare I: routes Q3 ----
+        case 8021: nmAdd("rec_progressive", 1); nm.route = "3a"; campaignTrail_temp.question_number = 2; break;
+        case 8022: nmAdd("rec_progressive", 2); nm.route = "3b"; campaignTrail_temp.question_number = 3; break;
+        case 8023:
+            nm.route = "3c";
+            // Pre-roll the Q3c RNG beats so the correct feedback can be written now
+            nm.q3c_a2_success = Math.random() < 0.85;
+            nm.q3c_a3_success = Math.random() < 0.55;
+            nmSetFeedback(8052, nm.q3c_a2_success ? NM_FB.q3c_a2_win : NM_FB.q3c_a2_fail);
+            nmSetFeedback(8053, nm.q3c_a3_success ? NM_FB.q3c_a3_win : NM_FB.q3c_a3_fail);
+            campaignTrail_temp.question_number = 4;
+            break;
+        case 8024: nmAdd("rec_progressive", -1); nm.route = "3d"; campaignTrail_temp.question_number = 5; break;
+
+        // ---- Q3a — Public Option ----
+        case 8031: nmAdd("delivery", 1); nmAdd("rec_healthcare", 1); nmAdd("rec_progressive", -1); nm.healthcare_result = "win"; nmAfterQ3(); break;
+        case 8032: nmAdd("delivery", 1); nmAdd("rec_healthcare", 1); nmAdd("rec_progressive", -1); nm.healthcare_result = "win"; nm.hosts_burned++; nmAfterQ3(); break;
+        case 8033: nm.healthcare_result = "partial"; nmAfterQ3(); break;
+        case 8034: nmAdd("delivery", -1); nmAdd("rec_progressive", 1); nm.healthcare_result = "loss"; nmAfterQ3(); break;
+
+        // ---- Q3b — Medicare for All ----
+        case 8041: nmAdd("rec_progressive", -1); nm.healthcare_result = "partial"; nmAfterQ3(); break;
+        case 8042: nmAdd("delivery", -1); nmAdd("rec_progressive", 1); nm.healthcare_result = "loss"; nmAfterQ3(); break;
+        case 8043: nmAdd("delivery", 1); nmAdd("rec_healthcare", 1); nm.healthcare_result = "win"; nmAfterQ3(); break;
+
+        // ---- Q3c — Executive Order (RNG pre-rolled at Q2) ----
+        case 8051: nmAdd("rec_healthcare", 1); nm.healthcare_result = "partial"; nmAfterQ3(); break;
+        case 8052:
+            if (nm.q3c_a2_success) { nmAdd("delivery", 1); nmAdd("rec_healthcare", 1); nmAdd("rec_legitimacy", 1); nm.healthcare_result = "win"; }
+            else { nmAdd("delivery", -1); nm.healthcare_result = "loss"; }
+            nmAfterQ3(); break;
+        case 8053:
+            if (nm.q3c_a3_success) { nmAdd("delivery", 1); nmAdd("rec_healthcare", 2); nmAdd("rec_progressive", 1); nm.healthcare_result = "win"; }
+            else { nmAdd("delivery", -1); nmAdd("rec_progressive", 1); nm.healthcare_result = "loss"; }
+            nmAfterQ3(); break;
+
+        // ---- Q3d — Subsidies Deal ----
+        case 8061: nmAdd("delivery", -1); nm.healthcare_result = "loss"; nmAfterQ3(); break;
+        case 8062: nmAdd("delivery", 1); nmAdd("rec_healthcare", 1); nmAdd("rec_progressive", -1); nm.healthcare_result = "win"; nmAfterQ3(); break;
+        case 8063: nmAdd("delivery", 1); nmAdd("rec_progressive", -1); nm.healthcare_result = "win"; nmAfterQ3(); break;
+
+        // ---- Q4 — Infrastructure (reads healthcare_result) ----
+        case 8071:
+            if (nm.healthcare_result === "win") { nmAdd("delivery", 1); nmAdd("rec_infrastructure", 2); nmAdd("rec_progressive", 1); }
+            else { nmAdd("rec_infrastructure", 1); nmAdd("rec_progressive", 1); }
+            break;
+        case 8072:
+            if (nm.healthcare_result === "win") { nmAdd("delivery", 1); nmAdd("rec_infrastructure", 1); nmAdd("rec_progressive", -1); }
+            else { nmAdd("delivery", -1); nmAdd("rec_progressive", -1); }
+            break;
+        case 8073: nmAdd("rec_infrastructure", 1); nmAdd("rec_progressive", -1); break;
+
+        // ---- Q5 — TPP ----
+        case 8081: nmAdd("delivery", 1); nmAdd("rec_trade", 1); nmAdd("rec_labor", 1); break;
+        case 8082: nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); nmAdd("rec_trade", -1); break;
+        case 8083: nmAdd("delivery", 1); nmAdd("rec_trade", 2); nmAdd("rec_labor", -2); nmAdd("rec_progressive", -1); break;
+
+        // ---- Q6 — Afghanistan ----
+        case 8091: nmAdd("rec_foreign", -2); nmAdd("delivery", -1); nmAfterQ6(); break;
+        case 8092: nmAfterQ6(); break;
+        case 8093: nmAdd("rec_foreign", 2); nmAdd("warren_relationship", -1); nmAdd("rec_progressive", -1); nmAfterQ6(); break;
+
+        // ---- Q7 — North Korea ----
+        case 8101: nmAdd("rec_foreign", -1); nmAfterQ7(); break;
+        case 8102:
+            // The doc's dangling fourth FX-ELSE is dead code and is dropped per bible §9.4
+            if (nm.rec_foreign >= 2) {
+                nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
+                campaignTrail_temp.question_number = 14;
+            } else if (nm.delivery >= 1) {
+                nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
+            } else {
+                nmAdd("rec_foreign", 2); nmAdd("delivery", -1); nmAdd("rec_legitimacy", -1); nmAfterQ7(); // ESCALATION
+            }
+            break;
+        case 8103: nmAdd("rec_foreign", -2); nmAfterQ7(); break;
+        case 8104: nmAdd("rec_foreign", 1); nmAdd("delivery", 1); nmAfterQ7(); break;
+
+        // ---- Q8 — Parkland / guns ----
+        case 8111: nmAdd("delivery", 1); nmAdd("rec_social", 1); nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
+        case 8112:
+            if (nm.delivery >= 2) { nmAdd("delivery", 1); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.guns_result = "win"; }
+            else if (nm.delivery >= 0) { nmAdd("rec_social", 1); nm.guns_result = "partial"; }
+            else { nmAdd("delivery", -1); nmAdd("rec_social", 1); nm.guns_result = "loss"; }
+            nmAfterQ8(); break;
+        case 8113: nmAdd("delivery", 1); nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
+        case 8114: nmAdd("delivery", 1); nmAdd("rec_social", 1); nm.guns_result = "partial"; nmAfterQ8(); break;
+
+        // ---- Q9 — RBG vacancy ----
+        case 8121: nmAdd("delivery", 1); nmAdd("rec_social", 1); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; break;
+        case 8122: nmAdd("delivery", 1); nmAdd("rec_progressive", -1); nmAdd("rec_social", -1); nm.scotus_result = "partial"; break;
+        case 8123:
+            if (nm.delivery >= 2) { nmAdd("delivery", 1); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; }
+            else { nmAdd("delivery", -1); nmAdd("rec_progressive", 1); nm.scotus_result = "loss"; }
+            break;
+        case 8124:
+            nmAdd("rec_social", 1); nmAdd("rec_legitimacy", -1); nm.scotus_result = "partial";
+            nm.harris_scotus = true; // bible §3.1 — feeds the Q16 VP shortlist; the doc's FX line omits this
+            break;
+
+        // ---- Q10 — Crossfire Hurricane ----
+        case 8131: nmAdd("rec_legitimacy", 2); break;
+        case 8132: nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nm.norms_weaponized = true; break;
+        case 8133: nmAdd("rec_progressive", -1); break;
+        case 8134: nmAdd("rec_legitimacy", 1); break;
+
+        // ---- Q11 — Executive Time (last drafted question; ends the run for now) ----
+        case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; campaignTrail_temp.question_number = 15; break;
+        case 8142: nmAdd("delivery", 2); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; campaignTrail_temp.question_number = 15; break;
+        case 8143: nm.midterm_push = true; campaignTrail_temp.question_number = 15; break;
+        case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); campaignTrail_temp.question_number = 15; break;
+
+        // ---- A HOUSE OF DYNAMITE terminal ----
+        case 8151: campaignTrail_temp.question_number = 99; break; // hard stop
+    }
+};
+
+/* ============================================================
+   Pivot scaffolding — GOP nominee cascade (bible §4.1).
+   The pivot overwrites candidate pk 301 with the first roster
+   entry whose gate matches. NOT WIRED UP YET: threshold numbers
+   (fail floor, triumph ceiling, axis ceilings) are still TBD
+   (bible §9.5), and `success` is only computed at the pivot.
+   Colors follow the mod scheme: GOP #FF0000 / #FFA0A0.
+   TODO: image_url + description for the six new candidates.
+   ============================================================ */
+var NM_GOP_COLORS = { color_hex: "#FF0000", secondary_color_hex: "#FFA0A0" };
+var NM_GOP_ROSTER = [
+    { first_name: "Donald",  last_name: "Trump",    state: "Florida",        gate: "success <= FAIL_FLOOR && !norms_weaponized", image_url: "https://www.jetsimon.com/public/static/images/donald-trump-2020.jpg" },
+    { first_name: "Chris",   last_name: "Christie", state: "New Jersey",     gate: "success <= FAIL_FLOOR && norms_weaponized",  image_url: "" },
+    { first_name: "Jeb",     last_name: "Bush",     state: "Florida",        gate: "success >= TRIUMPH_CEILING",                 image_url: "" },
+    { first_name: "Marco",   last_name: "Rubio",    state: "Florida",        gate: "rec_progressive >= PROGRESSIVE_CEILING",     image_url: "" },
+    { first_name: "Mike",    last_name: "Pence",    state: "Indiana",        gate: "rec_social >= SOCIAL_CEILING",               image_url: "https://www.jetsimon.com/public/static/images/mike-pence-2020.jpg" },
+    { first_name: "Nikki",   last_name: "Haley",    state: "South Carolina", gate: "rec_foreign <= DOVE_FLOOR",                  image_url: "https://www.jetsimon.com/public/static/images/nikki-haley-2020.jpg" },
+    { first_name: "Rand",    last_name: "Paul",     state: "Kentucky",       gate: "rec_foreign >= HAWK_CEILING",                image_url: "" },
+    { first_name: "Tucker",  last_name: "Carlson",  state: "Maine",          gate: "rec_progressive <= MODERATE_FLOOR",          image_url: "" },
+    { first_name: "Ted",     last_name: "Cruz",     state: "Texas",          gate: "else",                                       image_url: "" }
+];
 
 //#endcode

@@ -270,7 +270,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8052,
         "fields": {
             "question": 805,
-            "description": "Y'know, I think King Solomon once said something about splitting the baby. Let's put in all the easy stuff and then say states can pursue public options. Hell, California and New York alone could insure millions. [85% CHANCE OF SUCCESS, 15% CHANCE OF FAILURE]"
+            "description": "Y'know, I think King Solomon once said something about splitting the baby. Let's put in all the easy stuff and then say states can pursue public options. Hell, California and New York alone could insure millions."
         }
     },
     {
@@ -278,7 +278,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8053,
         "fields": {
             "question": 805,
-            "description": "Hell, let's get the whole enchilada. Don't stop at saying states can pursue public options. Invoke Bayh-Dole march-in rights to break patents on federally-funded drugs and lower their prices. Why should the taxpayer be on the hook for something that they can't even afford? [55% CHANCE OF SUCCESS, 45% CHANCE OF FAILURE]"
+            "description": "Hell, let's get the whole enchilada. Don't stop at saying states can pursue public options. Invoke Bayh-Dole march-in rights to break patents on federally-funded drugs and lower their prices. Why should the taxpayer be on the hook for something that they can't even afford?"
         }
     },
     {

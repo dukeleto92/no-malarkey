@@ -6926,11 +6926,11 @@ campaignTrail_temp.jet_data = [{}
 
 /* Code 2 is evaluated after the engine loads the base-game questionset for the
    picked ticket, so these overrides win over the site's built-in 2020 data.
-   Ticket is locked to Biden/Warren; the campaign sign reads "Biden 2020". */
+   Ticket is locked to Biden/Warren; Code 1 supplies the Biden 2020 sign art. */
 campaignTrail_temp.cyoa = true;
 campaignTrail_temp.running_mate_id = 308;
 campaignTrail_temp.running_mate_state_id = 1120; // Massachusetts (Warren)
 campaignTrail_temp.candidate_last_name = "Biden";
-campaignTrail_temp.running_mate_last_name = "2020";
+campaignTrail_temp.running_mate_last_name = "Warren";
 campaignTrail_temp.candidate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/President_Joe_Biden_delivers_remarks_from_the_Oval_Office_4.jpg/960px-President_Joe_Biden_delivers_remarks_from_the_Oval_Office_4.jpg";
 campaignTrail_temp.running_mate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg/960px-Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg";

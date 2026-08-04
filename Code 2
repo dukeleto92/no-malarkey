@@ -127,9 +127,18 @@ campaignTrail_temp.questions_json = [
     },
     {
         "model": "campaign_trail.question",
-        "pk": 815,
+        "pk": 816,
         "fields": {
             "priority": 14,
+            "description": "You picked Liz as your running mate for a few reasons. First, it was important these days to have gender balance on the ticket. At least, that's what Klain told you. Second, you needed someone with progressive bona fides to help unite the party. So far, she's been a useful voice in the room when it comes to policy, and you think she's a decent campaigner. Still, you can't quite shake the feeling that she's aggressively angling for your job. How do you plan on utilizing her as your presidency enters a critical stretch?",
+            "likelihood": 1
+        }
+    },
+    {
+        "model": "campaign_trail.question",
+        "pk": 815,
+        "fields": {
+            "priority": 15,
             "description": "The Air Force…they didn't get all the trucks. It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
             "likelihood": 1
         }
@@ -543,6 +552,38 @@ campaignTrail_temp.answers_json = [
         "fields": {
             "question": 815,
             "description": "…"
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8161,
+        "fields": {
+            "question": 816,
+            "description": "I don't like admitting it, but it's not as easy for me to spend all day on the trail like it used to be. The progressive wing of the party trusts Liz in a way they never quite trusted me. Let's send her out on a media tour and to some of the battleground states this year. Barack, God love him, never got the base to turn out for the midterms. Let's see what she can do."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8162,
+        "fields": {
+            "question": 816,
+            "description": "The job of a good vice president is to be seen and not heard. I was VP for eight years; I know better than anyone. Schedule her for the state funerals and ribbon-cutting ceremonies that I don't want to go to."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8163,
+        "fields": {
+            "question": 816,
+            "description": "Everyone says she's such a wonk. Let's give her a portfolio of her own to work on. How about antitrust? She seems passionate about that."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8164,
+        "fields": {
+            "question": 816,
+            "description": "You know, I've been thinking: what was the point of putting her on the ticket if we don't use her to buy credibility with the party's progressive wing? We've had to make some tough compromises that those folks don't seem to fully grasp. I'll tell Liz her new job is saleswoman-in-chief."
         }
     }
 ]
@@ -6916,6 +6957,42 @@ campaignTrail_temp.answer_feedback_json = [
             "answer": 8151,
             "candidate": 300,
             "answer_feedback": "A HOUSE OF DYNAMITE. [Placeholder terminal — the full ending presentation arrives with the pivot build. Reaching this screen means you surged in Afghanistan, then preemptively struck North Korea.]"
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9052,
+        "fields": {
+            "answer": 8161,
+            "candidate": 300,
+            "answer_feedback": "Warren dutifully complies. She is well received on the Sunday show circuit and draws large crowds on her visits to college towns across the country. Much to your chagrin, she also lands a fawning interview with Keepin' It 1600, where Favreau gushes over how she is the “conscience of the administration.”"
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9053,
+        "fields": {
+            "answer": 8162,
+            "candidate": 300,
+            "answer_feedback": "Warren is not happy, but she doesn't have much choice in the matter. Not long after she returns from the Munich Security Conference, Keepin' It 1600 starts a segment called “Warren Watch” that purports to represent the frustrated progressive staffers inside the White House. Klain warns you that your vice president may be leaking to friendly media."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9054,
+        "fields": {
+            "answer": 8163,
+            "candidate": 300,
+            "answer_feedback": "This is right in Liz's wheelhouse. She leads a working group that builds modestly successful antitrust cases against Amazon and Google. She expresses gratitude in one of your weekly lunches. At least she knows not to bite the hand that feeds her."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9055,
+        "fields": {
+            "answer": 8164,
+            "candidate": 300,
+            "answer_feedback": "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she finds herself able to go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”"
         }
     }
 ]

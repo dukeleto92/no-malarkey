@@ -151,7 +151,7 @@ campaignTrail_temp.global_parameter_json = [
             "issue_stance_6_max": 0.71,
             "global_variance": 0.01,
             "state_variance": 0.005,
-            "question_count": 15,
+            "question_count": 16,
             "default_map_color_hex": "#C9C9C9",
             "no_state_map_color_hex": "#999999"
         }
@@ -260,10 +260,10 @@ document.head.innerHTML += "<style>" +
     "</style>";
 
 /* ============================================================
-   NO MALARKEY — govern-phase engine (Q1–Q11)
+   NO MALARKEY — govern-phase engine (Q1–Q12)
    Source: scenario bible v0.6 + drafted questions doc.
    Tally tiers per bible §2; FX blocks per the doc's A-lines.
-   Q12 (Governing Style) is not yet drafted — slot reserved.
+   Q13 (Midterms) is still mid-draft in the doc — slot reserved.
    ============================================================ */
 
 campaignTrail_temp.cyoa = true;
@@ -272,7 +272,8 @@ campaignTrail_temp.cyoa = true;
    0 Q1 Inaugural · 1 Q2 Healthcare I · 2 Q3a · 3 Q3b · 4 Q3c · 5 Q3d ·
    6 Q4 Infrastructure · 7 Q5 TPP · 8 Q6 Afghanistan · 9 Q7 North Korea ·
    10 Q8 Guns · 11 Q9 RBG vacancy · 12 Q10 Crossfire Hurricane ·
-   13 Q11 Executive Time · 14 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2) */
+   13 Q11 Executive Time · 14 Q12 Warren Relationship ·
+   15 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2) */
 
 var nm = {
     // Tier A — bounded positional axes, clamp -2..+2 (bible §2)
@@ -289,7 +290,7 @@ var nm = {
     rec_infrastructure: 0,
     rec_immigration: 0,
     rec_trade: 0,
-    // hidden counter (bible §3.2) — sources: Q1 A3, Q3a A2, Q12 (planned)
+    // hidden counter (bible §3.2) — sources: Q1 A3, Q3a A2, Q12 A2, Q12 A4-fail
     hosts_burned: 0,
     // result flags (bible §3.1)
     route: null,
@@ -342,7 +343,9 @@ var NM_FB = {
     q8a2_partial: "Ryan realizes he has to do something to stop the runaway momentum. He agrees to bring a bill to the floor, but cuts out the proposed bans on high-capacity magazines and assault weapons. The bill that passes bans bump stocks and expands background checks to gun shows and Internet sales. Lovett calls it “better than nothing, but when Warren is president, we can and should expect better.”",
     q8a2_failure: "No dice. The NRA matches your push with a backlash so fierce that even frontline Republicans are cowed. Your proposals meet the same fate as Barack's did: a slow, agonizing death in the House. Vietor angrily notes that you apparently learned nothing in your time in the Obama administration.",
     q9a3_win: "Senate Republicans, even the moderates, are apoplectic when you announce Alexander's nomination. Nevertheless, your base is thrilled, and Schumer gets Alexander through by the skin of her teeth - with Vice President Warren breaking the tie.",
-    q9a3_sunk: "Even Schumer can't save you on this one. Republicans blast Alexander as completely unqualified and manage to enlist Joe Manchin in sinking her nomination. Tail between your legs, you offer up Sri Srinivasan as a replacement, and he is confirmed. Favreau mourns a “lost opportunity” for progressive change."
+    q9a3_sunk: "Even Schumer can't save you on this one. Republicans blast Alexander as completely unqualified and manage to enlist Joe Manchin in sinking her nomination. Tail between your legs, you offer up Sri Srinivasan as a replacement, and he is confirmed. Favreau mourns a “lost opportunity” for progressive change.",
+    q12a4_viral: "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she finds herself able to go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”",
+    q12a4_resentful: "Liz clearly resents selling your disappointing record to progressives, and it starts to show in various passive-aggressive comments she makes on her media tour. On Keepin' It 1600, Favreau asks what keeps her energized. She cryptically replies, “the future.”"
 };
 
 // After Q3 resolves: pre-write Q4 A1/A2 feedback (reads healthcare_result: win vs else), jump to Q4
@@ -371,6 +374,11 @@ function nmAfterQ7() {
 // After Q8: pre-write Q9 A3 feedback (reads delivery(prior): >=2 confirmed / <2 sunk)
 function nmAfterQ8() {
     nmSetFeedback(8123, nm.delivery >= 2 ? NM_FB.q9a3_win : NM_FB.q9a3_sunk);
+}
+
+// After Q11: pre-write Q12 A4 feedback (reads delivery(prior): >=2 viral / <2 resentful)
+function nmAfterQ11() {
+    nmSetFeedback(8164, nm.delivery >= 2 ? NM_FB.q12a4_viral : NM_FB.q12a4_resentful);
 }
 
 cyoAdventure = function (a) {
@@ -452,7 +460,7 @@ cyoAdventure = function (a) {
             // The doc's dangling fourth FX-ELSE is dead code and is dropped per bible §9.4
             if (nm.rec_foreign >= 2) {
                 nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
-                campaignTrail_temp.question_number = 13; // next shown = index 14 (terminal)
+                campaignTrail_temp.question_number = 14; // next shown = index 15 (terminal)
             } else if (nm.delivery >= 1) {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
             } else {
@@ -490,16 +498,26 @@ cyoAdventure = function (a) {
         case 8133: nmAdd("rec_progressive", -1); break;
         case 8134: nmAdd("rec_legitimacy", 1); break;
 
-        // ---- Q11 — Executive Time (last drafted question; ends the run for now) ----
-        // Jump lands question_number exactly on question_count (15) after the
+        // ---- Q11 — Executive Time (flows into Q12 at index 14) ----
+        case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; nmAfterQ11(); break;
+        case 8142: nmAdd("delivery", 2); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; nmAfterQ11(); break;
+        case 8143: nm.midterm_push = true; nmAfterQ11(); break;
+        case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); nmAfterQ11(); break;
+
+        // ---- Q12 — Warren Relationship (last drafted question; ends the run for now) ----
+        // Jump lands question_number exactly on question_count (16) after the
         // increment — election night fires only on strict equality.
-        case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; campaignTrail_temp.question_number = 14; break;
-        case 8142: nmAdd("delivery", 2); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; campaignTrail_temp.question_number = 14; break;
-        case 8143: nm.midterm_push = true; campaignTrail_temp.question_number = 14; break;
-        case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); campaignTrail_temp.question_number = 14; break;
+        case 8161: nmAdd("warren_relationship", 1); nmAdd("rec_progressive", 1); campaignTrail_temp.question_number = 15; break;
+        case 8162: nmAdd("warren_relationship", -1); nm.hosts_burned++; campaignTrail_temp.question_number = 15; break;
+        case 8163: nmAdd("delivery", 1); nmAdd("warren_relationship", 1); campaignTrail_temp.question_number = 15; break;
+        case 8164:
+            if (nm.delivery >= 2) { nmAdd("rec_progressive", 1); }
+            else { nmAdd("rec_progressive", -1); nmAdd("warren_relationship", -1); nm.hosts_burned++; }
+            campaignTrail_temp.question_number = 15;
+            break;
 
         // ---- A HOUSE OF DYNAMITE terminal ----
-        // No jump needed: index 14 + 1 = 15 = question_count, so the game ends.
+        // No jump needed: index 15 + 1 = 16 = question_count, so the game ends.
         // TODO: replace election night with a proper ending screen at the pivot build.
         case 8151: break;
     }

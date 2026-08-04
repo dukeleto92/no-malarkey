@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parity check</title>
+<link rel="stylesheet" href="harness.css">
+<style>
+  body { padding: 0; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 22px 20px 60px; }
+  h1 { font-size: 17px; margin: 0 0 4px; }
+  .lede { color: var(--muted); font-size: 13px; margin-bottom: 18px; max-width: 76ch; }
+  pre#out {
+    font-family: var(--mono); font-size: 12px; white-space: pre;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+    padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; min-height: 120px;
+  }
+  .controls { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px; }
+  .controls label { font-size: 12px; color: var(--muted); }
+  .controls input, .controls select { width: 180px; }
+  .snippet {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+    padding: 12px 14px; font-family: var(--mono); font-size: 11.5px;
+    white-space: pre-wrap; word-break: break-all; margin: 8px 0 0; color: var(--text);
+  }
+  details { margin-top: 20px; }
+  summary { cursor: pointer; font-size: 13px; color: var(--accent); }
+  .frame-hold { position: absolute; left: -20000px; top: 0; width: 1000px; height: 700px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Parity check</h1>
+  <p class="lede">
+    Runs one fixed scenario with one fixed seed through the pinned local engine and prints the
+    final results. Run the same scenario, same seed, same answer path on the real Showcase loader
+    and the numbers should match line for line. If they do not, the README's
+    <em>when things break</em> section lists the causes in order of likelihood.
+  </p>
+
+  <div class="controls">
+    <div>
+      <label for="p-mod">Mod</label><br>
+      <select id="p-mod"></select>
+    </div>
+    <div>
+      <label for="p-seed">Seed</label><br>
+      <input type="text" id="p-seed" value="1" spellcheck="false">
+    </div>
+    <div style="flex:1 1 260px">
+      <label for="p-path">Answer path (blank = lowest pk each turn)</label><br>
+      <input type="text" id="p-path" style="width:100%" placeholder="answer pks, in order" spellcheck="false">
+    </div>
+    <button id="p-run" class="primary">Run parity check</button>
+    <button id="p-copy">Copy output</button>
+    <button id="p-save">Save to runs/</button>
+  </div>
+
+  <pre id="out">Ready. Press "Run parity check".</pre>
+
+  <details>
+    <summary>How to produce the matching run on the real Showcase</summary>
+    <p class="lede" style="margin-top:10px">
+      Showcase does not seed its RNG, so an unseeded run there can never match. Seed it by hand
+      first: open <code>campaigntrailshowcase.com/campaign-trail/</code>, open the browser console,
+      paste the snippet below, and only then paste your Code 1 / Code 2 into the Custom Mod Loader
+      and play the same answer path. Seeding after page load is deliberate — the local harness seeds
+      at exactly the same point, which is what makes the two comparable.
+    </p>
+    <div class="snippet" id="snippet">loading…</div>
+    <p class="lede" style="margin-top:10px">
+      Then compare: the local output prints a <code>PATH</code> line and a
+      <code>NATIONAL</code> block. Showcase's own "Go to Final Results" screen shows the same
+      electoral votes and popular vote totals.
+    </p>
+  </details>
+</div>
+
+<div class="frame-hold" id="p-frame"></div>
+
+<script type="module">
+import { listMods, fetchMod } from './loader.js';
+import { GameSession } from './runner.js';
+import { buildDump, writeDump, stableStringify } from './dump.js';
+import { mulberry32, hashSeed } from './rng.js';
+
+const out = document.getElementById('out');
+const write = (s = '') => { out.textContent += `${s}\n`; };
+const reset = () => { out.textContent = ''; };
+
+// The snippet the user pastes into the real Showcase console. Generated from the
+// same mulberry32 source the harness uses, so there is exactly one algorithm.
+document.getElementById('snippet').textContent =
+`// Seed Showcase's RNG so its run can be compared with the local harness.
+// Paste this into the console BEFORE loading your mod, then play normally.
+(function () {
+  var seedInput = ${JSON.stringify(document.getElementById('p-seed').value || '1')};
+  function hashSeed(s){s=String(s);if(/^-?\\d+$/.test(s))return s>>>0;var h=2166136261>>>0;
+    for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+  var a = hashSeed(seedInput) >>> 0, n = 0;
+  Math.random = function () {
+    n++;
+    a = (a + 0x6D2B79F5) >>> 0;
+    var t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  Object.defineProperty(window, 'seededDraws', { get: function () { return n; } });
+  console.log('Seeded with', seedInput, '->', a);
+}());`;
+
+document.getElementById('p-seed').addEventListener('input', () => {
+  // keep the snippet's seed in sync with the field
+  const el = document.getElementById('snippet');
+  el.textContent = el.textContent.replace(/var seedInput = .*?;/, `var seedInput = ${JSON.stringify(document.getElementById('p-seed').value || '1')};`);
+});
+
+let lastDump = null;
+
+async function init() {
+  const mods = await listMods();
+  const sel = document.getElementById('p-mod');
+  sel.innerHTML = mods.map((m) => `<option value="${m.name}">${m.name} (${m.dir}/)</option>`).join('')
+    || '<option value="">no mods found</option>';
+}
+
+function pad(s, n) { return String(s).padEnd(n); }
+function padL(s, n) { return String(s).padStart(n); }
+
+async function run() {
+  reset();
+  const modName = document.getElementById('p-mod').value;
+  const seed = document.getElementById('p-seed').value.trim() || '1';
+  const pathRaw = document.getElementById('p-path').value.trim();
+
+  if (!modName) return write('No mod selected.');
+
+  write('PARITY CHECK');
+  write('='.repeat(72));
+
+  // engine pin
+  let engineVersion = {};
+  try {
+    const text = await (await fetch('/engine/VERSION', { cache: 'no-store' })).text();
+    engineVersion.commit = (text.match(/^commit\s+(\S+)/m) || [])[1] || null;
+  } catch { /* leave blank */ }
+
+  write(`engine commit  ${engineVersion.commit || '(unknown)'}`);
+  write(`seed           ${seed}  ->  ${hashSeed(seed)}`);
+
+  const mod = await fetchMod(modName);
+  write(`mod            ${mod.name}`);
+  write(`Code 1         ${mod.code1.bytes} bytes   mtime ${new Date(mod.code1.mtime).toISOString()}`);
+  write(`Code 2         ${mod.code2.bytes} bytes   mtime ${new Date(mod.code2.mtime).toISOString()}`);
+  write('');
+
+  const session = new GameSession({
+    mount: document.getElementById('p-frame'),
+    onEvent: ({ kind, message }) => { if (kind === 'warn') write(`  ! ${message}`); },
+  });
+
+  write('booting engine, submitting mod, clicking through selection...');
+  await session.boot();
+  await session.submitMod(mod);
+  await session.startGame({});
+  await session.begin({ seed });
+
+  const t = session.temp;
+  write(`started: ${t.questions_json.length} questions, question_count ${t.global_parameter_json[0].fields.question_count}`);
+  write(`ticket:  candidate ${session.selection.candidate}, running mate ${session.selection.runningMate}, difficulty ${session.selection.difficulty}`);
+  write('');
+
+  if (pathRaw) {
+    const pks = pathRaw.split(/[,\s]+/).filter(Boolean).map(Number);
+    write(`replaying supplied path (${pks.length} answers)...`);
+    await session.playPath(pks);
+    if (!session.isFinished()) {
+      write('path ended before the game did; continuing with lowest-pk answers...');
+      await session.playToEnd();
+    }
+  } else {
+    write('playing to the end, lowest-pk answer each turn...');
+    await session.playToEnd();
+  }
+
+  write('');
+  write(`PATH  ${(t.player_answers || []).filter((x) => x !== null).join(',')}`);
+  write(`turns played   ${session.transcript.length}`);
+  write(`random draws   ${session.rng ? session.rng.draws : 'n/a (unseeded)'}`);
+  write('');
+
+  const results = session.finalResults();
+  if (!results) {
+    write('NO FINAL RESULTS.');
+    write(`Stopped at question ${t.question_number + 1} of ${t.global_parameter_json[0].fields.question_count}.`);
+    write('Election night fires only on strict equality between question_number and question_count,');
+    write('so a CYOA jump that overshoots leaves the run hanging here. Check the last jump target.');
+    return undefined;
+  }
+
+  write('NATIONAL');
+  write('-'.repeat(72));
+  write(`${pad('candidate', 28)}${padL('EV', 6)}${padL('popular', 14)}${padL('share', 10)}`);
+  for (const c of results.national) {
+    write(`${pad(c.candidate, 28)}${padL(c.electoralVotes, 6)}${padL(c.votes.toLocaleString('en-US'), 14)}${padL(`${c.votePercent.toFixed(3)}%`, 10)}`);
+  }
+  write('');
+  write(`total popular votes  ${results.totalVotes.toLocaleString('en-US')}`);
+  write(`electoral votes to win  ${t.election_json[0].fields.winning_electoral_vote_number}`);
+  write('');
+
+  write('BY STATE');
+  write('-'.repeat(72));
+  write(`${pad('state', 24)}${padL('EV', 4)}  ${pad('leader', 22)}${padL('margin', 10)}`);
+  for (const st of results.states) {
+    const sorted = [...st.results].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    const total = st.results.reduce((n, x) => n + (x.votes || 0), 0);
+    const margin = sorted.length > 1 && total
+      ? (((sorted[0].votes || 0) - (sorted[1].votes || 0)) / total) * 100
+      : 0;
+    write(`${pad(st.state, 24)}${padL(st.electoralVotes, 4)}  ${pad(sorted[0] ? sorted[0].candidate : '-', 22)}${padL(`${margin.toFixed(3)}%`, 10)}`);
+  }
+  write('');
+  write('='.repeat(72));
+  write('Compare the NATIONAL block against the same scenario on Showcase.');
+  write('Same seed + same path + same engine commit should give identical numbers.');
+
+  lastDump = buildDump({ session, mod, seed, engineVersion, label: 'parity' });
+  console.log('Parity dump:\n', stableStringify(lastDump));
+  return undefined;
+}
+
+document.getElementById('p-run').addEventListener('click', async () => {
+  const btn = document.getElementById('p-run');
+  btn.disabled = true;
+  try {
+    await run();
+  } catch (err) {
+    write('');
+    write(`FAILED: ${err && err.message ? err.message : String(err)}`);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('p-copy').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(out.textContent);
+    write('\n(copied to clipboard)');
+  } catch {
+    write('\n(clipboard blocked; select the text above and copy manually)');
+  }
+});
+
+document.getElementById('p-save').addEventListener('click', async () => {
+  if (!lastDump) return write('\nNothing to save — run the check first.');
+  try {
+    const r = await writeDump('parity', lastDump);
+    write(`\nSaved ${r.file}`);
+  } catch (err) {
+    write(`\nCould not save: ${err.message}`);
+  }
+  return undefined;
+});
+
+init().catch((err) => write(`could not list mods: ${err.message}`));
+</script>
+</body>
+</html>

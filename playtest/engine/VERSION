@@ -1,0 +1,71 @@
+Campaign Trail Showcase engine — pinned vendored copy
+=====================================================
+
+upstream    https://github.com/campaign-trail-showcase/campaign-trail-showcase.github.io
+commit      01a550ded0f85d6475af14e5c9b84f903a3e67da
+commit date 2026-07-29 18:28:19 -0300
+subject     County map updates for LBM
+vendored    2026-07-29
+files       30
+size        2.9 MB
+
+EVERY FILE UNDER vendor/ IS A VERBATIM COPY. DO NOT EDIT ANY OF THEM.
+
+The harness never modifies engine files and never reimplements engine logic.
+It drives the real page the same way a human does: it fills in the Custom Mod
+Loader textareas, clicks "Play Custom Mod", clicks through the selection
+screens, and clicks answer buttons. The simulation, the turn loop
+(nextQuestion), the CYOA dispatch, and the vote math (A()) are all upstream
+code running unmodified.
+
+Layout mirrors upstream exactly so that the relative paths inside
+campaign-trail/index.html resolve without rewriting:
+
+  campaign-trail/index.html                  the real game page
+  static/js/*.js                             engine
+  static/js/lib/raphael.js                   map renderer
+  static/js/us-map-1.0.1/jquery.usmap.js     map plugin (loaded by the questionset)
+  static/json/*.json                         base election/candidate data
+  static/questionset/2020_Biden_Bass.html    base 2020 questionset (see below)
+  static/*.css, static/css/*.css             stylesheets
+  ajax.googleapis.com/.../jquery.min.js      jQuery 1.11.1
+
+Why the base questionset is vendored
+------------------------------------
+For a modded 2020 Biden ticket the engine resolves the questionset filename
+through baseScenarioDict and lands on 2020_Biden_Bass.html. It loads that file
+into #game_window FIRST, then runs your Code 2 over the top. Three consequences,
+all of which the harness depends on:
+
+  1. Your Code 2 inherits four values it never sets itself:
+       answer_feedback_flg = 1     (without this, no advisor feedback ever shows)
+       player_answers      = []
+       player_visits       = []
+       game_start_logging_id
+  2. Any base field your Code 2 does not override stays at the base value.
+  3. The questionset is what loads the us-map plugin. Without it the map
+     never initialises and the poll screens throw.
+
+Files deliberately NOT vendored
+-------------------------------
+Two scripts are fetched from a CDN by campaign-trail/index.html and are not in
+this folder:
+  https://code.jquery.com/jquery-4.0.0.min.js
+  https://code.jquery.com/ui/1.14.1/jquery-ui.min.js
+Google Fonts (Montserrat) is also remote — your Code 1 imports it too.
+So the FIRST load needs an internet connection. After that the browser caches
+them and you can work offline. This is the one external dependency; see the
+"when things break" section of the README.
+
+Images are not vendored. Missing images 404 harmlessly and show as broken
+image icons. Nothing functional depends on them.
+
+Verifying this copy is untouched
+--------------------------------
+    cd playtest/engine/vendor && shasum -a 256 -c ../MANIFEST.sha256
+
+Re-pinning to a newer upstream
+------------------------------
+See "What to do if the upstream engine changes" in ../README.md. Short version:
+re-clone, re-copy, regenerate MANIFEST.sha256, update this file, then run the
+parity check to see whether the numbers moved.

@@ -1,0 +1,187 @@
+/* Harness chrome only. Nothing here styles the game — the game is inside the
+   iframe and is styled by the engine plus your Code 1. */
+
+:root {
+  --bg: #12151c;
+  --panel: #1a1f29;
+  --panel-2: #222836;
+  --line: #303849;
+  --text: #e6e9ef;
+  --muted: #9aa4b8;
+  --accent: #4f8ef7;
+  --ok: #3fbf6f;
+  --warn: #e0a83c;
+  --err: #e2564a;
+  --new: #9b7fe0;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+.layout { display: grid; grid-template-columns: 400px 1fr; min-height: 100vh; }
+
+/* ---------------------------------------------------------------- sidebar */
+
+.side {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 14px 16px 40px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.side h1 {
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 2px;
+}
+
+.side .sub { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px 12px;
+  margin: 0 0 12px;
+}
+
+legend {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 0 6px;
+}
+
+label.row { display: block; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
+label.row > span { display: block; margin-bottom: 3px; }
+
+input[type="text"], input[type="number"], select {
+  width: 100%;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+input[type="text"], input[type="number"] { font-family: var(--mono); font-size: 12px; }
+
+.checks { display: flex; flex-direction: column; gap: 6px; }
+.checks label { font-size: 12px; color: var(--text); display: flex; gap: 7px; align-items: center; }
+
+.btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+
+button {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 7px 11px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+.filemeta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+.filemeta b { color: var(--text); font-weight: 600; }
+
+/* ---------------------------------------------------------------- main */
+
+.main { display: flex; flex-direction: column; min-width: 0; max-height: 100vh; }
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); background: var(--panel); padding: 0 10px; }
+
+.tabs button {
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  padding: 10px 14px;
+}
+
+.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+.tabs .count { font-family: var(--mono); font-size: 10px; margin-left: 5px; padding: 1px 5px; border-radius: 8px; background: var(--panel-2); }
+.tabs .count.err { background: var(--err); color: #fff; }
+.tabs .count.warn { background: var(--warn); color: #221a00; }
+.tabs .count.new { background: var(--new); color: #fff; }
+
+.pane { flex: 1; overflow: auto; padding: 0; display: none; min-height: 0; }
+.pane[data-active="true"] { display: block; }
+.pane.padded { padding: 14px 18px 40px; }
+
+/* game frame: fills the pane; the map is parked offscreen by injected CSS */
+#frame-mount { width: 100%; height: 100%; }
+.engine-frame { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+
+/* ---------------------------------------------------------------- report */
+
+pre.report {
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.badge { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 3px; font-weight: 600; margin-right: 6px; }
+.badge.ok { background: var(--ok); color: #04240f; }
+.badge.err { background: var(--err); color: #fff; }
+.badge.warn { background: var(--warn); color: #221a00; }
+.badge.new { background: var(--new); color: #fff; }
+
+.section { margin-bottom: 20px; }
+.section h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; }
+
+.item { border-left: 3px solid var(--line); padding: 6px 0 6px 10px; margin-bottom: 8px; }
+.item.err { border-left-color: var(--err); }
+.item.warn { border-left-color: var(--warn); }
+.item.note { border-left-color: var(--accent); }
+.item.new { border-left-color: var(--new); }
+.item .where { font-family: var(--mono); font-size: 11px; color: var(--text); font-weight: 600; }
+.item .msg { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+table.res { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+table.res th, table.res td { text-align: left; padding: 5px 9px; border-bottom: 1px solid var(--line); }
+table.res th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+table.res td.num { text-align: right; font-family: var(--mono); }
+table.res tr.win td { color: var(--ok); font-weight: 600; }
+
+.log { font-family: var(--mono); font-size: 11.5px; }
+.log .line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.log .line.warn { color: var(--warn); }
+.log .line.error { color: var(--err); }
+.log .line.info { color: var(--muted); }
+.log .line.ok { color: var(--ok); }
+
+.turn { border: 1px solid var(--line); border-radius: 5px; padding: 9px 11px; margin-bottom: 9px; }
+.turn .head { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 5px; }
+.turn .ans { font-size: 13px; margin-bottom: 5px; }
+.turn .fb { font-size: 12.5px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 9px; }
+
+.empty { color: var(--muted); font-style: italic; padding: 20px 0; }
+
+.hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+code { font-family: var(--mono); background: var(--panel-2); padding: 1px 4px; border-radius: 3px; font-size: 11.5px; }

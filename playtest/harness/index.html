@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Playtest harness</title>
+<link rel="stylesheet" href="harness.css">
+</head>
+<body>
+<div class="layout">
+
+  <aside class="side">
+    <h1>Playtest harness</h1>
+    <div class="sub">Local. Reads your mod files straight off disk.</div>
+
+    <fieldset>
+      <legend>Mod</legend>
+      <label class="row">
+        <span>Folder</span>
+        <select id="mod-select"></select>
+      </label>
+      <div class="filemeta" id="file-meta">not loaded</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Run</legend>
+      <label class="row">
+        <span>Seed</span>
+        <input type="text" id="seed" value="1" spellcheck="false">
+      </label>
+      <div class="checks">
+        <label><input type="checkbox" id="deterministic" checked> Deterministic (seeded)</label>
+      </div>
+      <label class="row" style="margin-top:8px">
+        <span>Answer path (pks, comma separated) &mdash; optional</span>
+        <input type="text" id="path" placeholder="answer pks, in order" spellcheck="false">
+      </label>
+      <label class="row">
+        <span>Jump to question # &mdash; optional</span>
+        <input type="number" id="jump" min="1" placeholder="e.g. 7">
+      </label>
+      <div class="hint">
+        A path is replayed answer by answer through the real engine, so tallies
+        and RNG are real rather than zeroed. Jump without a path plays the
+        lowest-pk answer each turn to get there.
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Actions</legend>
+      <div class="btns">
+        <button id="btn-reload" class="primary">Reload &amp; validate</button>
+        <button id="btn-start">Start run</button>
+      </div>
+      <div class="btns">
+        <button id="btn-play-end">Play to end</button>
+        <button id="btn-dump" disabled>Dump results</button>
+      </div>
+      <label class="row" style="margin-top:9px">
+        <span>Dump filename</span>
+        <input type="text" id="dump-name" value="run" spellcheck="false">
+      </label>
+      <div class="hint" id="dump-hint">Writes to <code>playtest/runs/</code>.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Engine</legend>
+      <div class="filemeta" id="engine-meta">&mdash;</div>
+    </fieldset>
+  </aside>
+
+  <main class="main">
+    <div class="tabs" role="tablist">
+      <button id="tab-game" role="tab" aria-selected="true" data-pane="pane-game">Game</button>
+      <button id="tab-report" role="tab" aria-selected="false" data-pane="pane-report">Validation <span class="count" id="c-report">&ndash;</span></button>
+      <button id="tab-turns" role="tab" aria-selected="false" data-pane="pane-turns">Turns <span class="count" id="c-turns">0</span></button>
+      <button id="tab-results" role="tab" aria-selected="false" data-pane="pane-results">Results</button>
+      <button id="tab-log" role="tab" aria-selected="false" data-pane="pane-log">Log</button>
+    </div>
+
+    <div class="pane" id="pane-game" data-active="true"><div id="frame-mount"></div></div>
+    <div class="pane padded" id="pane-report"><div id="report"><div class="empty">Nothing loaded yet.</div></div></div>
+    <div class="pane padded" id="pane-turns"><div id="turns"><div class="empty">No turns played.</div></div></div>
+    <div class="pane padded" id="pane-results"><div id="results"><div class="empty">No results yet. Finish a run.</div></div></div>
+    <div class="pane padded" id="pane-log"><div class="log" id="log"></div></div>
+  </main>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

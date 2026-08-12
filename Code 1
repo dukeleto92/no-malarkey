@@ -151,7 +151,7 @@ campaignTrail_temp.global_parameter_json = [
             "issue_stance_6_max": 0.71,
             "global_variance": 0.01,
             "state_variance": 0.005,
-            "question_count": 16,
+            "question_count": 17,
             "default_map_color_hex": "#C9C9C9",
             "no_state_map_color_hex": "#999999"
         }
@@ -200,80 +200,82 @@ jet_data = {
 
 //#startcode
 
-
-
-nct_stuff.themes[nct_stuff.selectedTheme].coloring_title = "#224192";
-
-nct_stuff.themes[nct_stuff.selectedTheme].coloring_window = "#DCE7F8";
-
-document.getElementsByClassName("game_header")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_title;
-
-$("#game_window")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_window;
-
-$(".container")[0].style.backgroundColor = "#FFFFFF";
-
-document.getElementById("header").src = "https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png";
-
-document.body.background = "";
-
-document.head.innerHTML += "<style>" +
-    "@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap');" +
-    /* Deep navy page frame, like the campaign site */
-    "body { background: #0B1F4E !important; }" +
-    /* Banner: white BIDEN 2020 wordmark on a solid campaign-blue field with the red 'E' stripe underline */
-    /* Fixed-height band: without explicit dimensions the showcase site renders the
-       logo PNG at its huge natural size */
-    "#header { background-color: #224192; object-fit: contain; width: 100% !important; height: 120px !important; display: block; padding: 12px 0; box-sizing: border-box; border-bottom: 6px solid #EB2026; }" +
-    ".game_header { border-bottom: 6px solid #EB2026; }" +
-    /* Campaign typography (Montserrat is the closest free match to Brother 1816) */
-    ".game_header, h1, h2, h3, button, select { font-family: 'Montserrat', Arial, sans-serif; }" +
-    "button { background-color: #224192; color: #FFFFFF; border: none; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 20px; margin: 2px; cursor: pointer; }" +
-    "button:hover { background-color: #EB2026; }" +
-    "select { border: 2px solid #224192; border-radius: 3px; padding: 4px 8px; background: #FFFFFF; color: #224192; font-weight: 600; }" +
-    /* Crop photos to their frames instead of stretching them */
-    "img:not(#header) { object-fit: cover; }" +
-    /* Ticket banner photos: fixed portrait frames regardless of source image size */
-    "#candidate_pic, #running_mate_pic { width: 135px !important; height: 164px !important; object-fit: cover; }" +
-    /* Campaign sign: the real Biden 2020 wordmark on the campaign-blue field with the red border */
-    "#campaign_sign { background: #224192 url('https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png') center / auto 68% no-repeat; height: 92px; border-color: #EB2026; }" +
-    "#campaign_sign p { display: none; }" +
-    /* Advisor feedback photo: crop to its 208x128 box instead of squashing */
-    "#visit_content img { object-fit: cover; }" +
-    /* Let windows grow with their text instead of overflowing */
-    /* flow-root makes the window contain the floated ticket photos so they
-       stay inside its bottom border */
-    "#game_window { height: fit-content !important; min-height: 540px; display: flow-root; }" +
-    ".inner_window_w_desc { background-color: #EAF1FB !important; height: fit-content !important; overflow: visible; }" +
-    ".inner_window, #candidate_info_holder { height: fit-content !important; }" +
-    /* Map screens: the fit-content game window breaks the base %-height chain, so give the
-       map container explicit dimensions — the usmap plugin computes its scale from them */
-    "#main_content_area { height: auto !important; overflow: hidden; }" +
-    "#map_container { width: 72% !important; height: 540px !important; }" +
-    /* Overlays (advisor feedback, election night): grow with their text instead of a fixed
-       62% height, so the buttons flow below long feedback instead of overlapping it */
-    ".overlay_window { height: fit-content !important; min-height: 0 !important; padding-bottom: .5em; }" +
-    ".overlay_window_content { height: fit-content !important; max-height: 55vh; overflow-y: auto; }" +
-    /* Long description screens (mod summary, candidate bios) scroll instead of
-       growing into text walls */
-    "#election_description_window, .person_description_window, .description_window_small { height: fit-content !important; max-height: 420px; overflow-y: auto; }" +
-    "#results_container { color: #000000; }" +
-    "</style>";
-
 /* ============================================================
-   NO MALARKEY — govern-phase engine (Q1–Q12)
+   NO MALARKEY — govern-phase engine (Q1–Q13)
    Source: scenario bible v0.6 + drafted questions doc.
    Tally tiers per bible §2; FX blocks per the doc's A-lines.
-   Q13 (Midterms) is still mid-draft in the doc — slot reserved.
    ============================================================ */
 
 campaignTrail_temp.cyoa = true;
 
-/* questions_json indices (priority order):
+/* questions_json indices (array order is what the engine walks; the
+   `priority` field is inert at runtime):
    0 Q1 Inaugural · 1 Q2 Healthcare I · 2 Q3a · 3 Q3b · 4 Q3c · 5 Q3d ·
    6 Q4 Infrastructure · 7 Q5 TPP · 8 Q6 Afghanistan · 9 Q7 North Korea ·
    10 Q8 Guns · 11 Q9 RBG vacancy · 12 Q10 Crossfire Hurricane ·
-   13 Q11 Executive Time · 14 Q12 Warren Relationship ·
-   15 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2) */
+   13 Q11 Executive Time · 14 Q12 Warren Relationship · 15 Q13 Midterms ·
+   16 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
+
+   --- SKETCH: progress bar ("Question N of 16" lies after Q3) ---
+   Cause: the engine labels questions as question_number+1 of question_count.
+   Exclusive Q3 branches occupy indices 2–5, so after healthcare the UI jumps
+   to "Question 7 of 16" for what the player experiences as Q4. Terminal and
+   unused branches also inflate the denominator.
+
+   Preferred fix (display-only, no jump retargeting):
+
+     1. Content spine (what players actually play on a normal run):
+          NM_SPINE = [801, 802, (one of 803-806), 807, 808, 809, 810,
+                      811, 812, 813, 814, 816, 817]
+        total = 13. Terminal (815) is not on the spine.
+
+     2. On each question paint, rewrite #progress_bar h3:
+          "Question {shown} of {total}"
+        where shown = how many spine questions answered + 1 (current),
+        and on the terminal screen show something like "Crisis" or hide the bar.
+
+     3. Hook (pick one):
+        a. setInterval / MutationObserver on #progress_bar (simplest, a bit crude)
+        b. wrap window.questionHTML after load and call nmPaintProgress() at end
+        c. jQuery ajaxComplete / DOMNodeInserted equivalent on #game_window
+
+     4. Implementation sketch:
+
+        var NM_SPINE_TOTAL = 13; // Q1–Q13; bump when Q14 lands
+        var NM_BRANCH_Q = { 803:1, 804:1, 805:1, 806:1 }; // exclusive slots
+        function nmSpineShown() {
+          // Count real answers (non-null) whose question is spine content.
+          // Or maintain nm.progress.n++, incremented once per cyoAdventure call
+          // except when landing on terminal-only 815.
+          return nm.progress || 1;
+        }
+        function nmPaintProgress() {
+          var el = document.querySelector("#progress_bar h3");
+          if (!el) return;
+          if (nm.terminal) { el.textContent = "Crisis"; return; }
+          el.textContent = "Question " + nmSpineShown() + " of " + NM_SPINE_TOTAL;
+        }
+        // Increment nm.progress at the *start* of each non-terminal question
+        // display (not in cyoAdventure — that runs after the answer). Easiest:
+        // nm.progress starts at 1; on every successful Continue that is not a
+        // visit-only screen, if next question pk is in spine and not a skipped
+        // branch, ++. Simpler still: map pk -> display number:
+        //   801→1, 802→2, 803-806→3, 807→4, … 817→13, 815→null
+
+        var NM_DISPLAY = {
+          801:1, 802:2, 803:3, 804:3, 805:3, 806:3,
+          807:4, 808:5, 809:6, 810:7, 811:8, 812:9,
+          813:10, 814:11, 816:12, 817:13
+        };
+
+     5. Alternative (data reorder): move Q3a–d to the end of questions_json
+        and use the engine's slot-swap cyoAdventure style. Corrects the native
+        counter but rewrites every question_number jump — higher risk.
+
+     Do NOT change question_count to 13 without also removing branch indices;
+     election night requires question_number === question_count exactly, and
+     jumps currently target 15/16 against a 17-slot array.
+   --- end sketch --- */
 
 var nm = {
     // Tier A — bounded positional axes, clamp -2..+2 (bible §2)
@@ -301,7 +303,10 @@ var nm = {
     harris_scotus: false,
     nato_tour: false, // see bible §9.2 — may become ukraine_trip
     debt_relief: false,
-    midterm_push: false,
+    // Q13 outcome (bible §3.1): "status_quo" | "dem_house" | "gop_senate"
+    congress_2019: null,
+    // Q13 addendum flag — gated on TBD thresholds, see NM_FAVREAU_GATE below
+    favreau_senate: false,
     // RNG pre-rolls for Q3c, rolled when Q2 routes there so feedback can be pre-written
     q3c_a2_success: null,
     q3c_a3_success: null,
@@ -345,8 +350,35 @@ var NM_FB = {
     q9a3_win: "Senate Republicans, even the moderates, are apoplectic when you announce Alexander's nomination. Nevertheless, your base is thrilled, and Schumer gets Alexander through by the skin of her teeth - with Vice President Warren breaking the tie.",
     q9a3_sunk: "Even Schumer can't save you on this one. Republicans blast Alexander as completely unqualified and manage to enlist Joe Manchin in sinking her nomination. Tail between your legs, you offer up Sri Srinivasan as a replacement, and he is confirmed. Favreau mourns a “lost opportunity” for progressive change.",
     q12a4_viral: "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she finds herself able to go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”",
-    q12a4_resentful: "Liz clearly resents selling your disappointing record to progressives, and it starts to show in various passive-aggressive comments she makes on her media tour. On Keepin' It 1600, Favreau asks what keeps her energized. She cryptically replies, “the future.”"
+    q12a4_resentful: "Liz clearly resents selling your disappointing record to progressives, and it starts to show in various passive-aggressive comments she makes on her media tour. On Keepin' It 1600, Favreau asks what keeps her energized. She cryptically replies, “the future.”",
+    q13a1_hold: "Your administration has delivered on progressive priorities despite the Republicans controlling the House, and those voters haven't forgotten. High Democratic turnout saves vulnerable incumbents in red states. The elections again return a Democratic Senate majority and a Republican House majority, but the Congressional Progressive Caucus is larger than ever.",
+    q13a1_wave: "You flub your way through a disastrous interview on Rachel Maddow, vomiting up half-digested word salad when lobbed softball questions about your failed agenda. Democratic turnout plummets, and 2019 welcomes a reinvigorated Republican Congressional majority not seen since the likes of Newt Gingrich.",
+    q13a2_hold: "Scranton Joe still has some life in him. Everyday Americans are satisfied with how you have governed the country so far, and they reward you by running Paul Ryan out of town on a rail.",
+    q13a2_wave: "Your pitch falls flat. Voters are fatigued by nearly a decade of Democratic presidencies and don't feel that your administration has accomplished much for them. The Republicans reap the whirlwind and ride a red wave to control of Congress.",
+    q13a3_hold: "The public is largely content with your presidency, and many voters are still disturbed by Trump or unconvinced by Ryan. Democrats successfully retain the Senate but fall just short in the House.",
+    q13a3_wave: "You avoid making the midterms a referendum about yourself, but at the same time, you aren't able to lift Democrats in tough races. Republicans make gains in the House and capture the Senate, imperiling your agenda through 2020.",
+    q13a4_hold: "With Trump in jail, people know you're serious about the threat that he and his movement pose to the country. The ensuing campaign is extremely ugly, but Democratic partisans motivated by your imprisonment of their biggest villain keep midterm losses to a minimum.",
+    q13a4_wave: "This cuts both ways. You're able to help increase Democratic turnout by leaning into the specter of Donald Trump, but not doing much to sell your administration's accomplishments. The American people respond by sending Republicans to Washington in 2019 with a slim majority in both houses.",
+    q13_favreau_addendum: " To your shock and horror, Keepin' It 1600 host Jon Favreau successfully challenged octogenarian Senator Dianne Feinstein and will represent California in the Senate starting in the 116th Congress."
 };
+
+/* Favreau Senate addendum (doc, end of Q13). Gate is
+     hosts_burned >= 3 AND rec_progressive <= {moderate floor}
+   The moderate floor is still a {placeholder} in the doc, like the GOP cascade
+   thresholds; while it is null the gate stays shut, so the addendum never fires
+   on a half-specified rule. Set it and the gate arms itself.
+
+   Reachability note: hosts_burned tops out at exactly 3 (Q1 A3 + Q3a A2 + one of
+   Q12 A2 / Q12 A4-fail), so a threshold of 3 means every burn is mandatory. Both
+   Q12 sources also push rec_progressive down, which is what the floor tests. */
+var NM_FAVREAU_GATE = { hosts_burned_min: 3, progressive_max: null };
+
+function nmFavreauSenate() {
+    if (NM_FAVREAU_GATE.hosts_burned_min === null) return false;
+    if (NM_FAVREAU_GATE.progressive_max === null) return false;
+    return nm.hosts_burned >= NM_FAVREAU_GATE.hosts_burned_min
+        && nm.rec_progressive <= NM_FAVREAU_GATE.progressive_max;
+}
 
 // After Q3 resolves: pre-write Q4 A1/A2 feedback (reads healthcare_result: win vs else), jump to Q4
 function nmAfterQ3() {
@@ -379,6 +411,22 @@ function nmAfterQ8() {
 // After Q11: pre-write Q12 A4 feedback (reads delivery(prior): >=2 viral / <2 resentful)
 function nmAfterQ11() {
     nmSetFeedback(8164, nm.delivery >= 2 ? NM_FB.q12a4_viral : NM_FB.q12a4_resentful);
+}
+
+/* After Q12: pre-write all four Q13 feedback variants, and resolve the Favreau
+   addendum. Everything these read (delivery, rec_progressive, norms_weaponized,
+   hosts_burned) is final once Q12 has resolved, and feedback is rendered before
+   cyoAdventure runs for the answer — so this has to happen a question ahead.
+
+   Each test below mirrors the matching branch in the Q13 cases exactly, so the
+   text a player reads always agrees with the Congress they get. */
+function nmAfterQ12() {
+    nm.favreau_senate = nmFavreauSenate();
+    var add = nm.favreau_senate ? NM_FB.q13_favreau_addendum : "";
+    nmSetFeedback(8171, (nm.rec_progressive >= 1 ? NM_FB.q13a1_hold : NM_FB.q13a1_wave) + add);
+    nmSetFeedback(8172, (nm.delivery >= 2      ? NM_FB.q13a2_hold : NM_FB.q13a2_wave) + add);
+    nmSetFeedback(8173, (nm.delivery >= 2      ? NM_FB.q13a3_hold : NM_FB.q13a3_wave) + add);
+    nmSetFeedback(8174, (nm.norms_weaponized   ? NM_FB.q13a4_hold : NM_FB.q13a4_wave) + add);
 }
 
 cyoAdventure = function (a) {
@@ -460,7 +508,7 @@ cyoAdventure = function (a) {
             // The doc's dangling fourth FX-ELSE is dead code and is dropped per bible §9.4
             if (nm.rec_foreign >= 2) {
                 nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
-                campaignTrail_temp.question_number = 14; // next shown = index 15 (terminal)
+                campaignTrail_temp.question_number = 15; // next shown = index 16 (terminal)
             } else if (nm.delivery >= 1) {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
             } else {
@@ -501,23 +549,54 @@ cyoAdventure = function (a) {
         // ---- Q11 — Executive Time (flows into Q12 at index 14) ----
         case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; nmAfterQ11(); break;
         case 8142: nmAdd("delivery", 2); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; nmAfterQ11(); break;
-        case 8143: nm.midterm_push = true; nmAfterQ11(); break;
+        // A3 is deliberately inert: the doc's FX is "delivery 0; midterm_push=true",
+        // and midterm_push was cut, so this answer moves nothing.
+        case 8143: nmAfterQ11(); break;
         case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); nmAfterQ11(); break;
 
-        // ---- Q12 — Warren Relationship (last drafted question; ends the run for now) ----
-        // Jump lands question_number exactly on question_count (16) after the
-        // increment — election night fires only on strict equality.
-        case 8161: nmAdd("warren_relationship", 1); nmAdd("rec_progressive", 1); campaignTrail_temp.question_number = 15; break;
-        case 8162: nmAdd("warren_relationship", -1); nm.hosts_burned++; campaignTrail_temp.question_number = 15; break;
-        case 8163: nmAdd("delivery", 1); nmAdd("warren_relationship", 1); campaignTrail_temp.question_number = 15; break;
+        // ---- Q12 — Warren Relationship (index 14, flows into Q13 at index 15) ----
+        // No jump: Q13 is the next slot, so the natural increment is correct.
+        // nmAfterQ12 must run last in each case — it reads the tallies this
+        // answer just moved (hosts_burned feeds the Favreau gate).
+        case 8161: nmAdd("warren_relationship", 1); nmAdd("rec_progressive", 1); nmAfterQ12(); break;
+        case 8162: nmAdd("warren_relationship", -1); nm.hosts_burned++; nmAfterQ12(); break;
+        case 8163: nmAdd("delivery", 1); nmAdd("warren_relationship", 1); nmAfterQ12(); break;
         case 8164:
             if (nm.delivery >= 2) { nmAdd("rec_progressive", 1); }
             else { nmAdd("rec_progressive", -1); nmAdd("warren_relationship", -1); nm.hosts_burned++; }
-            campaignTrail_temp.question_number = 15;
+            nmAfterQ12();
+            break;
+
+        // ---- Q13 — Midterms (last drafted question; ends the run) ----
+        // Each answer reads its condition off the *prior* tallies, so every test
+        // runs before this answer's own nmAdd calls.
+        // Jump lands question_number on 16, which the engine increments to 17 =
+        // question_count — election night fires only on strict equality, and the
+        // jump also steps over the terminal question parked at index 16.
+        case 8171:
+            if (nm.rec_progressive >= 1) { nmAdd("delivery", 1); nm.congress_2019 = "status_quo"; }
+            else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
+            campaignTrail_temp.question_number = 16;
+            break;
+        case 8172:
+            if (nm.delivery >= 2) { nmAdd("delivery", 2); nm.congress_2019 = "dem_house"; }
+            else { nmAdd("delivery", -2); nm.congress_2019 = "gop_senate"; }
+            nmAdd("rec_labor", 1); // both branches
+            campaignTrail_temp.question_number = 16;
+            break;
+        case 8173:
+            if (nm.delivery >= 2) { nm.congress_2019 = "status_quo"; }
+            else { nm.congress_2019 = "gop_senate"; }
+            campaignTrail_temp.question_number = 16;
+            break;
+        case 8174:
+            if (nm.norms_weaponized) { nm.congress_2019 = "status_quo"; }
+            else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
+            campaignTrail_temp.question_number = 16;
             break;
 
         // ---- A HOUSE OF DYNAMITE terminal ----
-        // No jump needed: index 15 + 1 = 16 = question_count, so the game ends.
+        // No jump needed: index 16 + 1 = 17 = question_count, so the game ends.
         // TODO: replace election night with a proper ending screen at the pivot build.
         case 8151: break;
     }
@@ -544,5 +623,70 @@ var NM_GOP_ROSTER = [
     { first_name: "Tucker",  last_name: "Carlson",  state: "Maine",          gate: "rec_progressive <= MODERATE_FLOOR",          image_url: "" },
     { first_name: "Ted",     last_name: "Cruz",     state: "Texas",          gate: "else",                                       image_url: "" }
 ];
+
+/* Theme / styling — isolated so a missing DOM node or nct_stuff
+   never prevents cyoAdventure from registering. Engine runs first. */
+try {
+    nct_stuff.themes[nct_stuff.selectedTheme].coloring_title = "#224192";
+
+    nct_stuff.themes[nct_stuff.selectedTheme].coloring_window = "#DCE7F8";
+
+    document.getElementsByClassName("game_header")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_title;
+
+    $("#game_window")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_window;
+
+    $(".container")[0].style.backgroundColor = "#FFFFFF";
+
+    document.getElementById("header").src = "https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png";
+
+    document.body.background = "";
+
+    document.head.innerHTML += "<style>" +
+        "@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap');" +
+        /* Deep navy page frame, like the campaign site */
+        "body { background: #0B1F4E !important; }" +
+        /* Banner: white BIDEN 2020 wordmark on a solid campaign-blue field with the red 'E' stripe underline */
+        /* Fixed-height band: without explicit dimensions the showcase site renders the
+           logo PNG at its huge natural size */
+        "#header { background-color: #224192; object-fit: contain; width: 100% !important; height: 120px !important; display: block; padding: 12px 0; box-sizing: border-box; border-bottom: 6px solid #EB2026; }" +
+        ".game_header { border-bottom: 6px solid #EB2026; }" +
+        /* Campaign typography (Montserrat is the closest free match to Brother 1816) */
+        ".game_header, h1, h2, h3, button, select { font-family: 'Montserrat', Arial, sans-serif; }" +
+        "button { background-color: #224192; color: #FFFFFF; border: none; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 20px; margin: 2px; cursor: pointer; }" +
+        "button:hover { background-color: #EB2026; }" +
+        "select { border: 2px solid #224192; border-radius: 3px; padding: 4px 8px; background: #FFFFFF; color: #224192; font-weight: 600; }" +
+        /* Crop photos to their frames instead of stretching them */
+        "img:not(#header) { object-fit: cover; }" +
+        /* Ticket banner photos: fixed portrait frames regardless of source image size */
+        "#candidate_pic, #running_mate_pic { width: 135px !important; height: 164px !important; object-fit: cover; }" +
+        /* Campaign sign: the real Biden 2020 wordmark on the campaign-blue field with the red border */
+        "#campaign_sign { background: #224192 url('https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png') center / auto 68% no-repeat; height: 92px; border-color: #EB2026; }" +
+        "#campaign_sign p { display: none; }" +
+        /* Advisor feedback photo: crop to its 208x128 box instead of squashing */
+        "#visit_content img { object-fit: cover; }" +
+        /* Let windows grow with their text instead of overflowing */
+        /* flow-root makes the window contain the floated ticket photos so they
+           stay inside its bottom border */
+        "#game_window { height: fit-content !important; min-height: 540px; display: flow-root; }" +
+        ".inner_window_w_desc { background-color: #EAF1FB !important; height: fit-content !important; overflow: visible; }" +
+        ".inner_window, #candidate_info_holder { height: fit-content !important; }" +
+        /* Map screens: the fit-content game window breaks the base %-height chain, so give the
+           map container explicit dimensions — the usmap plugin computes its scale from them */
+        "#main_content_area { height: auto !important; overflow: hidden; }" +
+        "#map_container { width: 72% !important; height: 540px !important; }" +
+        /* Overlays (advisor feedback, election night): grow with their text instead of a fixed
+           62% height, so the buttons flow below long feedback instead of overlapping it */
+        ".overlay_window { height: fit-content !important; min-height: 0 !important; padding-bottom: .5em; }" +
+        ".overlay_window_content { height: fit-content !important; max-height: 55vh; overflow-y: auto; }" +
+        /* Long description screens (mod summary, candidate bios) scroll instead of
+           growing into text walls */
+        "#election_description_window, .person_description_window, .description_window_small { height: fit-content !important; max-height: 420px; overflow-y: auto; }" +
+        "#results_container { color: #000000; }" +
+        "</style>";
+} catch (nmStyleErr) {
+    try {
+        console.warn("No Malarkey: theme/style setup failed (engine still active):", nmStyleErr);
+    } catch (e) { /* console unavailable */ }
+}
 
 //#endcode

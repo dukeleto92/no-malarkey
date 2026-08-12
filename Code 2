@@ -136,9 +136,18 @@ campaignTrail_temp.questions_json = [
     },
     {
         "model": "campaign_trail.question",
-        "pk": 815,
+        "pk": 817,
         "fields": {
             "priority": 15,
+            "description": "The midterm elections are just around the corner, and voters will get a chance to pass judgment on your administration so far. The next two years will determine whether you can accomplish what remains of your agenda. How do you want to make your case to the American people?",
+            "likelihood": 1
+        }
+    },
+    {
+        "model": "campaign_trail.question",
+        "pk": 815,
+        "fields": {
+            "priority": 16,
             "description": "The Air Force…they didn't get all the trucks. It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
             "likelihood": 1
         }
@@ -584,6 +593,38 @@ campaignTrail_temp.answers_json = [
         "fields": {
             "question": 816,
             "description": "You know, I've been thinking: what was the point of putting her on the ticket if we don't use her to buy credibility with the party's progressive wing? We've had to make some tough compromises that those folks don't seem to fully grasp. I'll tell Liz her new job is saleswoman-in-chief."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8171,
+        "fields": {
+            "question": 817,
+            "description": "It's all about rallying the base. That's what Barack missed. It's not enough for them to just turn up in presidential elections. Let's do some progressive media hits and remind our most loyal voters what we're doing for them."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8172,
+        "fields": {
+            "question": 817,
+            "description": "These elections are won and lost in the frontline districts. Regular folks want to know that we're delivering for them. Let's get out of the D.C. echo chamber and remind Main Street about how much we've done for them."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8173,
+        "fields": {
+            "question": 817,
+            "description": "The best thing we can do is show people how hard we're working. I can't be out on the trail all day. I've got plenty of accomplishments under my belt, and I trust folks to remember that."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8174,
+        "fields": {
+            "question": 817,
+            "description": "Two years ago, we almost had a fascist conman take over the country. I was the only one who could stop him - the only one. People are already forgetting, and I'm gonna remind them. This is a battle for the soul of this country."
         }
     }
 ]
@@ -6993,6 +7034,42 @@ campaignTrail_temp.answer_feedback_json = [
             "answer": 8164,
             "candidate": 300,
             "answer_feedback": "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she finds herself able to go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”"
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9056,
+        "fields": {
+            "answer": 8171,
+            "candidate": 300,
+            "answer_feedback": "Your administration has delivered on progressive priorities despite the Republicans controlling the House, and those voters haven't forgotten. High Democratic turnout saves vulnerable incumbents in red states. The elections again return a Democratic Senate majority and a Republican House majority, but the Congressional Progressive Caucus is larger than ever."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9057,
+        "fields": {
+            "answer": 8172,
+            "candidate": 300,
+            "answer_feedback": "Scranton Joe still has some life in him. Everyday Americans are satisfied with how you have governed the country so far, and they reward you by running Paul Ryan out of town on a rail."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9058,
+        "fields": {
+            "answer": 8173,
+            "candidate": 300,
+            "answer_feedback": "The public is largely content with your presidency, and many voters are still disturbed by Trump or unconvinced by Ryan. Democrats successfully retain the Senate but fall just short in the House."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9059,
+        "fields": {
+            "answer": 8174,
+            "candidate": 300,
+            "answer_feedback": "With Trump in jail, people know you're serious about the threat that he and his movement pose to the country. The ensuing campaign is extremely ugly, but Democratic partisans motivated by your imprisonment of their biggest villain keep midterm losses to a minimum."
         }
     }
 ]

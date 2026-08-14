@@ -624,6 +624,141 @@ var NM_GOP_ROSTER = [
     { first_name: "Ted",     last_name: "Cruz",     state: "Texas",          gate: "else",                                       image_url: "" }
 ];
 
+/* ============================================================
+   Variable tracker — player-facing "The Record" panel.
+
+   Shows the eleven visible tallies as qualitative bands rather than
+   integers. Deliberately excludes hosts_burned (bible §3.2 marks it
+   hidden), the Q3c RNG pre-rolls, and the result flags — same reason
+   the Q3c gamble odds are hidden from players.
+
+   Band thresholds are chosen so a label change lines up with a gate the
+   engine actually tests, which is why Delivery breaks at 0 and +2: those
+   are the cutoffs nmAfterQ7/Q8/Q11/Q12 read. A player who sees Delivery
+   tick from "Mixed" to "Effective" has genuinely crossed a branch.
+   ============================================================ */
+
+// Tier A axes, clamped -2..+2 — each gets its own vocabulary.
+var NM_BAND_PROGRESSIVE = [[2, "Champion"], [1, "Ally"], [0, "Balanced"], [-1, "Skeptic"], [-Infinity, "Adversary"]];
+var NM_BAND_SOCIAL      = [[2, "Champion"], [1, "Ally"], [0, "Balanced"], [-1, "Cautious"], [-Infinity, "Traditionalist"]];
+var NM_BAND_FOREIGN     = [[2, "Hawk"], [1, "Interventionist"], [0, "Balanced"], [-1, "Restrained"], [-Infinity, "Dove"]];
+var NM_BAND_WARREN      = [[2, "Partners"], [1, "Warm"], [0, "Cordial"], [-1, "Strained"], [-Infinity, "Estranged"]];
+
+/* Tier B accumulators are unclamped. An exhaustive walk of all answer paths
+   puts delivery at -8..+11 and rec_legitimacy at -4..+5, so the outer bands
+   have real room rather than being decorative. */
+var NM_BAND_DELIVERY   = [[4, "Commanding"], [2, "Effective"], [0, "Mixed"], [-2, "Struggling"], [-Infinity, "Floundering"]];
+var NM_BAND_LEGITIMACY = [[3, "Restored"], [1, "Strengthened"], [0, "Holding"], [-2, "Eroded"], [-Infinity, "Damaged"]];
+
+// Tier C flavor tallies, clamped -3..+3 — one shared scale.
+var NM_BAND_ISSUE = [[2, "Strong record"], [1, "Some progress"], [0, "Nothing yet"], [-1, "Setbacks"], [-Infinity, "Damaged"]];
+
+/* hide_until_moved keeps a declared-but-unreachable tally out of the panel
+   until something actually moves it. rec_immigration is the only one: it is
+   declared in `nm` but no immigration question exists yet, so without this it
+   would read "Nothing yet" for the entire run. The row is already wired — it
+   appears on its own the moment an immigration question moves the tally. */
+var NM_TRACKER_ROWS = [
+    { group: "Where You Stand", key: "rec_progressive",     label: "Progressive Wing",      bands: NM_BAND_PROGRESSIVE },
+    { group: "Where You Stand", key: "rec_social",          label: "Social Policy",         bands: NM_BAND_SOCIAL },
+    { group: "Where You Stand", key: "rec_foreign",         label: "Foreign Policy",        bands: NM_BAND_FOREIGN },
+    { group: "Where You Stand", key: "warren_relationship", label: "Vice President Warren", bands: NM_BAND_WARREN },
+    { group: "Your Presidency", key: "delivery",            label: "Delivery",              bands: NM_BAND_DELIVERY },
+    { group: "Your Presidency", key: "rec_legitimacy",      label: "Institutions",          bands: NM_BAND_LEGITIMACY },
+    { group: "Issue Record",    key: "rec_labor",           label: "Labor",                 bands: NM_BAND_ISSUE },
+    { group: "Issue Record",    key: "rec_healthcare",      label: "Healthcare",            bands: NM_BAND_ISSUE },
+    { group: "Issue Record",    key: "rec_infrastructure",  label: "Infrastructure",        bands: NM_BAND_ISSUE },
+    { group: "Issue Record",    key: "rec_trade",           label: "Trade",                 bands: NM_BAND_ISSUE },
+    { group: "Issue Record",    key: "rec_immigration",     label: "Immigration",           bands: NM_BAND_ISSUE, hide_until_moved: true }
+];
+
+// First band whose threshold the value clears. Bands run high to low.
+function nmBand(value, bands) {
+    for (var i = 0; i < bands.length; i++) {
+        if (value >= bands[i][0]) return bands[i][1];
+    }
+    return bands[bands.length - 1][1];
+}
+
+function nmTrackerHTML() {
+    var html = "";
+    var openGroup = null;
+    for (var i = 0; i < NM_TRACKER_ROWS.length; i++) {
+        var row = NM_TRACKER_ROWS[i];
+        var value = nm[row.key];
+        if (row.hide_until_moved && value === 0) continue;
+        if (row.group !== openGroup) {
+            if (openGroup !== null) html += "</div>";
+            html += "<h4 class=\"nm_track_group\">" + row.group + "</h4><div class=\"nm_track_rows\">";
+            openGroup = row.group;
+        }
+        html += "<div class=\"nm_track_row\">" +
+                    "<span class=\"nm_track_label\">" + row.label + "</span>" +
+                    "<span class=\"nm_track_value\">" + nmBand(value, row.bands) + "</span>" +
+                "</div>";
+    }
+    if (openGroup !== null) html += "</div>";
+    return html;
+}
+
+/* Mirrors advisorFeedback()'s overlay pattern: backdrop + window appended to
+   #game_window, both removed together on close. Rebuilt from `nm` on every
+   open, so it never has to be kept in sync with the tallies. */
+function nmOpenTracker() {
+    if (document.getElementById("nm_tracker_window")) return;
+    var overlay = "<div class=\"overlay\" id=\"nm_tracker_overlay\"></div>" +
+        "<div class=\"overlay_window\" id=\"nm_tracker_window\">" +
+            "<div class=\"overlay_window_content\" id=\"nm_tracker_content\">" +
+                "<h3>The Record</h3>" +
+                nmTrackerHTML() +
+            "</div>" +
+            "<div id=\"nm_tracker_buttons\"><button id=\"nm_tracker_close\">OK</button></div>" +
+        "</div>";
+    $("#game_window").append(overlay);
+    $("#nm_tracker_close").on("click", function () {
+        $("#nm_tracker_overlay, #nm_tracker_window").remove();
+    });
+}
+window.nmOpenTracker = nmOpenTracker; // console debugging
+
+/* questionHTML() rebuilds the game window from scratch each question, wiping
+   everything but #main_content_area and .game_header — so the button has to be
+   re-injected after every render rather than added once. */
+function nmInjectTrackerButton() {
+    if (document.getElementById("nm_tracker_button")) return;
+    var mapButton = document.getElementById("view_electoral_map");
+    if (!mapButton || !mapButton.parentNode) return;
+    var button = document.createElement("button");
+    button.id = "nm_tracker_button";
+    button.className = "answer_select_button";
+    button.textContent = "The Record";
+    mapButton.parentNode.insertBefore(button, mapButton.nextSibling);
+    $(button).on("click", function (evt) {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        nmOpenTracker();
+    });
+}
+
+/* Wrapping a global the same way cyoAdventure is replaced above: the engine is
+   a classic script, so its unqualified questionHTML() calls resolve through
+   window and pick up the wrapper. Guarded so a failed injection can never stop
+   the question screen itself from rendering. */
+if (typeof questionHTML === "function") {
+    var nmBaseQuestionHTML = questionHTML;
+    questionHTML = function () {
+        var result = nmBaseQuestionHTML.apply(this, arguments);
+        try {
+            nmInjectTrackerButton();
+        } catch (nmTrackerErr) {
+            try {
+                console.warn("No Malarkey: tracker button injection failed:", nmTrackerErr);
+            } catch (e) { /* console unavailable */ }
+        }
+        return result;
+    };
+}
+
 /* Theme / styling — isolated so a missing DOM node or nct_stuff
    never prevents cyoAdventure from registering. Engine runs first. */
 try {
@@ -682,6 +817,15 @@ try {
            growing into text walls */
         "#election_description_window, .person_description_window, .description_window_small { height: fit-content !important; max-height: 420px; overflow-y: auto; }" +
         "#results_container { color: #000000; }" +
+        /* Variable tracker ("The Record") */
+        "#nm_tracker_content { padding-bottom: .5em; }" +
+        "h4.nm_track_group { font-family: 'Montserrat', Arial, sans-serif; font-size: .8em; text-transform: uppercase; letter-spacing: .08em; color: #224192; text-align: left; margin: .9em 1.2em .3em; padding-bottom: .2em; border-bottom: 2px solid #EB2026; }" +
+        ".nm_track_rows { margin: 0 1.2em; }" +
+        /* Label left, value right, with a rule between so long labels stay readable */
+        ".nm_track_row { display: flex; justify-content: space-between; align-items: baseline; gap: 1em; padding: .25em 0; border-bottom: 1px solid #DCE7F8; font-weight: 400; }" +
+        ".nm_track_label { color: #333333; text-align: left; }" +
+        ".nm_track_value { font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; color: #224192; text-align: right; white-space: nowrap; }" +
+        "#nm_tracker_buttons { text-align: center; }" +
         "</style>";
 } catch (nmStyleErr) {
     try {

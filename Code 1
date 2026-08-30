@@ -229,66 +229,17 @@ campaignTrail_temp.cyoa = true;
    16 Q14 Immigration ·
    17 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
 
-   --- SKETCH: progress bar ("Question N of 16" lies after Q3) ---
-   Cause: the engine labels questions as question_number+1 of question_count.
-   Exclusive Q3 branches occupy indices 2–5, so after healthcare the UI jumps
-   to "Question 7 of 16" for what the player experiences as Q4. Terminal and
-   unused branches also inflate the denominator.
+   The engine labels every screen "Question {question_number+1} of
+   {question_count}", but question_number is an index into questions_json.
+   Q3's four mutually exclusive branches occupy indices 2-5 and a player only
+   ever plays one of them, so the native counter jumps at healthcare (2 goes
+   straight to 6 on the Q3d route) and the parked terminal inflates the
+   denominator. nmPaintProgress() below relabels it from NM_DISPLAY, purely
+   as display: no jump target or question_count changes.
 
-   Preferred fix (display-only, no jump retargeting):
-
-     1. Content spine (what players actually play on a normal run):
-          NM_SPINE = [801, 802, (one of 803-806), 807, 808, 809, 810,
-                      811, 812, 813, 814, 816, 817, 818]
-        total = 14. Terminal (815) is not on the spine.
-
-     2. On each question paint, rewrite #progress_bar h3:
-          "Question {shown} of {total}"
-        where shown = how many spine questions answered + 1 (current),
-        and on the terminal screen show something like "Crisis" or hide the bar.
-
-     3. Hook (pick one):
-        a. setInterval / MutationObserver on #progress_bar (simplest, a bit crude)
-        b. wrap window.questionHTML after load and call nmPaintProgress() at end
-        c. jQuery ajaxComplete / DOMNodeInserted equivalent on #game_window
-
-     4. Implementation sketch:
-
-        var NM_SPINE_TOTAL = 14; // Q1–Q14; bump when Q15 (The Ticket) lands
-        var NM_BRANCH_Q = { 803:1, 804:1, 805:1, 806:1 }; // exclusive slots
-        function nmSpineShown() {
-          // Count real answers (non-null) whose question is spine content.
-          // Or maintain nm.progress.n++, incremented once per cyoAdventure call
-          // except when landing on terminal-only 815.
-          return nm.progress || 1;
-        }
-        function nmPaintProgress() {
-          var el = document.querySelector("#progress_bar h3");
-          if (!el) return;
-          if (nm.terminal) { el.textContent = "Crisis"; return; }
-          el.textContent = "Question " + nmSpineShown() + " of " + NM_SPINE_TOTAL;
-        }
-        // Increment nm.progress at the *start* of each non-terminal question
-        // display (not in cyoAdventure — that runs after the answer). Easiest:
-        // nm.progress starts at 1; on every successful Continue that is not a
-        // visit-only screen, if next question pk is in spine and not a skipped
-        // branch, ++. Simpler still: map pk -> display number:
-        //   801→1, 802→2, 803-806→3, 807→4, … 818→14, 815→null
-
-        var NM_DISPLAY = {
-          801:1, 802:2, 803:3, 804:3, 805:3, 806:3,
-          807:4, 808:5, 809:6, 810:7, 811:8, 812:9,
-          813:10, 814:11, 816:12, 817:13, 818:14
-        };
-
-     5. Alternative (data reorder): move Q3a–d to the end of questions_json
-        and use the engine's slot-swap cyoAdventure style. Corrects the native
-        counter but rewrites every question_number jump — higher risk.
-
-     Do NOT change question_count to 14 without also removing branch indices;
-     election night requires question_number === question_count exactly, and
-     jumps currently target 16/17 against an 18-slot array.
-   --- end sketch --- */
+   Do NOT change question_count to 14 without also removing the branch
+   indices; election night requires question_number === question_count
+   exactly, and jumps target 16/17 against an 18-slot array. */
 
 var nm = {
     // Tier A — bounded positional axes (bible §2). rec_progressive clamps at
@@ -731,6 +682,56 @@ cyoAdventure = function (a) {
 };
 
 /* ============================================================
+   Progress bar — display-only relabelling.
+
+   The player plays fourteen questions. questions_json holds eighteen slots,
+   because Q3 is one question with four mutually exclusive branch slots and
+   the terminal is parked at the end. NM_DISPLAY maps a question's pk to the
+   number the player should actually see.
+   ============================================================ */
+var NM_SPINE_TOTAL = 14;
+var NM_DISPLAY = {
+    801: 1, 802: 2,
+    803: 3, 804: 3, 805: 3, 806: 3,   // Q3a-d — one question, four variants
+    807: 4, 808: 5, 809: 6, 810: 7, 811: 8, 812: 9,
+    813: 10, 814: 11, 816: 12, 817: 13, 818: 14
+    // 815, A HOUSE OF DYNAMITE, is a terminal and not on the spine
+};
+
+// `e ||= campaignTrail_temp` in the engine, so this is the live index.
+function nmCurrentQuestionPk() {
+    var qs = campaignTrail_temp.questions_json, n = campaignTrail_temp.question_number;
+    return (qs && qs[n]) ? qs[n].pk : null;
+}
+
+function nmPaintProgress() {
+    try {
+        var el = document.querySelector("#progress_bar h3");
+        if (!el) return;
+        var pk = nmCurrentQuestionPk();
+        var text = NM_DISPLAY[pk] ? "Question " + NM_DISPLAY[pk] + " of " + NM_SPINE_TOTAL
+                                  : (pk === 815 ? "Crisis" : null);
+        // The guard also stops the observer below from re-entering: the second
+        // pass finds the text already correct and writes nothing.
+        if (text && el.textContent !== text) el.textContent = text;
+    } catch (e) { /* a mislabelled bar must never cost the run */ }
+}
+
+/* The engine rebuilds #progress_bar inside questionHTML() on every paint, so
+   the relabel has to run again each time. Watching the game window covers
+   every path that repaints it — questions, visits, feedback dismissals —
+   without wrapping any engine function. */
+function nmWatchProgress() {
+    var target = document.getElementById("game_window") || document.body;
+    if (window.MutationObserver && target) {
+        new window.MutationObserver(nmPaintProgress).observe(target, { childList: true, subtree: true });
+    } else {
+        setInterval(nmPaintProgress, 300);
+    }
+    nmPaintProgress();
+}
+
+/* ============================================================
    Variable tracker — a live read-out of the player's record,
    pinned beside the game window and repainted after every answer.
 
@@ -1012,12 +1013,21 @@ try {
     } catch (e) { /* console unavailable */ }
 }
 
-/* Built in its own guard: a theme failure above must not cost the read-out. */
+/* Each in its own guard: a theme failure above must not cost the read-out, and
+   the two chrome features must not be able to take each other down. */
 try {
     nmBuildTracker();
 } catch (nmTrackerErr) {
     try {
         console.warn("No Malarkey: variable tracker failed to build (engine still active):", nmTrackerErr);
+    } catch (e) { /* console unavailable */ }
+}
+
+try {
+    nmWatchProgress();
+} catch (nmProgressErr) {
+    try {
+        console.warn("No Malarkey: progress-bar relabel failed (engine still active):", nmProgressErr);
     } catch (e) { /* console unavailable */ }
 }
 

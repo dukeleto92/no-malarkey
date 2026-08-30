@@ -7,7 +7,7 @@ campaignTrail_temp.election_json = [
             "summary": "<p>Defying conventional political expectations, Vice President Joe Biden entered the race for the 2016 Democratic presidential nomination on October 21, 2015. Speaking from the Rose Garden, he framed his candidacy as a response to the passing of his son Beau and the growth of right-wing populism. This decision triggered a fierce, three-way contest against Senator Bernie Sanders and former Secretary of State Hillary Clinton.</p><p>Concurrently, the political establishment was upended when businessman and reality TV personality Donald Trump captured the Republican presidential nomination, naming Indiana Governor Mike Pence as his vice-presidential running mate. Trump ran on fierce opposition to free trade and immigration, directly appealing to voters affected by American deindustrialization.</p><p>Biden, meanwhile, ran as a tribune of the working class, picking up critical union endorsements across the Midwest. Key proposals of his campaign included a public option for the Affordable Care Act, a massive trillion-dollar investment in infrastructure, comprehensive reform of the immigration system, and the renegotiation of the controversial Trans-Pacific Partnership.</p><p>Maintaining his polling lead over the course of the election cycle, Biden secured a comfortable victory over Trump on election night. As he prepares to assume the presidency in 2017, he will need to navigate an increasingly fragmented Democratic coalition and manage a highly combative, radicalized Republican opposition.</p>",
             "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Joe_Biden_%2848554152307%29.jpg/960px-Joe_Biden_%2848554152307%29.jpg",
             "winning_electoral_vote_number": 270,
-            "advisor_url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Jon_Favreau_%28speechwriter%29%2C_Feb_2013.jpg",
+            "advisor_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg/480px-Jon_Favreau_Canvassing_%28cropped%29.jpg",
             "recommended_reading": "<ul>\n<li><a href=https://www.chicagotribune.com/opinion/editorials/ct-edit-chicago-tribune-biden-endorsement-20200925-lnyxsb5qvrftnjjmj3rnzj33jy-story.html>Our Case For Joe Biden</a></li>\n<li><a href=https://nationalinterest.org/feature/case-trump-166808>The Case For Trump</a></li>\n<li><a href=https://www.npr.org/2020/11/18/935730100/how-biden-won-ramping-up-the-base-and-expanding-margins-in-the-suburbs>How Biden Won: Ramping Up The Base And Expanding Margins In The Suburbs</a></li>\n<li><a href=https://www.prospectmagazine.co.uk/politics/donald-trump-joe-biden-us-election-almost-win-votes-concede>Why Did Trump Almost Win?</a></li>\n<li><a href=https://www.hoover.org/research/no-evidence-voter-fraud-guide-statistical-claims-about-2020-election>No Evidence For Voter Fraud: A Guide To Statistical Claims About The 2020 Election</a></li>\n</ul>",
             "has_visits": 1,
             "no_electoral_majority_image": "https://www.jetsimon.com/public/static/images/2012-no-majority.jpg",
@@ -1015,14 +1015,21 @@ try {
     } catch (e) { /* console unavailable */ }
 }
 
-/* Art fallbacks. The advisor portrait was swapped from the group shot of the
-   hosts to a solo Favreau; if that file ever moves or 404s, the frame falls
-   back to the image it replaced rather than showing a broken photo. Error
-   events don't bubble, so the listener runs in the capture phase. */
+/* Art fallbacks, walked one hop at a time: a scaled thumbnail first, then the
+   full-size original if that thumb is unavailable (Commons refuses a thumb
+   wider than the source file), then the image the photo replaced. A frame is
+   never left broken. Error events don't bubble, so the listener runs in the
+   capture phase. */
 var NM_ART_FALLBACK = {
-    "https://upload.wikimedia.org/wikipedia/commons/2/2f/Jon_Favreau_%28speechwriter%29%2C_Feb_2013.jpg":
+    // Advisor frame — Favreau canvassing, replacing the group shot of the hosts
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg/480px-Jon_Favreau_Canvassing_%28cropped%29.jpg":
+        "https://upload.wikimedia.org/wikipedia/commons/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg":
         "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg/960px-Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg/960px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg":
+    // Ticket banner — Warren at the Wing Ding, replacing the Senate portrait
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg/960px-Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg":
+        "https://upload.wikimedia.org/wikipedia/commons/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg":
         "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg/960px-Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg"
 };
 

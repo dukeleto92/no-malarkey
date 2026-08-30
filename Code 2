@@ -7164,7 +7164,7 @@ campaignTrail_temp.running_mate_state_id = 1120; // Massachusetts (Warren)
 campaignTrail_temp.candidate_last_name = "Biden";
 campaignTrail_temp.running_mate_last_name = "Warren";
 campaignTrail_temp.candidate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/President_Joe_Biden_delivers_remarks_from_the_Oval_Office_4.jpg/960px-President_Joe_Biden_delivers_remarks_from_the_Oval_Office_4.jpg";
-/* Banner photo: the campaign-stage shot, not the flat Senate portrait — the
-   ticket banner is where Warren's ambition should read. Same image the bio
-   screen uses (Code 1, candidate 308). */
-campaignTrail_temp.running_mate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg/960px-Elizabeth_Warren_during_her_presidential_town_hall_at_the_Marquee_Theatre_in_Tempe%2C_Arizona_on_August_1%2C_2019_%2848520947136%29_%28cropped%29.jpg";
+/* Banner photo: the Wing Ding dinner shot, not the flat Senate portrait — the
+   ticket banner is where Warren's ambition should read. The bio screen keeps
+   the Tempe town hall photo (Code 1, candidate 308). */
+campaignTrail_temp.running_mate_image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg/960px-Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg";

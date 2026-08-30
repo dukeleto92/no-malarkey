@@ -1021,32 +1021,50 @@ try {
     } catch (e) { /* console unavailable */ }
 }
 
-/* Art fallbacks, walked one hop at a time: a scaled thumbnail first, then the
-   full-size original if that thumb is unavailable (Commons refuses a thumb
+/* Art fallbacks. Each chain is ordered best-first: a scaled thumbnail, then
+   the full-size original if Commons has no thumb that wide (it refuses a thumb
    wider than the source file), then the image the photo replaced. A frame is
-   never left broken. Error events don't bubble, so the listener runs in the
-   capture phase. */
-var NM_ART_FALLBACK = {
+   never left broken.
+
+   The chains are read-only, and that is the point. The engine re-renders the
+   advisor <img> from scratch on every single answer — six separate call sites
+   all emitting `<img src="${election.advisor_url}" width="208" height="128">`
+   — so the fallback has to be able to run again on every one of them. The
+   first version of this deleted each entry after using it, which meant the
+   very first failure consumed the only fallback and left every later question
+   with a broken frame. Walking a fixed list instead is both re-runnable and
+   loop-free: each hop moves strictly forward and the list is finite.
+
+   Error events don't bubble, so the listener runs in the capture phase. */
+var NM_ART_CHAINS = [
     // Advisor frame — Favreau canvassing, replacing the group shot of the hosts
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg/480px-Jon_Favreau_Canvassing_%28cropped%29.jpg":
+    [
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg/480px-Jon_Favreau_Canvassing_%28cropped%29.jpg",
         "https://upload.wikimedia.org/wikipedia/commons/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg":
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg/960px-Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg/960px-Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg"
+    ],
     // Ticket banner — Warren at the Wing Ding, replacing the Senate portrait
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg/960px-Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg":
+    [
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg/960px-Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg",
         "https://upload.wikimedia.org/wikipedia/commons/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg":
         "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg/960px-Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg"
-};
+    ]
+];
+
+function nmArtNext(src) {
+    for (var i = 0; i < NM_ART_CHAINS.length; i++) {
+        var at = NM_ART_CHAINS[i].indexOf(src);
+        if (at !== -1 && at + 1 < NM_ART_CHAINS[i].length) return NM_ART_CHAINS[i][at + 1];
+    }
+    return null;
+}
 
 try {
     document.addEventListener("error", function (ev) {
         var img = ev.target;
         if (!img || img.tagName !== "IMG") return;
-        var alt = NM_ART_FALLBACK[img.src];
-        if (!alt) return;
-        delete NM_ART_FALLBACK[img.src]; // one swap per source, never a loop
-        img.src = alt;
+        var next = nmArtNext(img.src);
+        if (next) img.src = next;
     }, true);
 } catch (nmArtErr) {
     try {

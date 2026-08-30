@@ -151,7 +151,7 @@ campaignTrail_temp.global_parameter_json = [
             "issue_stance_6_max": 0.71,
             "global_variance": 0.01,
             "state_variance": 0.005,
-            "question_count": 17,
+            "question_count": 18,
             "default_map_color_hex": "#C9C9C9",
             "no_state_map_color_hex": "#999999"
         }
@@ -201,9 +201,21 @@ jet_data = {
 //#startcode
 
 /* ============================================================
-   NO MALARKEY — govern-phase engine (Q1–Q13)
-   Source: scenario bible v0.6 + drafted questions doc.
+   NO MALARKEY — govern-phase engine (Q1–Q14)
+   Source: scenario bible v0.8 + drafted questions doc.
    Tally tiers per bible §2; FX blocks per the doc's A-lines.
+
+   v0.8 calibration, applied here:
+     - delivery-write rule (§2.1): the grant is derived from the
+       answer's result class — loss -1, partial 0, win +1, and a win
+       through a record-gated branch +2. RNG wins stay flat at +1.
+     - half-ceiling gate ladder (§2.3): Q7 >= +1, Q8 >= +2, Q9 >= +3,
+       Q12 >= +4, Q13 >= +5 (>= +4 with midterm_push), Q14 >= +6.
+     - rec_progressive clamps at +-3 (§2); every other Tier A axis
+       stays at +-2.
+     - midterm_push is live again (Q11 A3 sets it, Q13 A2/A3 discount).
+     - Q14 Immigration is drafted and locked (§6); The Ticket (Q15)
+       is specced but undrafted, so the govern phase still ends at Q14.
    ============================================================ */
 
 campaignTrail_temp.cyoa = true;
@@ -214,7 +226,8 @@ campaignTrail_temp.cyoa = true;
    6 Q4 Infrastructure · 7 Q5 TPP · 8 Q6 Afghanistan · 9 Q7 North Korea ·
    10 Q8 Guns · 11 Q9 RBG vacancy · 12 Q10 Crossfire Hurricane ·
    13 Q11 Executive Time · 14 Q12 Warren Relationship · 15 Q13 Midterms ·
-   16 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
+   16 Q14 Immigration ·
+   17 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
 
    --- SKETCH: progress bar ("Question N of 16" lies after Q3) ---
    Cause: the engine labels questions as question_number+1 of question_count.
@@ -226,8 +239,8 @@ campaignTrail_temp.cyoa = true;
 
      1. Content spine (what players actually play on a normal run):
           NM_SPINE = [801, 802, (one of 803-806), 807, 808, 809, 810,
-                      811, 812, 813, 814, 816, 817]
-        total = 13. Terminal (815) is not on the spine.
+                      811, 812, 813, 814, 816, 817, 818]
+        total = 14. Terminal (815) is not on the spine.
 
      2. On each question paint, rewrite #progress_bar h3:
           "Question {shown} of {total}"
@@ -241,7 +254,7 @@ campaignTrail_temp.cyoa = true;
 
      4. Implementation sketch:
 
-        var NM_SPINE_TOTAL = 13; // Q1–Q13; bump when Q14 lands
+        var NM_SPINE_TOTAL = 14; // Q1–Q14; bump when Q15 (The Ticket) lands
         var NM_BRANCH_Q = { 803:1, 804:1, 805:1, 806:1 }; // exclusive slots
         function nmSpineShown() {
           // Count real answers (non-null) whose question is spine content.
@@ -260,25 +273,27 @@ campaignTrail_temp.cyoa = true;
         // nm.progress starts at 1; on every successful Continue that is not a
         // visit-only screen, if next question pk is in spine and not a skipped
         // branch, ++. Simpler still: map pk -> display number:
-        //   801→1, 802→2, 803-806→3, 807→4, … 817→13, 815→null
+        //   801→1, 802→2, 803-806→3, 807→4, … 818→14, 815→null
 
         var NM_DISPLAY = {
           801:1, 802:2, 803:3, 804:3, 805:3, 806:3,
           807:4, 808:5, 809:6, 810:7, 811:8, 812:9,
-          813:10, 814:11, 816:12, 817:13
+          813:10, 814:11, 816:12, 817:13, 818:14
         };
 
      5. Alternative (data reorder): move Q3a–d to the end of questions_json
         and use the engine's slot-swap cyoAdventure style. Corrects the native
         counter but rewrites every question_number jump — higher risk.
 
-     Do NOT change question_count to 13 without also removing branch indices;
+     Do NOT change question_count to 14 without also removing branch indices;
      election night requires question_number === question_count exactly, and
-     jumps currently target 15/16 against a 17-slot array.
+     jumps currently target 16/17 against an 18-slot array.
    --- end sketch --- */
 
 var nm = {
-    // Tier A — bounded positional axes, clamp -2..+2 (bible §2)
+    // Tier A — bounded positional axes (bible §2). rec_progressive clamps at
+    // -3..+3 (it has twelve sources and railed by Q6–Q8 on the old +-2);
+    // every other Tier A axis stays at -2..+2.
     rec_progressive: 0,
     rec_social: 0,
     rec_foreign: 0,
@@ -303,9 +318,13 @@ var nm = {
     harris_scotus: false,
     nato_tour: false, // see bible §9.2 — may become ukraine_trip
     debt_relief: false,
+    // Q11 A3 → the 1-point discount on the Q13 A2/A3 gate (bible §3.1)
+    midterm_push: false,
     // Q13 outcome (bible §3.1): "status_quo" | "dem_house" | "gop_senate"
     congress_2019: null,
-    // Q13 addendum flag — gated on TBD thresholds, see NM_FAVREAU_GATE below
+    // Q14 outcome (bible §3.1): "win" (a law) | "partial" (the pen) | "loss"
+    immigration_result: null,
+    // Q13 addendum flag — see NM_FAVREAU_GATE; also read for Q14 prose
     favreau_senate: false,
     // RNG pre-rolls for Q3c, rolled when Q2 routes there so feedback can be pre-written
     q3c_a2_success: null,
@@ -319,7 +338,9 @@ var NM_TIER_C = ["rec_labor", "rec_healthcare", "rec_infrastructure", "rec_immig
 
 function nmAdd(tally, amt) {
     nm[tally] += amt;
-    if (NM_TIER_A.indexOf(tally) !== -1) nm[tally] = Math.max(-2, Math.min(2, nm[tally]));
+    // bible §2 / validator item 11: rec_progressive is the only Tier A axis at +-3
+    if (tally === "rec_progressive") nm[tally] = Math.max(-3, Math.min(3, nm[tally]));
+    else if (NM_TIER_A.indexOf(tally) !== -1) nm[tally] = Math.max(-2, Math.min(2, nm[tally]));
     if (NM_TIER_C.indexOf(tally) !== -1) nm[tally] = Math.max(-3, Math.min(3, nm[tally]));
 }
 
@@ -359,19 +380,54 @@ var NM_FB = {
     q13a3_wave: "You avoid making the midterms a referendum about yourself, but at the same time, you aren't able to lift Democrats in tough races. Republicans make gains in the House and capture the Senate, imperiling your agenda through 2020.",
     q13a4_hold: "With Trump in jail, people know you're serious about the threat that he and his movement pose to the country. The ensuing campaign is extremely ugly, but Democratic partisans motivated by your imprisonment of their biggest villain keep midterm losses to a minimum.",
     q13a4_wave: "This cuts both ways. You're able to help increase Democratic turnout by leaning into the specter of Donald Trump, but not doing much to sell your administration's accomplishments. The American people respond by sending Republicans to Washington in 2019 with a slim majority in both houses.",
-    q13_favreau_addendum: " To your shock and horror, Keepin' It 1600 host Jon Favreau successfully challenged octogenarian Senator Dianne Feinstein and will represent California in the Senate starting in the 116th Congress."
+    q13_favreau_addendum: " To your shock and horror, Keepin' It 1600 host Jon Favreau successfully challenged octogenarian Senator Dianne Feinstein and will represent California in the Senate starting in the 116th Congress.",
+    q14a1_win: "Republicans, having been sufficiently chastened by the last decade of election results, are finally willing to play ball. Speaker Pelosi ushers the Comprehensive Immigration Reform Act of 2019 through the House, and McConnell lets it pass the Senate with minimal fuss. The law beefs up border security while streamlining pathways to legal immigration. You've landed the white whale.",
+    // bible §9.10: splitting this into status_quo vs gop_senate variants is
+    // prose-only work that is still outstanding; one text covers both today.
+    q14a1_loss: "The Comprehensive Immigration Reform Act of 2019 dies the same ignoble death as its 2007 predecessor. Lovett appears at a rally with a Hispanic congresswoman from the Bronx demanding accountability from your administration.",
+    q14a2_win: "Vietor paints you as “mealy-mouthed”, but your compromise bill sails through Congress, powered by frontline Republicans and unenthusiastic Democrats.",
+    // The {Senator} insertion is filled by nmQ14A2Loss() below (bible §9.10).
+    q14a2_loss_pre: "“He's a failed president. He just is,” podcaster Bill Simmons opines in an interview with ",
+    q14a2_loss_post: "Favreau. “No way Obama lets a bill like this fall apart. It's almost like Biden wants Trump back in the picture.”",
+    q14a3_win: "It takes some cajoling, but you have enough progressive bona fides at this point to get the most liberal members of the Democratic caucus on board with this proposal. The Freedom Caucus, predictably, tries to blow up the whole thing, but enough establishment Republicans are on board that the bill is never seriously threatened.",
+    q14a3_loss: "“He wants to build Trump's wall for him?” Rhodes asks incredulously. “Tell me what the difference is between these two guys again, because it's getting increasingly difficult to tell.” The bill doesn't make it out of committee."
 };
 
-/* Favreau Senate addendum (doc, end of Q13). Gate is
-     hosts_burned >= 3 AND rec_progressive <= {moderate floor}
-   The moderate floor is still a {placeholder} in the doc, like the GOP cascade
-   thresholds; while it is null the gate stays shut, so the addendum never fires
-   on a half-specified rule. Set it and the gate arms itself.
+/* Q14 A2's failure text names Favreau, who on the secret path has been a
+   sitting senator since January 2019. Prose-level read of favreau_senate —
+   it gates text, not FX (bible §10.2, §11). */
+function nmQ14A2Loss() {
+    return NM_FB.q14a2_loss_pre + (nm.favreau_senate ? "Senator " : "") + NM_FB.q14a2_loss_post;
+}
 
-   Reachability note: hosts_burned tops out at exactly 3 (Q1 A3 + Q3a A2 + one of
-   Q12 A2 / Q12 A4-fail), so a threshold of 3 means every burn is mandatory. Both
-   Q12 sources also push rec_progressive down, which is what the floor tests. */
-var NM_FAVREAU_GATE = { hosts_burned_min: 3, progressive_max: null };
+/* Favreau Senate addendum (doc, end of Q13). Gate per bible §5:
+     hosts_burned >= 2 AND rec_progressive <= -3
+   v0.7's threshold of 3 required the unique maximal burn path (hosts_burned
+   tops out at exactly 3: Q1 A3 + Q3a A2 + one of Q12 A2 / Q12 A4-fail), which
+   hard-gated the secret path on the Q2 healthcare route. Lowering it to 2 opens
+   several combinations, and the widened +-3 progressive clamp is what keeps the
+   moderate floor doing independent work: three of the four burn sources also
+   write rec_progressive -1, so on the old +-2 clamp two burns had all but
+   guaranteed the floor. Reaching -3 now takes a further moderate move. */
+var NM_FAVREAU_GATE = { hosts_burned_min: 2, progressive_max: -3 };
+
+/* Gate ladder (bible §2.3): each delivery(prior) read sits at half the
+   reachable delivery ceiling at that point, rounded down. Q8 is the anchor.
+   Recompute the whole ladder if a new delivery source is ever added. */
+var NM_GATE = {
+    q7_contained: 1,   // ceiling +3
+    q8_strong: 2,      // ceiling +4  (anchor)
+    q9_confirmed: 3,   // ceiling +6
+    q12_viral: 4,      // ceiling +9
+    q13_hold: 5,       // ceiling +10, -1 with midterm_push
+    q14_muscle: 6      // ceiling +12
+};
+
+// Q13 A2/A3 compound gate: the tally band, or one step lower with midterm_push.
+function nmQ13Hold() {
+    return nm.delivery >= NM_GATE.q13_hold
+        || (nm.midterm_push && nm.delivery >= NM_GATE.q13_hold - 1);
+}
 
 function nmFavreauSenate() {
     if (NM_FAVREAU_GATE.hosts_burned_min === null) return false;
@@ -392,25 +448,25 @@ function nmAfterQ3() {
 // Terminal gate is >= +2, not == +2, per bible §10.3
 function nmAfterQ6() {
     var text = nm.rec_foreign >= 2 ? NM_FB.q7a2_terminal :
-               (nm.delivery >= 1 ? NM_FB.q7a2_contained : NM_FB.q7a2_escalation);
+               (nm.delivery >= NM_GATE.q7_contained ? NM_FB.q7a2_contained : NM_FB.q7a2_escalation);
     nmSetFeedback(8102, text);
 }
 
-// After Q7: pre-write Q8 A2 feedback (reads delivery(prior) bands: >=2 / 0..1 / <0)
+// After Q7: pre-write Q8 A2 feedback (reads delivery(prior) bands: >=+2 / 0..+1 / <0)
 function nmAfterQ7() {
-    var text = nm.delivery >= 2 ? NM_FB.q8a2_strong :
+    var text = nm.delivery >= NM_GATE.q8_strong ? NM_FB.q8a2_strong :
                (nm.delivery >= 0 ? NM_FB.q8a2_partial : NM_FB.q8a2_failure);
     nmSetFeedback(8112, text);
 }
 
-// After Q8: pre-write Q9 A3 feedback (reads delivery(prior): >=2 confirmed / <2 sunk)
+// After Q8: pre-write Q9 A3 feedback (reads delivery(prior): >=+3 confirmed / <+3 sunk)
 function nmAfterQ8() {
-    nmSetFeedback(8123, nm.delivery >= 2 ? NM_FB.q9a3_win : NM_FB.q9a3_sunk);
+    nmSetFeedback(8123, nm.delivery >= NM_GATE.q9_confirmed ? NM_FB.q9a3_win : NM_FB.q9a3_sunk);
 }
 
-// After Q11: pre-write Q12 A4 feedback (reads delivery(prior): >=2 viral / <2 resentful)
+// After Q11: pre-write Q12 A4 feedback (reads delivery(prior): >=+4 viral / <+4 resentful)
 function nmAfterQ11() {
-    nmSetFeedback(8164, nm.delivery >= 2 ? NM_FB.q12a4_viral : NM_FB.q12a4_resentful);
+    nmSetFeedback(8164, nm.delivery >= NM_GATE.q12_viral ? NM_FB.q12a4_viral : NM_FB.q12a4_resentful);
 }
 
 /* After Q12: pre-write all four Q13 feedback variants, and resolve the Favreau
@@ -423,10 +479,27 @@ function nmAfterQ11() {
 function nmAfterQ12() {
     nm.favreau_senate = nmFavreauSenate();
     var add = nm.favreau_senate ? NM_FB.q13_favreau_addendum : "";
+    var hold = nmQ13Hold();
     nmSetFeedback(8171, (nm.rec_progressive >= 1 ? NM_FB.q13a1_hold : NM_FB.q13a1_wave) + add);
-    nmSetFeedback(8172, (nm.delivery >= 2      ? NM_FB.q13a2_hold : NM_FB.q13a2_wave) + add);
-    nmSetFeedback(8173, (nm.delivery >= 2      ? NM_FB.q13a3_hold : NM_FB.q13a3_wave) + add);
-    nmSetFeedback(8174, (nm.norms_weaponized   ? NM_FB.q13a4_hold : NM_FB.q13a4_wave) + add);
+    nmSetFeedback(8172, (hold                    ? NM_FB.q13a2_hold : NM_FB.q13a2_wave) + add);
+    nmSetFeedback(8173, (hold                    ? NM_FB.q13a3_hold : NM_FB.q13a3_wave) + add);
+    nmSetFeedback(8174, (nm.norms_weaponized     ? NM_FB.q13a4_hold : NM_FB.q13a4_wave) + add);
+}
+
+/* After Q13: pre-write the three conditional Q14 variants. Q14 A1 branches on
+   congress_2019, A2 on delivery(prior) >= +6 OR congress_2019 = gop_senate, and
+   A3 on rec_progressive(prior) >= +2 — all of which Q13 has just finalised.
+   A4 is unconditional, so its stored feedback stands.
+
+   Outstanding (bible §9.10): the question's framing line still says Favreau and
+   Vietor demand action from the podcast booth, which on the secret path is wrong
+   — he has been a senator since January. The favreau_senate variant of that line
+   is undrafted, so the single text ships as written. */
+function nmAfterQ13() {
+    nmSetFeedback(8181, nm.congress_2019 === "dem_house" ? NM_FB.q14a1_win : NM_FB.q14a1_loss);
+    var muscled = nm.delivery >= NM_GATE.q14_muscle || nm.congress_2019 === "gop_senate";
+    nmSetFeedback(8182, muscled ? NM_FB.q14a2_win : nmQ14A2Loss());
+    nmSetFeedback(8183, nm.rec_progressive >= 2 ? NM_FB.q14a3_win : NM_FB.q14a3_loss);
 }
 
 cyoAdventure = function (a) {
@@ -508,8 +581,8 @@ cyoAdventure = function (a) {
             // The doc's dangling fourth FX-ELSE is dead code and is dropped per bible §9.4
             if (nm.rec_foreign >= 2) {
                 nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
-                campaignTrail_temp.question_number = 15; // next shown = index 16 (terminal)
-            } else if (nm.delivery >= 1) {
+                campaignTrail_temp.question_number = 16; // next shown = index 17 (terminal)
+            } else if (nm.delivery >= NM_GATE.q7_contained) {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
             } else {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", -1); nmAdd("rec_legitimacy", -1); nmAfterQ7(); // ESCALATION
@@ -519,20 +592,25 @@ cyoAdventure = function (a) {
         case 8104: nmAdd("rec_foreign", 1); nmAdd("delivery", 1); nmAfterQ7(); break;
 
         // ---- Q8 — Parkland / guns ----
-        case 8111: nmAdd("delivery", 1); nmAdd("rec_social", 1); nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
+        // delivery grants follow guns_result per the write rule (bible §2.1):
+        // the three guaranteed partials pay 0, and only the record-gated win
+        // pays the +2 premium that prices the risk of reaching for it.
+        case 8111: nmAdd("rec_social", 1); nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
         case 8112:
-            if (nm.delivery >= 2) { nmAdd("delivery", 1); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.guns_result = "win"; }
+            if (nm.delivery >= NM_GATE.q8_strong) { nmAdd("delivery", 2); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.guns_result = "win"; }
             else if (nm.delivery >= 0) { nmAdd("rec_social", 1); nm.guns_result = "partial"; }
             else { nmAdd("delivery", -1); nmAdd("rec_social", 1); nm.guns_result = "loss"; }
             nmAfterQ8(); break;
-        case 8113: nmAdd("delivery", 1); nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
-        case 8114: nmAdd("delivery", 1); nmAdd("rec_social", 1); nm.guns_result = "partial"; nmAfterQ8(); break;
+        case 8113: nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
+        // A4's prose (the Safe Kids and Schools Act) overshoots its partial flag;
+        // bible §9.5 item 9 keeps the flag and revises the prose down later.
+        case 8114: nmAdd("rec_social", 1); nm.guns_result = "partial"; nmAfterQ8(); break;
 
         // ---- Q9 — RBG vacancy ----
         case 8121: nmAdd("delivery", 1); nmAdd("rec_social", 1); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; break;
-        case 8122: nmAdd("delivery", 1); nmAdd("rec_progressive", -1); nmAdd("rec_social", -1); nm.scotus_result = "partial"; break;
+        case 8122: nmAdd("rec_progressive", -1); nmAdd("rec_social", -1); nm.scotus_result = "partial"; break;
         case 8123:
-            if (nm.delivery >= 2) { nmAdd("delivery", 1); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; }
+            if (nm.delivery >= NM_GATE.q9_confirmed) { nmAdd("delivery", 2); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; }
             else { nmAdd("delivery", -1); nmAdd("rec_progressive", 1); nm.scotus_result = "loss"; }
             break;
         case 8124:
@@ -548,10 +626,12 @@ cyoAdventure = function (a) {
 
         // ---- Q11 — Executive Time (flows into Q12 at index 14) ----
         case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; nmAfterQ11(); break;
-        case 8142: nmAdd("delivery", 2); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; nmAfterQ11(); break;
-        // A3 is deliberately inert: the doc's FX is "delivery 0; midterm_push=true",
-        // and midterm_push was cut, so this answer moves nothing.
-        case 8143: nmAfterQ11(); break;
+        // A2 pays +1, not the v0.7 +2: it was the largest unconditional delivery
+        // grant in the mod, and its closest analogue (Q3c A2) pays +1 (bible §2.1).
+        case 8142: nmAdd("delivery", 1); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; nmAfterQ11(); break;
+        // A3 moves no tally; it banks midterm_push, the 1-point discount on the
+        // Q13 A2/A3 gate and that flag's only consumer (bible §3.1).
+        case 8143: nm.midterm_push = true; nmAfterQ11(); break;
         case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); nmAfterQ11(); break;
 
         // ---- Q12 — Warren Relationship (index 14, flows into Q13 at index 15) ----
@@ -562,41 +642,88 @@ cyoAdventure = function (a) {
         case 8162: nmAdd("warren_relationship", -1); nm.hosts_burned++; nmAfterQ12(); break;
         case 8163: nmAdd("delivery", 1); nmAdd("warren_relationship", 1); nmAfterQ12(); break;
         case 8164:
-            if (nm.delivery >= 2) { nmAdd("rec_progressive", 1); }
+            if (nm.delivery >= NM_GATE.q12_viral) { nmAdd("rec_progressive", 1); }
             else { nmAdd("rec_progressive", -1); nmAdd("warren_relationship", -1); nm.hosts_burned++; }
             nmAfterQ12();
             break;
 
-        // ---- Q13 — Midterms (last drafted question; ends the run) ----
+        // ---- Q13 — Midterms (index 15, flows into Q14 at index 16) ----
         // Each answer reads its condition off the *prior* tallies, so every test
-        // runs before this answer's own nmAdd calls.
-        // Jump lands question_number on 16, which the engine increments to 17 =
-        // question_count — election night fires only on strict equality, and the
-        // jump also steps over the terminal question parked at index 16.
+        // runs before this answer's own nmAdd calls. A2 is the sole route to
+        // dem_house (bible §3.1 invariant); A3 tops out at status_quo and, per
+        // the write rule, its failure branch now costs delivery -1 rather than
+        // being a free roll. No jump: Q14 is the next slot.
+        // nmAfterQ13 runs last — it reads what this answer just wrote.
         case 8171:
             if (nm.rec_progressive >= 1) { nmAdd("delivery", 1); nm.congress_2019 = "status_quo"; }
             else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
-            campaignTrail_temp.question_number = 16;
+            nmAfterQ13();
             break;
         case 8172:
-            if (nm.delivery >= 2) { nmAdd("delivery", 2); nm.congress_2019 = "dem_house"; }
+            if (nmQ13Hold()) { nmAdd("delivery", 2); nm.congress_2019 = "dem_house"; }
             else { nmAdd("delivery", -2); nm.congress_2019 = "gop_senate"; }
             nmAdd("rec_labor", 1); // both branches
-            campaignTrail_temp.question_number = 16;
+            nmAfterQ13();
             break;
         case 8173:
-            if (nm.delivery >= 2) { nm.congress_2019 = "status_quo"; }
-            else { nm.congress_2019 = "gop_senate"; }
-            campaignTrail_temp.question_number = 16;
+            if (nmQ13Hold()) { nm.congress_2019 = "status_quo"; }
+            else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
+            nmAfterQ13();
             break;
         case 8174:
             if (nm.norms_weaponized) { nm.congress_2019 = "status_quo"; }
             else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
-            campaignTrail_temp.question_number = 16;
+            nmAfterQ13();
+            break;
+
+        // ---- Q14 — Immigration (last drafted question; ends the run) ----
+        // Positional-write principle (bible §6.5): rec_progressive records the
+        // position and so fires on both branches of an answer, while delivery
+        // records whether it worked. A1 and A3 win through a record-gated branch
+        // and pay +2; A2's win is partly ungated by the gop_senate relief, so it
+        // stays at +1 (bible §2.1, Q14 A2 exception).
+        // Jump lands question_number on 17, which the engine increments to 18 =
+        // question_count — election night fires only on strict equality, and the
+        // jump also steps over the terminal question parked at index 17.
+        case 8181:
+            if (nm.congress_2019 === "dem_house") {
+                nmAdd("delivery", 2); nmAdd("rec_immigration", 2); nm.immigration_result = "win";
+            } else {
+                nmAdd("delivery", -1); nm.immigration_result = "loss";
+            }
+            nmAdd("rec_progressive", 1); // both branches
+            campaignTrail_temp.question_number = 17;
+            break;
+        case 8182:
+            if (nm.delivery >= NM_GATE.q14_muscle || nm.congress_2019 === "gop_senate") {
+                nmAdd("delivery", 1); nmAdd("rec_immigration", -1); nm.immigration_result = "win";
+            } else {
+                nmAdd("delivery", -1); nm.immigration_result = "loss";
+            }
+            nmAdd("rec_progressive", -1); // both branches
+            campaignTrail_temp.question_number = 17;
+            break;
+        case 8183:
+            // Nixon-to-China: the moderate-coded answer needs a progressive record.
+            if (nm.rec_progressive >= 2) {
+                nmAdd("delivery", 2); nmAdd("rec_immigration", 1); nm.immigration_result = "win";
+            } else {
+                nmAdd("delivery", -1); nm.immigration_result = "loss";
+            }
+            nmAdd("rec_progressive", -1); // both branches
+            campaignTrail_temp.question_number = 17;
+            break;
+        case 8184:
+            // The duck: no gate, and the pen costs legitimacy. Bible §9.9 notes
+            // the drafted prose does not yet earn that -1; the write stands and
+            // the prose gets teeth in a later pass.
+            nmAdd("rec_immigration", 1); nmAdd("rec_legitimacy", -1);
+            nm.immigration_result = "partial";
+            campaignTrail_temp.question_number = 17;
             break;
 
         // ---- A HOUSE OF DYNAMITE terminal ----
-        // No jump needed: index 16 + 1 = 17 = question_count, so the game ends.
+        // No jump needed: index 17 + 1 = 18 = question_count, so the game ends.
         // TODO: replace election night with a proper ending screen at the pivot build.
         case 8151: break;
     }
@@ -608,6 +735,11 @@ cyoAdventure = function (a) {
    entry whose gate matches. NOT WIRED UP YET: threshold numbers
    (fail floor, triumph ceiling, axis ceilings) are still TBD
    (bible §9.5), and `success` is only computed at the pivot.
+   On the widened rec_progressive axis the bible's provisional
+   values are the rails themselves — progressive ceiling +3 for
+   Rubio, moderate floor -3 for Tucker — which keeps both as
+   genuine extremity outcomes and keeps them distinct from Q14
+   A3's >= +2 gate. Confirm before this block is finalized (§4.1).
    Colors follow the mod scheme: GOP #FF0000 / #FFA0A0.
    TODO: image_url + description for the six new candidates.
    ============================================================ */

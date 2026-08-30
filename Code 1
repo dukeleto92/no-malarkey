@@ -951,6 +951,12 @@ try {
         "#campaign_sign p { display: none; }" +
         /* Advisor feedback photo: crop to its 208x128 box instead of squashing */
         "#visit_content img { object-fit: cover; }" +
+        /* The engine hard-codes the advisor image to a 208x128 landscape frame in
+           half a dozen places, so target it by those attributes rather than by any
+           one container. Favreau's photo is a tall portrait with his head near the
+           top; a centred cover-crop keeps the middle band, which is chin to chest.
+           Pulling the crop origin to 5% down puts the whole head in frame. */
+        "img[width='208'][height='128'] { object-fit: cover; object-position: 50% 5%; }" +
         /* Let windows grow with their text instead of overflowing */
         /* flow-root makes the window contain the floated ticket photos so they
            stay inside its bottom border */

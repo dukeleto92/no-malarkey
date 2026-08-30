@@ -837,6 +837,27 @@ function nmPaintTracker() {
     } catch (e) { /* never let the read-out break the run */ }
 }
 
+/* The panel stays hidden through election select, candidate select and the
+   bios, and appears with the first question. `#progress_bar` is built by the
+   engine's questionHTML() and exists on no earlier screen, which makes it the
+   cleanest "the game has actually started" marker available to a mod. */
+function nmGameStarted() {
+    return !!document.getElementById("progress_bar");
+}
+
+function nmWatchForGameStart(box) {
+    if (nmGameStarted()) { box.style.display = ""; nmPaintTracker(); return; }
+    box.style.display = "none";
+    var poll = setInterval(function () {
+        try {
+            if (!nmGameStarted()) return;
+            clearInterval(poll);
+            box.style.display = "";
+            nmPaintTracker();
+        } catch (e) { clearInterval(poll); }
+    }, 400);
+}
+
 function nmBuildTracker() {
     if (document.getElementById("nm_tracker")) return;
     var box = document.createElement("div");
@@ -860,6 +881,7 @@ function nmBuildTracker() {
     };
     applyOpen();
     nmPaintTracker();
+    nmWatchForGameStart(box);
 }
 
 /* ============================================================

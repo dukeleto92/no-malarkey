@@ -202,20 +202,63 @@ jet_data = {
 
 /* ============================================================
    NO MALARKEY — govern-phase engine (Q1–Q14)
-   Source: scenario bible v0.8 + drafted questions doc.
+   Source: scenario bible v0.9 + drafted questions doc.
    Tally tiers per bible §2; FX blocks per the doc's A-lines.
 
-   v0.8 calibration, applied here:
-     - delivery-write rule (§2.1): the grant is derived from the
-       answer's result class — loss -1, partial 0, win +1, and a win
-       through a record-gated branch +2. RNG wins stay flat at +1.
-     - half-ceiling gate ladder (§2.3): Q7 >= +1, Q8 >= +2, Q9 >= +3,
-       Q12 >= +4, Q13 >= +5 (>= +4 with midterm_push), Q14 >= +6.
-     - rec_progressive clamps at +-3 (§2); every other Tier A axis
-       stays at +-2.
-     - midterm_push is live again (Q11 A3 sets it, Q13 A2/A3 discount).
-     - Q14 Immigration is drafted and locked (§6); The Ticket (Q15)
-       is specced but undrafted, so the govern phase still ends at Q14.
+   v0.9 calibration, applied here:
+     - delivery-write rule (§2.1, extended by §D): every answer carries a
+       declared outcome class — loss -1, partial 0, win +1, a win through a
+       record-gated branch +2, an RNG win a flat +1 — whether or not its
+       question carries a result flag. The rule used to derive the class from
+       the flag, so the flagless questions fell straight through it; Q7 A4,
+       Q11 A1 and Q12 A3 all paid a win's grant for a partial and now pay 0.
+     - floor_safe (§B): the best delivery an *accumulator-blind* player can
+       hold — one who never picks an answer that branches on delivery(prior)
+       or on an RNG roll. It is the second input to every gate and is carried
+       beside the ceiling in the ledger from now on.
+     - gate ladder re-anchored (§E) on floor_safe(n) + floor(gap(n) / 2), where
+       gap = ceiling - floor_safe: Q8 >= +3, Q9 >= +4, Q12 >= +7, Q13 >= +7
+       (>= +5 with midterm_push), Q14 >= +8. Q7 stays >= +1 as a declared
+       exemption. See NM_GATE for why the v0.8 half-ceiling ladder could not
+       have worked at any numerals.
+     - midterm_push repriced (§G): the Q13 discount is 2 points, not 1. At 1 it
+       exactly cancelled the delivery Q11 A3 gives up against its siblings, so
+       the flag was worth precisely zero from the day it was introduced.
+     - midterm_result (§K): Q13 gets the standard win/partial/loss flag, so the
+       write rule derives its grants like every other question's instead of
+       leaving them hand-set and internally inconsistent.
+     - rec_progressive still clamps at +-3 (§2); every other Tier A axis is +-2.
+
+   Ledger after the above (§F), reproduced by an exhaustive walk of the phase:
+
+       read         ceiling   floor   floor_safe
+       Q7  A2          +3      -3        +3
+       Q8  A2          +4      -4        +3
+       Q9  A3          +6      -5        +3
+       Q12 A4          +9      -6        +5
+       Q13 A2/A3       +9      -6        +5
+       Q14 A2         +11      -8        +6
+       end of govern  +13      -9        +8
+
+   §A's three desyncs are desyncs in the *document*, not here: the mod has only
+   ever carried one favreau_senate block and has gated it at hosts_burned >= 2
+   since v0.8, Q7 A2 has no dangling fourth branch (see case 8102), and its
+   terminal test is already `rec_foreign >= 2` and not an equality. Nothing to
+   apply; §A.3's prerequisite for §L is satisfied on this side. §C adds a
+   fourth of the same kind, and that one WAS live — see case 8163.
+
+   Deliberately NOT in this pass:
+     - §H, rec_progressive saturation. The axis rails by Q2-Q3, not Q6-Q8, so
+       Q13 A1's >= +1 and Q14 A3's >= +2 are close to free. The bible holds the
+       fix back explicitly: two difficulty levers moving together is how v0.8
+       produced a result nobody could attribute. Land this, play it, then move
+       the axis.
+     - §I, the two dominated answers (Q8 A3, Q9 A2). Q8 A3's proposed fix is a
+       delivery +1, which would raise floor_safe and re-derive the whole ladder
+       — so it belongs with §H, not here. Both are marked at their case below.
+     - §L, the freed immigration slot. Still undrafted, and gated on §A.3.
+     - Q14 Immigration is drafted and locked (§6); The Ticket (Q15) is specced
+       but undrafted, so the govern phase still ends at Q14.
    ============================================================ */
 
 campaignTrail_temp.cyoa = true;
@@ -269,8 +312,11 @@ var nm = {
     harris_scotus: false,
     nato_tour: false, // see bible §9.2 — may become ukraine_trip
     debt_relief: false,
-    // Q11 A3 → the 1-point discount on the Q13 A2/A3 gate (bible §3.1)
+    // Q11 A3 → the 2-point discount on the Q13 A2/A3 gate (bible §3.1, §G)
     midterm_push: false,
+    // Q13 result flag (bible §K): "win" | "partial" | "loss". Added in v0.9 so
+    // Q13's delivery grants are derived by the write rule rather than hand-set.
+    midterm_result: null,
     // Q13 outcome (bible §3.1): "status_quo" | "dem_house" | "gop_senate"
     congress_2019: null,
     // Q14 outcome (bible §3.1): "win" (a law) | "partial" (the pen) | "loss"
@@ -356,28 +402,102 @@ function nmQ14A2Loss() {
    v0.7's threshold of 3 required the unique maximal burn path (hosts_burned
    tops out at exactly 3: Q1 A3 + Q3a A2 + one of Q12 A2 / Q12 A4-fail), which
    hard-gated the secret path on the Q2 healthcare route. Lowering it to 2 opens
-   several combinations, and the widened +-3 progressive clamp is what keeps the
-   moderate floor doing independent work: three of the four burn sources also
-   write rec_progressive -1, so on the old +-2 clamp two burns had all but
-   guaranteed the floor. Reaching -3 now takes a further moderate move. */
+   several combinations.
+
+   The second condition does NOT do the independent work §5 claimed for it, and
+   §H.3 is where that fell over. The argument was that on the widened +-3 clamp,
+   reaching -3 takes at least one further moderate move beyond the burns. It
+   does not: Q1 A3 and Q2 A4 alone put a player at -2 and any third moderate
+   write rails them, which on a twelve-source axis is nothing to arrange. The
+   moderate floor is close to a freebie here for the same reason Q13 A1's >= +1
+   and Q14 A3's >= +2 are. Fixing it is §H's job — the widening moved the rail
+   by about one question, not the six §9.8 assumed — and §H is deliberately not
+   in this pass, so the threshold stands as-is and this comment is the record. */
 var NM_FAVREAU_GATE = { hosts_burned_min: 2, progressive_max: -3 };
 
-/* Gate ladder (bible §2.3): each delivery(prior) read sits at half the
-   reachable delivery ceiling at that point, rounded down. Q8 is the anchor.
+/* Gate ladder (bible v0.9 §E.1): each delivery(prior) gate sits at
+
+       floor_safe(n) + floor((ceiling(n) - floor_safe(n)) / 2)
+
+   — half the distance between the best risk-free position and the best
+   possible one. Clearing a gate therefore takes roughly one successful reach
+   beyond safe play, and the number of reaches grows as the phase goes on.
+
+   v0.8 anchored on the ceiling alone, and that could not have worked at any
+   numerals (§B.3): the free +1s are spread evenly across the phase, so the
+   risk-free line rises at about half the ceiling's slope. The two curves are
+   near parallel, and a half-ceiling gate lands on the risk-free line however
+   it is tuned. Anchoring at both ends is what fixes it — a new delivery source
+   now moves the gate differently depending on whether it is free or risky,
+   which is exactly the discrimination the old rule lacked.
+
+       gate   floor_safe   ceiling   gap   sits at   cheapest clearing route
+       Q8         +3         +4       1      +3      perfect safe play, no reach
+       Q9         +3         +6       3      +4      the above + one reach
+       Q12        +5         +9       4      +7      floor_safe + Q8 A2 win
+       Q13        +5         +9       4      +7      same
+       Q14        +6        +11       5      +8      same, +6 already counting
+                                                     Q13 A1 — still one reach
+
+   Q8's is the only gate clearable without a reach, deliberately: at that
+   position there is nothing to reach for yet. It is the last gate that tests
+   avoiding failure; from Q9 on they test succeeding at risk.
+
+   Two of §E's reachability notes do not survive measurement, and the numerals
+   above are right in both cases — it is the prose under them that is off:
+
+     - §E.3 calls Q14 "the only two-reach gate in the mod", counting a Q8 A2
+       win and a Q13 A2 win. floor_safe at Q14 is +6 and that already includes
+       Q13 A1's free +1, so the Q8 A2 win alone lands exactly on +8. Q14 is a
+       one-reach gate, like Q12 and Q13. §13's playtest note singles it out on
+       the strength of the two-reach claim; Q12 remains the sharper target,
+       since it jumps three points and its failure branch feeds hosts_burned.
+     - §G says the 2-point discount lets a cautious player clear Q13 without a
+       reach, because +5 "lands exactly on floor_safe". It does not follow:
+       floor_safe +5 is measured on a line that spends Q11 on A4's +1, and
+       taking A3 to bank the flag is what gives that point up. The blind push
+       line tops out at +4 — one short. The flag's net +1 is real, but the
+       bargain as described needs a 3-point discount, which would contradict
+       §G's own "net value: +1". Left at 2, since that is the stated numeral.
+
    Recompute the whole ladder if a new delivery source is ever added. */
 var NM_GATE = {
-    q7_contained: 1,   // ceiling +3
-    q8_strong: 2,      // ceiling +4  (anchor)
-    q9_confirmed: 3,   // ceiling +6
-    q12_viral: 4,      // ceiling +9
-    q13_hold: 5,       // ceiling +10, -1 with midterm_push
-    q14_muscle: 6      // ceiling +12
+    /* Q7 is a declared exemption from the rule above, not a gate derived by it.
+       gap is 0 there — floor_safe and the ceiling are both +3 — so the rule
+       returns +3, which would be simultaneously maximally demanding and
+       completely free. It is incoherent because there is nothing yet to be
+       demanding about: no answer before Q7 trades risk for delivery, so there
+       is no record to discriminate on (§B.4). >= +1 does a different and
+       legitimate job — it separates a player who has actively failed
+       (healthcare loss, Q4 A3, Q6 A1) from one who has not. Document it as a
+       failure check. The exemption ends if the freed slot lands early and
+       brings the front half its first delivery risk (§L). */
+    q7_failure_check: 1,
+    q8_strong: 3,
+    q9_confirmed: 4,
+    q12_viral: 7,
+    q13_hold: 7,
+    q14_muscle: 8,
+    /* midterm_push's discount on the Q13 gate (§G). Q11 A3 pays delivery 0
+       where its siblings pay +1, so taking it costs a point. At a 1-point
+       discount the flag bought back exactly that point and nothing else —
+       gate >= +4 holding X is the same position as gate >= +5 holding X + 1 —
+       and it was strictly worse if the player then took a Q13 answer that does
+       not read it, or needed the point at Q14. It was mechanically null for
+       two revisions. At 2 the flag is worth net +1. See the note above on why
+       it does not also buy a reach-free clear of Q13. */
+    q13_push_discount: 2
 };
 
-// Q13 A2/A3 compound gate: the tally band, or one step lower with midterm_push.
+/* Q13 A2/A3's gate, in full: the tally band OR the midterm_push relief band.
+   Both halves are the gate. Documenting it as its simple half ">= +7" is the
+   §J violation — a compound gate written up as one of its branches is worse
+   than a wrong numeral, because the player has no way to learn the relief
+   branch exists at all. Any prose label for this node reads
+   ">= +7, or >= +5 with a midterm push". */
 function nmQ13Hold() {
     return nm.delivery >= NM_GATE.q13_hold
-        || (nm.midterm_push && nm.delivery >= NM_GATE.q13_hold - 1);
+        || (nm.midterm_push && nm.delivery >= NM_GATE.q13_hold - NM_GATE.q13_push_discount);
 }
 
 function nmFavreauSenate() {
@@ -395,27 +515,29 @@ function nmAfterQ3() {
     campaignTrail_temp.question_number = 5; // next shown = index 6 (Q4)
 }
 
-// After Q6: pre-write Q7 A2 feedback (reads rec_foreign(prior) and delivery(prior))
-// Terminal gate is >= +2, not == +2, per bible §10.3
+// After Q6: pre-write Q7 A2 feedback (reads rec_foreign(prior) and delivery(prior)).
+// Terminal gate is >= +2, not == +2, per bible §10.3. The delivery read below is
+// the failure check, not a ladder gate — see NM_GATE.q7_failure_check.
 function nmAfterQ6() {
     var text = nm.rec_foreign >= 2 ? NM_FB.q7a2_terminal :
-               (nm.delivery >= NM_GATE.q7_contained ? NM_FB.q7a2_contained : NM_FB.q7a2_escalation);
+               (nm.delivery >= NM_GATE.q7_failure_check ? NM_FB.q7a2_contained : NM_FB.q7a2_escalation);
     nmSetFeedback(8102, text);
 }
 
-// After Q7: pre-write Q8 A2 feedback (reads delivery(prior) bands: >=+2 / 0..+1 / <0)
+// After Q7: pre-write Q8 A2 feedback. Three delivery(prior) bands, each closed
+// at both ends per §J: >= +3 strong / >= 0 and < +3 partial / < 0 failure.
 function nmAfterQ7() {
     var text = nm.delivery >= NM_GATE.q8_strong ? NM_FB.q8a2_strong :
                (nm.delivery >= 0 ? NM_FB.q8a2_partial : NM_FB.q8a2_failure);
     nmSetFeedback(8112, text);
 }
 
-// After Q8: pre-write Q9 A3 feedback (reads delivery(prior): >=+3 confirmed / <+3 sunk)
+// After Q8: pre-write Q9 A3 feedback (reads delivery(prior): >= +4 confirmed / < +4 sunk)
 function nmAfterQ8() {
     nmSetFeedback(8123, nm.delivery >= NM_GATE.q9_confirmed ? NM_FB.q9a3_win : NM_FB.q9a3_sunk);
 }
 
-// After Q11: pre-write Q12 A4 feedback (reads delivery(prior): >=+4 viral / <+4 resentful)
+// After Q11: pre-write Q12 A4 feedback (reads delivery(prior): >= +7 viral / < +7 resentful)
 function nmAfterQ11() {
     nmSetFeedback(8164, nm.delivery >= NM_GATE.q12_viral ? NM_FB.q12a4_viral : NM_FB.q12a4_resentful);
 }
@@ -438,8 +560,12 @@ function nmAfterQ12() {
 }
 
 /* After Q13: pre-write the three conditional Q14 variants. Q14 A1 branches on
-   congress_2019, A2 on delivery(prior) >= +6 OR congress_2019 = gop_senate, and
+   congress_2019, A2 on delivery(prior) >= +8 OR congress_2019 = gop_senate, and
    A3 on rec_progressive(prior) >= +2 — all of which Q13 has just finalised.
+
+   A2's gate is compound and any prose label has to say so in full (§J): the
+   gop_senate relief is described in §6.3 as the node's sharpest idea, and
+   labelling it ">= +8" alone leaves it invisible to the person playing.
    A4 is unconditional, so its stored feedback stands.
 
    Outstanding (bible §9.10): the question's framing line still says Favreau and
@@ -522,9 +648,17 @@ cyoAdventure = function (a) {
         case 8083: nmAdd("delivery", 1); nmAdd("rec_trade", 2); nmAdd("rec_labor", -2); nmAdd("rec_progressive", -1); break;
 
         // ---- Q6 — Afghanistan ----
+        /* The `nmAdd("delivery", 0)` calls here and at Q12 are not dead code.
+           Bible §K: validator item 5 can check a grant against a declared
+           outcome class, but it cannot check a write that is not there — an
+           absent term and a declared partial look identical. The six writes
+           §K asks for are Q6 A2 and A3 and all four Q12 branches; §K names
+           "Q6 A3, Q12 A1, Q12 A2, Q12 A4 (both branches)", which is five
+           against its own count of six, and Q6 A2 is the answer that squares
+           it. Both Q6 answers are partials either way, so both get the write. */
         case 8091: nmAdd("rec_foreign", -2); nmAdd("delivery", -1); nmAfterQ6(); break;
-        case 8092: nmAfterQ6(); break;
-        case 8093: nmAdd("rec_foreign", 2); nmAdd("warren_relationship", -1); nmAdd("rec_progressive", -1); nmAfterQ6(); break;
+        case 8092: nmAdd("delivery", 0); nmAfterQ6(); break;
+        case 8093: nmAdd("delivery", 0); nmAdd("rec_foreign", 2); nmAdd("warren_relationship", -1); nmAdd("rec_progressive", -1); nmAfterQ6(); break;
 
         // ---- Q7 — North Korea ----
         case 8101: nmAdd("rec_foreign", -1); nmAfterQ7(); break;
@@ -533,14 +667,21 @@ cyoAdventure = function (a) {
             if (nm.rec_foreign >= 2) {
                 nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
                 campaignTrail_temp.question_number = 16; // next shown = index 17 (terminal)
-            } else if (nm.delivery >= NM_GATE.q7_contained) {
+            } else if (nm.delivery >= NM_GATE.q7_failure_check) {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
             } else {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", -1); nmAdd("rec_legitimacy", -1); nmAfterQ7(); // ESCALATION
             }
             break;
         case 8103: nmAdd("rec_foreign", -2); nmAfterQ7(); break;
-        case 8104: nmAdd("rec_foreign", 1); nmAdd("delivery", 1); nmAfterQ7(); break;
+        /* A4 pays 0, not the v0.8 +1 (bible §D). Its feedback ends "...but does
+           it really make a difference?" — Kim goes on firing missiles into the
+           Sea of Japan and the sanctions regime is framed as inconsequential in
+           the prose itself. That is a partial, and it was paying a win's grant.
+           It is one of the two answers v0.8's correction pass could not see,
+           because §2.1 derived the class from the question's result flag and
+           Q7 does not have one. */
+        case 8104: nmAdd("rec_foreign", 1); nmAdd("delivery", 0); nmAfterQ7(); break;
 
         // ---- Q8 — Parkland / guns ----
         // delivery grants follow guns_result per the write rule (bible §2.1):
@@ -552,6 +693,14 @@ cyoAdventure = function (a) {
             else if (nm.delivery >= 0) { nmAdd("rec_social", 1); nm.guns_result = "partial"; }
             else { nmAdd("delivery", -1); nmAdd("rec_social", 1); nm.guns_result = "loss"; }
             nmAfterQ8(); break;
+        /* OPEN (bible §I.1, must-clear item 6): A1, A3 and A4 are mechanically
+           the same answer — delivery 0, guns_result partial — separated only by
+           rec_social +1 (A1, A4) and rec_progressive -1 (A1, A3). A4 strictly
+           dominates: it has A1's upside without A1's cost, and A3 pays a
+           positional cost for nothing at all. §I recommends giving A3 a
+           delivery +1 ("a narrow bill that's guaranteed to pass" is exactly the
+           safe-delivery answer), but that raises floor_safe by one and
+           re-derives the ladder with it — so it lands with §H, not here. */
         case 8113: nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
         // A4's prose (the Safe Kids and Schools Act) overshoots its partial flag;
         // bible §9.5 item 9 keeps the flag and revises the prose down later.
@@ -559,6 +708,14 @@ cyoAdventure = function (a) {
 
         // ---- Q9 — RBG vacancy ----
         case 8121: nmAdd("delivery", 1); nmAdd("rec_social", 1); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; break;
+        /* OPEN (bible §I.2, must-clear item 6): A2 is worse than the ungated A1
+           on every single term and buys no flag in exchange — the only answer
+           in the mod dominated on every axis with nothing hidden behind it
+           (A4 is also a partial, but at least buys harris_scotus, which Q15 A4
+           reads). §I recommends rec_legitimacy +1: Srinivasan is the
+           bipartisan-confirmation answer and the fiction fits exactly. It is
+           held with §I.1 so the node is decided once, deliberately, either way
+           — as a compensation or as a documented punish. */
         case 8122: nmAdd("rec_progressive", -1); nmAdd("rec_social", -1); nm.scotus_result = "partial"; break;
         case 8123:
             if (nm.delivery >= NM_GATE.q9_confirmed) { nmAdd("delivery", 2); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; }
@@ -576,54 +733,93 @@ cyoAdventure = function (a) {
         case 8134: nmAdd("rec_legitimacy", 1); break;
 
         // ---- Q11 — Executive Time (flows into Q12 at index 14) ----
-        case 8141: nmAdd("delivery", 1); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; nmAfterQ11(); break;
+        /* A1 pays 0, not the v0.8 +1 (bible §D) — the other answer the flagless
+           questions hid from v0.8's correction pass. A five-capital tour
+           delivers nothing material; Pfeiffer's favourable contrast with
+           Republican chaos is positioning, and it is already paid for with the
+           rec_legitimacy +1 on the same line. Compare A2 and A4, which sign
+           instruments that survive contact with the world.
+
+           Before this, three of Q11's four answers paid a flat +1 with no gate,
+           no flag and no risk, which made Q11 the single densest free-delivery
+           node in the mod. Now +1 is what the two enacting answers pay. */
+        case 8141: nmAdd("delivery", 0); nmAdd("rec_legitimacy", 1); nm.nato_tour = true; nmAfterQ11(); break;
         // A2 pays +1, not the v0.7 +2: it was the largest unconditional delivery
         // grant in the mod, and its closest analogue (Q3c A2) pays +1 (bible §2.1).
         case 8142: nmAdd("delivery", 1); nmAdd("rec_progressive", 1); nmAdd("rec_legitimacy", -1); nmAdd("warren_relationship", 1); nm.debt_relief = true; nmAfterQ11(); break;
-        // A3 moves no tally; it banks midterm_push, the 1-point discount on the
-        // Q13 A2/A3 gate and that flag's only consumer (bible §3.1).
-        case 8143: nm.midterm_push = true; nmAfterQ11(); break;
+        /* A3 moves no tally; it banks midterm_push, the discount on the Q13
+           A2/A3 gate and that flag's only consumer (bible §3.1). A1's correction
+           above sharpens what A3 costs — it now forgoes the +1 that A2 and A4
+           pay, and §G's 2-point discount is what finally makes that trade worth
+           taking. See NM_GATE.q13_push_discount. */
+        case 8143: nmAdd("delivery", 0); nm.midterm_push = true; nmAfterQ11(); break;
         case 8144: nmAdd("delivery", 1); nmAdd("rec_labor", 2); nmAdd("rec_progressive", 1); nmAfterQ11(); break;
 
         // ---- Q12 — Warren Relationship (index 14, flows into Q13 at index 15) ----
         // No jump: Q13 is the next slot, so the natural increment is correct.
         // nmAfterQ12 must run last in each case — it reads the tallies this
         // answer just moved (hosts_burned feeds the Favreau gate).
-        case 8161: nmAdd("warren_relationship", 1); nmAdd("rec_progressive", 1); nmAfterQ12(); break;
-        case 8162: nmAdd("warren_relationship", -1); nm.hosts_burned++; nmAfterQ12(); break;
-        case 8163: nmAdd("delivery", 1); nmAdd("warren_relationship", 1); nmAfterQ12(); break;
+        case 8161: nmAdd("delivery", 0); nmAdd("warren_relationship", 1); nmAdd("rec_progressive", 1); nmAfterQ12(); break;
+        case 8162: nmAdd("delivery", 0); nmAdd("warren_relationship", -1); nm.hosts_burned++; nmAfterQ12(); break;
+        /* A3 pays 0, not +1 — a third instance of §D's class, and a fourth
+           spec/document desync alongside §A's three. §C records Q12 A3 as
+           "already 0" in the live document; it is not, it was +1. It matters
+           because the doc's own v0.9 arithmetic is computed against 0: the
+           §B.2 floor_safe walk takes Q12 A1 as the best free answer, and §F's
+           ceiling drops from +10 to +9 at the Q13 read. With +1 standing, both
+           columns come out a point high from Q13 onward and §E.2's Q14 gate no
+           longer re-derives. Handing Liz an antitrust portfolio that wins
+           "modestly successful" cases is a partial, so 0 is also the right
+           read on its own terms. */
+        case 8163: nmAdd("delivery", 0); nmAdd("warren_relationship", 1); nmAfterQ12(); break;
         case 8164:
-            if (nm.delivery >= NM_GATE.q12_viral) { nmAdd("rec_progressive", 1); }
-            else { nmAdd("rec_progressive", -1); nmAdd("warren_relationship", -1); nm.hosts_burned++; }
+            if (nm.delivery >= NM_GATE.q12_viral) { nmAdd("delivery", 0); nmAdd("rec_progressive", 1); }
+            else { nmAdd("delivery", 0); nmAdd("rec_progressive", -1); nmAdd("warren_relationship", -1); nm.hosts_burned++; }
             nmAfterQ12();
             break;
 
-        // ---- Q13 — Midterms (index 15, flows into Q14 at index 16) ----
-        // Each answer reads its condition off the *prior* tallies, so every test
-        // runs before this answer's own nmAdd calls. A2 is the sole route to
-        // dem_house (bible §3.1 invariant); A3 tops out at status_quo and, per
-        // the write rule, its failure branch now costs delivery -1 rather than
-        // being a free roll. No jump: Q14 is the next slot.
-        // nmAfterQ13 runs last — it reads what this answer just wrote.
+        /* ---- Q13 — Midterms (index 15, flows into Q14 at index 16) ----
+           Each answer reads its condition off the *prior* tallies, so every test
+           runs before this answer's own nmAdd calls. A2 is the sole route to
+           dem_house (bible §3.1 invariant); A3 tops out at status_quo. No jump:
+           Q14 is the next slot. nmAfterQ13 runs last — it reads what this answer
+           just wrote.
+
+           midterm_result is new in v0.9 (bible §K). Q13 sat outside §2.1
+           entirely: with no result flag the write rule had nothing to classify
+           against, so its grants were hand-set and came out inconsistent —
+           A3's success paid 0 while A1's paid +1 though both land status_quo.
+           With the flag the grants are simply what the rule says:
+
+               A2 success  record-gated win   +2      A2 failure  -2 *
+               A1 success  win                +1      all others  -1
+               A3, A4 success  partial         0
+
+           * A2's -2 is the one declared exception: it is the largest swing in
+           the phase in both directions and the reason its gate is worth
+           reaching for. Every other failure is a flat loss at -1. The grants
+           below are unchanged by the flag — that they already matched the rule
+           is the good sign §K was looking for. Q13 is now the second-largest
+           delivery swing in the mod and is legible to the validator. */
         case 8171:
-            if (nm.rec_progressive >= 1) { nmAdd("delivery", 1); nm.congress_2019 = "status_quo"; }
-            else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
+            if (nm.rec_progressive >= 1) { nmAdd("delivery", 1); nm.midterm_result = "win"; nm.congress_2019 = "status_quo"; }
+            else { nmAdd("delivery", -1); nm.midterm_result = "loss"; nm.congress_2019 = "gop_senate"; }
             nmAfterQ13();
             break;
         case 8172:
-            if (nmQ13Hold()) { nmAdd("delivery", 2); nm.congress_2019 = "dem_house"; }
-            else { nmAdd("delivery", -2); nm.congress_2019 = "gop_senate"; }
+            if (nmQ13Hold()) { nmAdd("delivery", 2); nm.midterm_result = "win"; nm.congress_2019 = "dem_house"; }
+            else { nmAdd("delivery", -2); nm.midterm_result = "loss"; nm.congress_2019 = "gop_senate"; }
             nmAdd("rec_labor", 1); // both branches
             nmAfterQ13();
             break;
         case 8173:
-            if (nmQ13Hold()) { nm.congress_2019 = "status_quo"; }
-            else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
+            if (nmQ13Hold()) { nmAdd("delivery", 0); nm.midterm_result = "partial"; nm.congress_2019 = "status_quo"; }
+            else { nmAdd("delivery", -1); nm.midterm_result = "loss"; nm.congress_2019 = "gop_senate"; }
             nmAfterQ13();
             break;
         case 8174:
-            if (nm.norms_weaponized) { nm.congress_2019 = "status_quo"; }
-            else { nmAdd("delivery", -1); nm.congress_2019 = "gop_senate"; }
+            if (nm.norms_weaponized) { nmAdd("delivery", 0); nm.midterm_result = "partial"; nm.congress_2019 = "status_quo"; }
+            else { nmAdd("delivery", -1); nm.midterm_result = "loss"; nm.congress_2019 = "gop_senate"; }
             nmAfterQ13();
             break;
 
@@ -893,9 +1089,16 @@ function nmBuildTracker() {
    (bible §9.5), and `success` is only computed at the pivot.
    On the widened rec_progressive axis the bible's provisional
    values are the rails themselves — progressive ceiling +3 for
-   Rubio, moderate floor -3 for Tucker — which keeps both as
-   genuine extremity outcomes and keeps them distinct from Q14
-   A3's >= +2 gate. Confirm before this block is finalized (§4.1).
+   Rubio, moderate floor -3 for Tucker.
+
+   That placement no longer does what §4.1 wanted from it. §H.2
+   measures the axis railing by Q2-Q3, not Q6-Q8: about +12 of
+   positive writes are available across sixteen questions against
+   a +-3 clamp, so the rails are trivially reachable and neither
+   cascade gate reads as a genuine extremity outcome. Numbering
+   these is blocked on §H picking an option — the recommendation
+   is +-5 with Q2 cut to +-1 — and restating them costs nothing
+   today precisely because they are still unset (§4.1).
    Colors follow the mod scheme: GOP #FF0000 / #FFA0A0.
    TODO: image_url + description for the six new candidates.
    ============================================================ */

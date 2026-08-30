@@ -145,9 +145,18 @@ campaignTrail_temp.questions_json = [
     },
     {
         "model": "campaign_trail.question",
-        "pk": 815,
+        "pk": 818,
         "fields": {
             "priority": 16,
+            "description": "Now that the midterms are over, there is time for one more legislative push in your first term. Your staff is in unanimous agreement: if you're going to try to push something through, it has to be immigration. Klain tells you this is the silver bullet to stopping another Trump-style campaign for the presidency. On Keepin' It 1600, Favreau and Vietor demand that you do something about the country's broken immigration system. What will it be, Mr. President?",
+            "likelihood": 1
+        }
+    },
+    {
+        "model": "campaign_trail.question",
+        "pk": 815,
+        "fields": {
+            "priority": 17,
             "description": "The Air Force…they didn't get all the trucks. It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
             "likelihood": 1
         }
@@ -625,6 +634,38 @@ campaignTrail_temp.answers_json = [
         "fields": {
             "question": 817,
             "description": "Two years ago, we almost had a fascist conman take over the country. I was the only one who could stop him - the only one. People are already forgetting, and I'm gonna remind them. This is a battle for the soul of this country."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8181,
+        "fields": {
+            "question": 818,
+            "description": "The whole enchilada, no pun intended. Really, I'm serious. We damn near got it done in 2007 when I was still in the Senate. We're not letting it get away from us this time."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8182,
+        "fields": {
+            "question": 818,
+            "description": "Look, this is a hot potato - I mean button - I mean hot-button issue. We can't be seen as legalizing millions of people who shouldn't even be here. Let's make this a border security bill, first and foremost, and increase the number of immigration judges to clear the backlog. But no amnesty."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8183,
+        "fields": {
+            "question": 818,
+            "description": "The answer is obvious. We focus on what people actually say they want. Legalize the DACA and TPS holders, increase the number of Border Patrol agents, and throw in some money for new barriers where they make sense. It's a win all around."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8184,
+        "fields": {
+            "question": 818,
+            "description": "Are you nuts? We can't risk this blowing up with reelection on the horizon. Just tee up some executive orders for me to sign. Easy wins for the base."
         }
     }
 ]
@@ -7070,6 +7111,42 @@ campaignTrail_temp.answer_feedback_json = [
             "answer": 8174,
             "candidate": 300,
             "answer_feedback": "With Trump in jail, people know you're serious about the threat that he and his movement pose to the country. The ensuing campaign is extremely ugly, but Democratic partisans motivated by your imprisonment of their biggest villain keep midterm losses to a minimum."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9060,
+        "fields": {
+            "answer": 8181,
+            "candidate": 300,
+            "answer_feedback": "Republicans, having been sufficiently chastened by the last decade of election results, are finally willing to play ball. Speaker Pelosi ushers the Comprehensive Immigration Reform Act of 2019 through the House, and McConnell lets it pass the Senate with minimal fuss. The law beefs up border security while streamlining pathways to legal immigration. You've landed the white whale."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9061,
+        "fields": {
+            "answer": 8182,
+            "candidate": 300,
+            "answer_feedback": "Vietor paints you as “mealy-mouthed”, but your compromise bill sails through Congress, powered by frontline Republicans and unenthusiastic Democrats."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9062,
+        "fields": {
+            "answer": 8183,
+            "candidate": 300,
+            "answer_feedback": "It takes some cajoling, but you have enough progressive bona fides at this point to get the most liberal members of the Democratic caucus on board with this proposal. The Freedom Caucus, predictably, tries to blow up the whole thing, but enough establishment Republicans are on board that the bill is never seriously threatened."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9063,
+        "fields": {
+            "answer": 8184,
+            "candidate": 300,
+            "answer_feedback": "Your staff finds a few things for you to sign, but unfortunately, Barack already picked most of the low-hanging fruit. Pfeiffer shares a poll in his Message Box newsletter which shows that a majority of voters favor major reform to the immigration system."
         }
     }
 ]

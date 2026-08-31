@@ -44,20 +44,35 @@ campaignTrail_temp.candidate_json = [
     {
         "model": "campaign_trail.candidate",
         "pk": 301,
+        /* The opposition slot. It is deliberately nameless until the nominee
+           cascade fires at the end of the govern phase (NM_GOP_ROSTER /
+           nmResolveNominee below). Every screen the player can reach before
+           then — the estimated-support list on a campaign visit, the mid-game
+           electoral map, its hover tooltips — renders the opponent from this
+           record's last_name, so an empty first_name and a last_name of
+           "The Republicans" is what makes the opposition read as a party
+           rather than a person.
+
+           nmSetNominee() overwrites first_name, last_name, state, image_url
+           and description here, in place. The pk never changes: every
+           candidate_issue_score, candidate_state_multiplier and opponents_*
+           entry in the mod is keyed to 301, and PROPS.CANDIDATES is a getter
+           that rebuilds from candidate_json on every read, so the rename
+           lands on the next paint with nothing to invalidate. */
         "fields": {
-            "first_name": "Donald",
-            "last_name": "Trump",
+            "first_name": "",
+            "last_name": "The Republicans",
             "election": 21,
             "party": "Republican",
-            "state": "Florida",
+            "state": "",
             "priority": 2,
-            "description": "'",
+            "description": "<p>The Republican Party has not settled on a nominee, and until it does it is less a candidate than a mood. Donald Trump never conceded 2016 and never went home. Paul Ryan is running a House that would rather investigate you than legislate. The donors want the fever to break; the base is the fever.</p><p>Whoever they send at you in 2020, they will be running against your record. That is still being written.</p>",
             "color_hex": "#FF0000",
             "secondary_color_hex": "#FFA0A0",
             "is_active": 0,
-            "image_url": "https://www.jetsimon.com/public/static/images/donald-trump-2020.jpg",
-            "electoral_victory_message": "<h3>Congratulations! You have won the 2020 election.</h3><p>For the second time in a row, many analysts saw a victory for you as practically impossible. But whatever they say, it is clear that your Make America Great Again agenda has been vindicated. Where do you take things from here?</p>",
-            "electoral_loss_message": "<h3>Sorry! You have lost the 2020 election.</h3><p>After an election in which many of your supporters claimed democracy itself was at stake, what happens now? Many analysts believe the party will need to go in a completely different direction next time. As for yourself, will you take these results sitting down, or will you prepare yourself for an epic political comeback in 2024?</p>",
+            "image_url": "",
+            "electoral_victory_message": "<h3>Congratulations! You have won the 2020 election.</h3><p>Four years ago the party was written off as a spent force. Whatever the analysts say now, the country has handed it the White House. Where do you take things from here?</p>",
+            "electoral_loss_message": "<h3>Sorry! You have lost the 2020 election.</h3><p>After an election in which many of your opponent's supporters claimed democracy itself was at stake, what happens now? Many analysts believe the party will need to go in a completely different direction next time.</p>",
             "no_electoral_majority_message": "<h3>Congratulations! You have won the 2020 election.</h3><p>In spite of the 269-269 tie in the electoral college, Republicans control a majority of state delegations in the House of Representatives. A lot of liberals are absolutely distraught and outraged that the election came down to such a technicality, but hey, those are the rules!</p>",
             "description_as_running_mate": "",
             "candidate_score": 1,
@@ -326,6 +341,11 @@ var nm = {
     // RNG pre-rolls for Q3c, rolled when Q2 routes there so feedback can be pre-written
     q3c_a2_success: null,
     q3c_a3_success: null,
+    // GOP nominee, resolved by the cascade at the end of the govern phase
+    // (bible §4.1 / the doc's candidate gate table). Holds the roster `key`
+    // — "trump", "cruz", … — and stays null while the opposition is still
+    // just "The Republicans".
+    gop_nominee: null,
     terminal: null
 };
 window.nm = nm; // console debugging
@@ -577,6 +597,20 @@ function nmAfterQ13() {
     var muscled = nm.delivery >= NM_GATE.q14_muscle || nm.congress_2019 === "gop_senate";
     nmSetFeedback(8182, muscled ? NM_FB.q14a2_win : nmQ14A2Loss());
     nmSetFeedback(8183, nm.rec_progressive >= 2 ? NM_FB.q14a3_win : NM_FB.q14a3_loss);
+}
+
+/* End of the govern phase. Every exit from it comes through here: the four Q14
+   answers, and the House of Dynamite terminal, which ends the phase early.
+
+   The one thing it does today is run the nominee cascade, which is what turns
+   the opposition from "The Republicans" into a person — see NM_GOP_ROSTER
+   below for the gate table and why its order matters. It is a named hook and
+   not a bare nmResolveNominee() call at each site because the pivot build has
+   more to hang here (the ticket question, the pivot's own framing screen), and
+   they should all land in one place with one set of guarantees: it runs once,
+   after the phase's last write, before the engine paints anything else. */
+function nmEndGovern() {
+    nmResolveNominee();
 }
 
 cyoAdventure = function (a) {
@@ -832,6 +866,12 @@ cyoAdventure = function (a) {
         // Jump lands question_number on 17, which the engine increments to 18 =
         // question_count — election night fires only on strict equality, and the
         // jump also steps over the terminal question parked at index 17.
+        //
+        // nmEndGovern() runs before the jump on every branch: it is where the
+        // Republicans stop being "The Republicans" and acquire a nominee. It has
+        // to come after this answer's own nmAdd calls, because the last of them
+        // can be the point that clears Jeb's +11 or drops the run to the
+        // delivery <= 0 band that hands the nomination back to Trump.
         case 8181:
             if (nm.congress_2019 === "dem_house") {
                 nmAdd("delivery", 2); nmAdd("rec_immigration", 2); nm.immigration_result = "win";
@@ -839,6 +879,7 @@ cyoAdventure = function (a) {
                 nmAdd("delivery", -1); nm.immigration_result = "loss";
             }
             nmAdd("rec_progressive", 1); // both branches
+            nmEndGovern();
             campaignTrail_temp.question_number = 17;
             break;
         case 8182:
@@ -848,6 +889,7 @@ cyoAdventure = function (a) {
                 nmAdd("delivery", -1); nm.immigration_result = "loss";
             }
             nmAdd("rec_progressive", -1); // both branches
+            nmEndGovern();
             campaignTrail_temp.question_number = 17;
             break;
         case 8183:
@@ -858,6 +900,7 @@ cyoAdventure = function (a) {
                 nmAdd("delivery", -1); nm.immigration_result = "loss";
             }
             nmAdd("rec_progressive", -1); // both branches
+            nmEndGovern();
             campaignTrail_temp.question_number = 17;
             break;
         case 8184:
@@ -866,13 +909,20 @@ cyoAdventure = function (a) {
             // the prose gets teeth in a later pass.
             nmAdd("rec_immigration", 1); nmAdd("rec_legitimacy", -1);
             nm.immigration_result = "partial";
+            nmEndGovern();
             campaignTrail_temp.question_number = 17;
             break;
 
         // ---- A HOUSE OF DYNAMITE terminal ----
         // No jump needed: index 17 + 1 = 18 = question_count, so the game ends.
+        // The govern phase ends here too, seven questions early, and the cascade
+        // still has to run: election night follows this answer, and an unnamed
+        // opponent on the final map is a bug, not a mood. The record is short
+        // and the axes are barely moved, so this route lands on the roster's
+        // outer rows — Trump or Christie on a failing record, Ted Cruz on a
+        // positive one, with the middle seven mostly out of reach.
         // TODO: replace election night with a proper ending screen at the pivot build.
-        case 8151: break;
+        case 8151: nmEndGovern(); break;
     }
     nmPaintTracker(); // every answer is a write; refresh the read-out
 };
@@ -964,7 +1014,13 @@ var NM_TRACKER = {
         { key: "guns_result",        label: "Guns" },
         { key: "scotus_result",      label: "Court" },
         { key: "congress_2019",      label: "Congress" },
-        { key: "immigration_result", label: "Immigration" }
+        { key: "immigration_result", label: "Immigration" },
+        /* Appears only once the cascade has fired, which is the point: until
+           then the row is absent and the opponent is "The Republicans"
+           everywhere the player can look. The gate that selected the nominee
+           is not shown — the tracker's rule is current values, never the
+           threshold a question is about to read (or has just read). */
+        { key: "gop_nominee",        label: "GOP nominee" }
     ],
     // Booleans the player set by an explicit choice; shown only once true
     marks: [
@@ -977,9 +1033,15 @@ var NM_TRACKER = {
     open: true
 };
 
+/* Outcome values to the short tag the tracker prints. The nine nominee keys
+   share the table with the result flags; they are surnames, so a key that ever
+   collides with a flag value would be a bug in the roster, not here. */
 var NM_OUTCOME_LABEL = {
     win: "won", partial: "partial", loss: "lost",
-    dem_house: "Dem House", status_quo: "split", gop_senate: "GOP sweep"
+    dem_house: "Dem House", status_quo: "split", gop_senate: "GOP sweep",
+    trump: "Trump", christie: "Christie", jeb: "Bush", rubio: "Rubio",
+    haley: "Haley", paul: "Paul", pence: "Pence", carlson: "Carlson",
+    cruz: "Cruz"
 };
 
 function nmSigned(v) { return (v > 0 ? "+" : "") + v; }
@@ -1082,38 +1144,175 @@ function nmBuildTracker() {
 }
 
 /* ============================================================
-   Pivot scaffolding — GOP nominee cascade (bible §4.1).
-   The pivot overwrites candidate pk 301 with the first roster
-   entry whose gate matches. NOT WIRED UP YET: threshold numbers
-   (fail floor, triumph ceiling, axis ceilings) are still TBD
-   (bible §9.5), and `success` is only computed at the pivot.
-   On the widened rec_progressive axis the bible's provisional
-   values are the rails themselves — progressive ceiling +3 for
-   Rubio, moderate floor -3 for Tucker.
+   GOP nominee cascade (bible §4.1; gate table under "Republican
+   Candidate Profiles" in the doc's Mod Description section).
 
-   That placement no longer does what §4.1 wanted from it. §H.2
-   measures the axis railing by Q2-Q3, not Q6-Q8: about +12 of
-   positive writes are available across sixteen questions against
-   a +-3 clamp, so the rails are trivially reachable and neither
-   cascade gate reads as a genuine extremity outcome. Numbering
-   these is blocked on §H picking an option — the recommendation
-   is +-5 with Q2 cut to +-1 — and restating them costs nothing
-   today precisely because they are still unset (§4.1).
-   Colors follow the mod scheme: GOP #FF0000 / #FFA0A0.
-   TODO: image_url + description for the six new candidates.
+   Nine possible opponents, one cascade, FIRST MATCH WINS — so the
+   array order below IS the rule, and it is the doc's order, which
+   is not the order the old scaffolding had (the doc puts Pence
+   seventh, after Rand Paul; the scaffolding had him fifth). Moving
+   him changes outcomes: a player at rec_social +2, rec_progressive
+   +2, rec_foreign -2 matches both Haley and Pence, and the doc
+   hands that player Haley.
+
+       #  nominee            gate
+       1  Donald Trump       delivery <= 0 AND NOT norms_weaponized
+       2  Chris Christie     delivery <= 0 AND norms_weaponized
+       3  Jeb Bush           delivery >= +11
+       4  Marco Rubio        rec_progressive >= +3 AND rec_social >= +1
+       5  Nikki Haley        rec_foreign <= -2 AND rec_progressive >= 0
+       6  Rand Paul          rec_foreign >= +2 AND rec_progressive <= 0
+       7  Mike Pence         rec_social >= +2 AND rec_progressive >= +2
+       8  Tucker Carlson     rec_progressive <= -3 AND hosts_burned < 2
+       9  Ted Cruz           else
+
+   Three properties of the table that are load-bearing and easy to
+   break by editing a row in isolation:
+
+     - Rows 1 and 2 between them cover every delivery <= 0 run, so
+       rows 3-8 are only ever evaluated at delivery >= +1. A failed
+       presidency cannot draw Rubio or Rand Paul no matter what its
+       positional record looks like; it draws the man who never
+       conceded, or — if you put him in the dock — the prosecutor.
+     - Jeb's +11 is measured against an end-of-govern delivery
+       ceiling of +13 (the ledger at the top of this file). It is
+       the near-perfect run, and it is meant to be: the fever breaks
+       and the party goes back to the family.
+     - Tucker's second clause reads the hidden host counter, which
+       is the same counter the Favreau Senate path gates on at
+       >= 2 (NM_FAVREAU_GATE). Burning Keepin' It 1600 twice does
+       not merely open the secret path, it closes the primetime
+       host out of the nomination — the two hidden outcomes are
+       mutually exclusive by construction.
+
+   `delivery` here is the final govern-phase figure, read after the
+   last question's own writes have landed. Every axis is read at its
+   clamped value, so Rubio's +3 and Tucker's -3 are the
+   rec_progressive rails exactly (§2), and Haley's -2 / Paul's +2 are
+   the rec_foreign rails.
+
+   Colors follow the mod scheme: GOP #FF0000 / #FFA0A0, applied by
+   nmSetNominee so a roster row never has to restate them.
+
+   TODO (art): Jeb Bush and Tucker Carlson have no portrait. The
+   other seven use images the engine already hosts. Wikimedia has
+   usable free photos of both — Gage Skidmore's campaign-trail
+   series for Jeb, and a CPAC portrait for Carlson — but the exact
+   Commons filenames could not be verified from the build
+   environment, and a guessed URL is a broken frame on the ending
+   screen. Left empty deliberately: the engine falls back to the
+   election's no_electoral_majority_image for a winner with no
+   image_url, which is wrong-looking but never broken.
    ============================================================ */
+var NM_GOP_PK = 301;
 var NM_GOP_COLORS = { color_hex: "#FF0000", secondary_color_hex: "#FFA0A0" };
+var NM_GOP_IMG = "https://www.jetsimon.com/public/static/images/";
 var NM_GOP_ROSTER = [
-    { first_name: "Donald",  last_name: "Trump",    state: "Florida",        gate: "success <= FAIL_FLOOR && !norms_weaponized", image_url: "https://www.jetsimon.com/public/static/images/donald-trump-2020.jpg" },
-    { first_name: "Chris",   last_name: "Christie", state: "New Jersey",     gate: "success <= FAIL_FLOOR && norms_weaponized",  image_url: "" },
-    { first_name: "Jeb",     last_name: "Bush",     state: "Florida",        gate: "success >= TRIUMPH_CEILING",                 image_url: "" },
-    { first_name: "Marco",   last_name: "Rubio",    state: "Florida",        gate: "rec_progressive >= PROGRESSIVE_CEILING",     image_url: "" },
-    { first_name: "Mike",    last_name: "Pence",    state: "Indiana",        gate: "rec_social >= SOCIAL_CEILING",               image_url: "https://www.jetsimon.com/public/static/images/mike-pence-2020.jpg" },
-    { first_name: "Nikki",   last_name: "Haley",    state: "South Carolina", gate: "rec_foreign <= DOVE_FLOOR",                  image_url: "https://www.jetsimon.com/public/static/images/nikki-haley-2020.jpg" },
-    { first_name: "Rand",    last_name: "Paul",     state: "Kentucky",       gate: "rec_foreign >= HAWK_CEILING",                image_url: "" },
-    { first_name: "Tucker",  last_name: "Carlson",  state: "Maine",          gate: "rec_progressive <= MODERATE_FLOOR",          image_url: "" },
-    { first_name: "Ted",     last_name: "Cruz",     state: "Texas",          gate: "else",                                       image_url: "" }
+    {
+        key: "trump", first_name: "Donald", last_name: "Trump", state: "Florida",
+        gate: function () { return nm.delivery <= 0 && !nm.norms_weaponized; },
+        image_url: NM_GOP_IMG + "donald-trump-2020.jpg",
+        description: "<p>He never conceded. Not in November 2016, not in the four years since. The fraud was massive, the machines were rigged, the whole thing was a disgrace, and he has said so at a rally roughly every eleven days since you took the oath.</p><p>It should have been a punchline. Instead he spent your presidency doing the one thing he has always been genuinely good at: standing next to a failure and pointing at it. Every bill that died in Ryan's House, every promise that came out of conference smaller than it went in, he read aloud to a crowd in a hockey arena. You handed him the material.</p><p>He is the nominee because nobody could give the party a reason to move on, and you were supposed to be that reason.</p>"
+    },
+    {
+        key: "christie", first_name: "Chris", last_name: "Christie", state: "New Jersey",
+        gate: function () { return nm.delivery <= 0 && nm.norms_weaponized; },
+        image_url: NM_GOP_IMG + "chris-christie-2016.jpg",
+        description: "<p>You put Donald Trump in the dock. The Republican Party answered with the only man in it who can say he did that first — the U.S. Attorney who perp-walked a hundred and thirty public officials in New Jersey and never lost a case.</p><p>That is the whole argument, and it is a better one than you would like. Christie does not defend Trump; he barely mentions him. He talks about a Justice Department that decided who to indict by watching the polling, and he talks about it in the register of a man who used to run one. Then he turns to your record, which did not deliver, and asks what exactly the country got in exchange for the precedent.</p><p>He is loud, he is quick, and he is the first opponent of your presidency who is not obviously beatable on temperament.</p>"
+    },
+    {
+        key: "jeb", first_name: "Jeb", last_name: "Bush", state: "Florida",
+        gate: function () { return nm.delivery >= 11; },
+        image_url: "",
+        description: "<p>The fever broke. Four years of a president who actually passed things drained the insurgency of the one thing it ran on, and when the party went looking for someone who could govern, it did what it has done in six of the last eleven cycles and reached for the family.</p><p>He is low-energy. He knows he is low-energy; he has made a kind of peace with it, and in a general election against a record as long as yours it is not obviously a weakness. His pitch is not that Washington is broken. His pitch is that it works now, that it works because a Republican House made it work, and that the country might like the competence without the rest of it.</p><p>Please clap.</p>"
+    },
+    {
+        key: "rubio", first_name: "Marco", last_name: "Rubio", state: "Florida",
+        gate: function () { return nm.rec_progressive >= 3 && nm.rec_social >= 1; },
+        image_url: NM_GOP_IMG + "marco-rubio-2012.jpg",
+        description: "<p>You governed from the left, and the party decided the answer was not to shout louder but to look younger. Rubio is forty-nine, speaks Spanish on Univision without a script, and has spent two years building a case that the country did not vote for a revolution in 2016 — it voted for a nice old man from Scranton, and got Elizabeth Warren's agenda with his signature on it.</p><p>The line writes itself and he has been rehearsing it since the midterms. He is disciplined, he is fluent, and he does not repeat himself when he is rattled anymore.</p><p>The problem for you is that he is not running against Joe Biden. He is running against your record, which is long, expensive, and further left than anything an American president has signed since Johnson.</p>"
+    },
+    {
+        key: "haley", first_name: "Nikki", last_name: "Haley", state: "South Carolina",
+        gate: function () { return nm.rec_foreign <= -2 && nm.rec_progressive >= 0; },
+        image_url: NM_GOP_IMG + "nikki-haley-2020.jpg",
+        description: "<p>You pulled America back, and the party found the one Republican who can say so without sounding like she is asking for another war. Two terms as governor of South Carolina, the flag off the statehouse grounds after Charleston, and a foreign policy delivered in the vocabulary of a woman explaining something patiently to a room that ought to have known better.</p><p>Her case is that the world noticed. Allies who used to call Washington first now call somebody else, adversaries have stopped bothering to lie, and the president who spent forty years telling everyone he was the foreign policy guy turned out to be the one who blinked.</p><p>She is the hardest opponent on this list to caricature, which is precisely the problem.</p>"
+    },
+    {
+        key: "paul", first_name: "Rand", last_name: "Paul", state: "Kentucky",
+        gate: function () { return nm.rec_foreign >= 2 && nm.rec_progressive <= 0; },
+        image_url: NM_GOP_IMG + "rand-paul-2012.jpg",
+        description: "<p>You used the military, and the libertarian got his opening. Rand Paul has been waiting a decade for a Democratic president to hand him an authorization nobody voted on, and you obliged.</p><p>He is running a coalition that should not hold together and somehow does: his father's people, the war-weary, the young men who found him through three-hour podcasts, and a slice of the antiwar left who cannot believe what they are about to do. He will filibuster anything. He will read your own 2007 floor speeches back to you on live television, and they are good speeches, and they are about a president who took the country to war without asking.</p><p>He cannot win a Republican primary in a normal year. This has not been a normal four years.</p>"
+    },
+    {
+        key: "pence", first_name: "Mike", last_name: "Pence", state: "Indiana",
+        gate: function () { return nm.rec_social >= 2 && nm.rec_progressive >= 2; },
+        image_url: NM_GOP_IMG + "mike-pence-2020.jpg",
+        description: "<p>He waited. Through the loss, through the wilderness, through four years of a president who moved the country left on guns and on the Court and did not seem to notice how much of it was still out there — Mike Pence sat still and let the fever run its course, and when the party wanted someone who had never once wavered, there he was.</p><p>He is not exciting. He has never been exciting. He is the last man in American politics who says grace before a fundraiser and means it, and against an administration that governed as far left on the culture as yours did, that is not a liability to the people voting in Iowa.</p><p>You have made this a war about who America is. He is delighted to have it.</p>"
+    },
+    {
+        key: "carlson", first_name: "Tucker", last_name: "Carlson", state: "Maine",
+        gate: function () { return nm.rec_progressive <= -3 && nm.hosts_burned < 2; },
+        image_url: "",
+        description: "<p>You governed as a moderate. The rage that put Donald Trump on a debate stage did not go anywhere; it simply stopped having a candidate, and for four years it had a television show instead, at eight o'clock, five nights a week, to an audience that grew every quarter of your presidency.</p><p>He has never held office. He does not want to talk about the deficit. What he has is three million people a night and a theory of the case — that both parties sold the country out, that yours did it with a smile and a story about Scranton, and that the men who used to build things here know exactly who did it to them.</p><p>The consultants think he is unelectable. They thought that last time, too.</p>"
+    },
+    {
+        key: "cruz", first_name: "Ted", last_name: "Cruz", state: "Texas",
+        gate: null, // the `else` row — must stay last
+        image_url: NM_GOP_IMG + "ted-cruz-2016.jpg",
+        description: "<p>Nobody's first choice. Everybody's second.</p><p>The party spent a year looking for a nominee who was one thing in particular — the war candidate, the peace candidate, the culture candidate, the competence candidate — and your presidency never handed it a clean enough case for any of them. So it settled, the way it usually does, on the man who had been running the entire time and was still standing when the money ran out for everyone else.</p><p>Do not mistake settled for weak. Cruz is the best debater in his party, he has been preparing for this since he was in high school, and he has a genuine gift for making a fight about a principle at the exact moment he is losing it on the facts. His colleagues in the Senate cannot stand him. Sixty million people are going to vote for him anyway.</p>"
+    }
 ];
+
+/* Returns the fields object for the opposition slot, or null if something has
+   removed it. Everything downstream tolerates the null: a mod that cannot find
+   pk 301 should leave the opponent reading "The Republicans" rather than throw
+   in the middle of the last question of the run. */
+function nmGopFields() {
+    var cands = campaignTrail_temp.candidate_json;
+    for (var i = 0; i < cands.length; i++) {
+        if (cands[i].pk === NM_GOP_PK) return cands[i].fields;
+    }
+    return null;
+}
+
+/* Names the opposition. Writes only the identity fields — the ending messages,
+   priority, party, is_active, candidate_score and the two color hexes on pk 301
+   are the party's, not the nominee's, and every score row in Code 2 is keyed to
+   the pk, which does not move. */
+function nmSetNominee(row) {
+    var f = nmGopFields();
+    if (!f) return;
+    f.first_name = row.first_name;
+    f.last_name = row.last_name;
+    f.state = row.state;
+    f.image_url = row.image_url;
+    f.description = row.description;
+    f.color_hex = NM_GOP_COLORS.color_hex;
+    f.secondary_color_hex = NM_GOP_COLORS.secondary_color_hex;
+    nm.gop_nominee = row.key;
+}
+
+/* The cascade. First match wins; the last row has a null gate and always
+   matches, so this cannot fall through. Idempotent — a second call re-reads
+   the same final tallies and writes the same nominee — but it is only ever
+   called once, at the end of the govern phase.
+
+   Every gate reads a tally the player has finished writing by then, which is
+   why this runs here and not, say, at election night: nothing after the last
+   question can move delivery, rec_progressive, rec_social, rec_foreign,
+   norms_weaponized or hosts_burned, and the map has to be able to show the
+   name from the next paint onwards. */
+function nmResolveNominee() {
+    for (var i = 0; i < NM_GOP_ROSTER.length; i++) {
+        var row = NM_GOP_ROSTER[i];
+        if (!row.gate || row.gate()) {
+            nmSetNominee(row);
+            return row;
+        }
+    }
+    return null;
+}
 
 /* Theme / styling — isolated so a missing DOM node or nct_stuff
    never prevents cyoAdventure from registering. Engine runs first. */

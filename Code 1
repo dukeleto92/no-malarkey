@@ -53,21 +53,22 @@ campaignTrail_temp.candidate_json = [
            "The Republicans" is what makes the opposition read as a party
            rather than a person.
 
-           nmSetNominee() overwrites first_name, last_name and state here, in
-           place. The pk never changes: every candidate_issue_score,
+           nmSetNominee() overwrites first_name, last_name, state and image_url
+           here, in place. The pk never changes: every candidate_issue_score,
            candidate_state_multiplier and opponents_* entry in the mod is keyed
            to 301, and PROPS.CANDIDATES is a getter that rebuilds from
            candidate_json on every read, so the rename lands on the next paint
            with nothing to invalidate.
 
-           description and image_url are empty, the three ending messages are
-           left exactly as the base 2020 scenario wrote them, and the cascade
-           touches none of the five. An opponent in this engine has no bio
-           screen and no portrait — descHTML() renders only the player's
-           candidate and running mate — and the ending messages are read off
-           the *player's* record, so on a ticket locked to Biden they are
-           unreachable text either way. Nothing on this record reaches a screen
-           except the name, so nothing on it is written but the name. */
+           image_url starts empty because the unnamed party has no face and no
+           screen to show one on: its only consumer is the winner's photo on
+           the final results screen, which cannot be reached before the cascade
+           has run. description stays empty and the three ending messages stay
+           exactly as the base 2020 scenario wrote them, and the cascade
+           touches neither. An opponent has no bio screen — descHTML() renders
+           only the player's candidate and running mate — and the ending
+           messages are read off the *player's* record, so on a ticket locked
+           to Biden they are unreachable text either way. */
         "fields": {
             "first_name": "",
             "last_name": "The Republicans",
@@ -1203,58 +1204,99 @@ function nmBuildTracker() {
    Colors follow the mod scheme: GOP #FF0000 / #FFA0A0, applied by
    nmSetNominee so a roster row never has to restate them.
 
-   A row is a name, a home state, and a gate — nothing else, on
-   purpose. An opponent in this engine has no bio and no portrait to
-   fill. `description` is a genuinely dead field on this record:
-   descHTML() is only ever called for the player's own candidate and
-   running mate, and there is no opponent bio screen to reach.
-   `image_url` has exactly one consumer, the winner's photo on the
-   final results screen, which the opposition only reaches by beating
-   you; left empty it falls back to the election's
-   no_electoral_majority_image, the same way the base game handles
-   any candidate without a portrait. Neither is worth nine rows of
-   prose and nine sourced photographs. If a later build gives the
-   pivot a screen that introduces the nominee properly, that screen
-   brings its own copy and art with it.
+   A row is a name, a home state, a portrait and a gate — and no bio.
+   The asymmetry is the engine's, not an oversight: `description` is
+   a genuinely dead field on an opponent, because descHTML() is only
+   ever called for the player's own candidate and running mate and
+   there is no opponent bio screen to reach, while `image_url` has
+   exactly one consumer that a player can get to — the winner's photo
+   on the final results screen, which the opposition reaches only by
+   beating you. Nine portraits earn their place; nine bios would not.
+   If a later build gives the pivot a screen that introduces the
+   nominee properly, that screen brings its own copy with it.
    ============================================================ */
 var NM_GOP_PK = 301;
+/* The Showcase's own image host — the seven portraits below are files the
+   engine already ships and references from its base candidate.json. */
+var NM_GOP_IMG = "https://www.jetsimon.com/public/static/images/";
+
+/* Jeb Bush and Tucker Carlson are the two the engine has never had a portrait
+   for — neither has been a candidate in a base scenario — so they come from
+   Commons instead, the same source as the Biden, Warren and Favreau photos.
+   Their file pages, which carry the licence and the photographer:
+     commons.wikimedia.org/wiki/File:Jeb_Bush_(16686581821)_(cropped).jpg
+     commons.wikimedia.org/wiki/File:Tucker_Carlson_2020_(cropped).jpg
+
+   Both are the "(cropped)" derivative rather than the original frame, which
+   matters: .person_image on the results screen sets height 250px and leaves
+   width auto, so the photo keeps its aspect ratio and a wide event shot would
+   render as a 250px-tall letterbox beside the text. Head-and-shoulders crops
+   land at roughly portrait proportions, like the engine's own cutouts.
+
+   NM_ART_CHAINS at the foot of this file carries a fallback for each: the
+   480px thumb first, then the full-size original for the case where Commons
+   refuses a thumb wider than the source, then the election's own
+   no_electoral_majority_image — which is exactly what the engine substitutes
+   for a winner with no portrait at all, so the worst case here is the
+   behaviour we had before these two were filled in, not a broken frame. */
+var NM_COMMONS_JEB = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Jeb_Bush_%2816686581821%29_%28cropped%29.jpg/480px-Jeb_Bush_%2816686581821%29_%28cropped%29.jpg";
+var NM_COMMONS_TUCKER = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Tucker_Carlson_2020_%28cropped%29.jpg/480px-Tucker_Carlson_2020_%28cropped%29.jpg";
+
+/* The last hop of both chains: whatever the election record names as its
+   no-majority image, which is the same file overallResultsHtml() falls back to
+   for a winner with an empty image_url. Taken from the record rather than
+   retyped so the two can never disagree. */
+var NM_NO_PORTRAIT = (function () {
+    try {
+        return campaignTrail_temp.election_json[0].fields.no_electoral_majority_image || "";
+    } catch (e) { return ""; }
+})();
 var NM_GOP_COLORS = { color_hex: "#FF0000", secondary_color_hex: "#FFA0A0" };
 var NM_GOP_ROSTER = [
     {
         key: "trump", first_name: "Donald", last_name: "Trump", state: "Florida",
-        gate: function () { return nm.delivery <= 0 && !nm.norms_weaponized; }
+        gate: function () { return nm.delivery <= 0 && !nm.norms_weaponized; },
+        image_url: NM_GOP_IMG + "donald-trump-2020.jpg"
     },
     {
         key: "christie", first_name: "Chris", last_name: "Christie", state: "New Jersey",
-        gate: function () { return nm.delivery <= 0 && nm.norms_weaponized; }
+        gate: function () { return nm.delivery <= 0 && nm.norms_weaponized; },
+        image_url: NM_GOP_IMG + "chris-christie-2016.jpg"
     },
     {
         key: "jeb", first_name: "Jeb", last_name: "Bush", state: "Florida",
-        gate: function () { return nm.delivery >= 11; }
+        gate: function () { return nm.delivery >= 11; },
+        image_url: NM_COMMONS_JEB
     },
     {
         key: "rubio", first_name: "Marco", last_name: "Rubio", state: "Florida",
-        gate: function () { return nm.rec_progressive >= 3 && nm.rec_social >= 1; }
+        gate: function () { return nm.rec_progressive >= 3 && nm.rec_social >= 1; },
+        image_url: NM_GOP_IMG + "marco-rubio-2012.jpg"
     },
     {
         key: "haley", first_name: "Nikki", last_name: "Haley", state: "South Carolina",
-        gate: function () { return nm.rec_foreign <= -2 && nm.rec_progressive >= 0; }
+        gate: function () { return nm.rec_foreign <= -2 && nm.rec_progressive >= 0; },
+        image_url: NM_GOP_IMG + "nikki-haley-2020.jpg"
     },
     {
         key: "paul", first_name: "Rand", last_name: "Paul", state: "Kentucky",
-        gate: function () { return nm.rec_foreign >= 2 && nm.rec_progressive <= 0; }
+        gate: function () { return nm.rec_foreign >= 2 && nm.rec_progressive <= 0; },
+        image_url: NM_GOP_IMG + "rand-paul-2012.jpg"
     },
     {
         key: "pence", first_name: "Mike", last_name: "Pence", state: "Indiana",
-        gate: function () { return nm.rec_social >= 2 && nm.rec_progressive >= 2; }
+        gate: function () { return nm.rec_social >= 2 && nm.rec_progressive >= 2; },
+        image_url: NM_GOP_IMG + "mike-pence-2020.jpg"
     },
     {
         key: "carlson", first_name: "Tucker", last_name: "Carlson", state: "Maine",
-        gate: function () { return nm.rec_progressive <= -3 && nm.hosts_burned < 2; }
+        gate: function () { return nm.rec_progressive <= -3 && nm.hosts_burned < 2; },
+        image_url: NM_COMMONS_TUCKER
     },
     {
         key: "cruz", first_name: "Ted", last_name: "Cruz", state: "Texas",
-        gate: null // the `else` row — must stay last
+        gate: null, // the `else` row — must stay last
+        image_url: NM_GOP_IMG + "ted-cruz-2016.jpg"
     }
 ];
 
@@ -1270,10 +1312,11 @@ function nmGopFields() {
     return null;
 }
 
-/* Names the opposition, and does nothing else. The name is the only thing on
-   this record a player ever sees, so it is the only thing worth writing: no
-   bio, no portrait, no per-nominee ending text. state comes along because it
-   is identity rather than prose, and costs one assignment.
+/* Names the opposition. Writes the identity fields and nothing else: still no
+   bio and no per-nominee ending text, because neither has a screen to reach,
+   but the portrait does — it is the winner's photo on the final results
+   screen, the one thing an opponent's record renders besides its name, and
+   the only way to see it is to lose to them.
 
    Everything left alone is the party's rather than the nominee's — priority,
    party, is_active, candidate_score, the ending messages — and every score row
@@ -1286,6 +1329,7 @@ function nmSetNominee(row) {
     f.first_name = row.first_name;
     f.last_name = row.last_name;
     f.state = row.state;
+    f.image_url = row.image_url;
     f.color_hex = NM_GOP_COLORS.color_hex;
     f.secondary_color_hex = NM_GOP_COLORS.secondary_color_hex;
     nm.gop_nominee = row.key;
@@ -1458,6 +1502,29 @@ var NM_ART_CHAINS = [
         "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg/960px-Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg",
         "https://upload.wikimedia.org/wikipedia/commons/5/5b/Elizabeth_Warren_speaking_at_the_2019_Iowa_Democratic_Wing_Ding_dinner_in_the_Surf_Ballroom_in_Clear_Lake%2C_Iowa_on_August_9%2C_2019_%2848573587712%29.jpg",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg/960px-Elizabeth_Warren%2C_official_portrait%2C_114th_Congress.jpg"
+    ],
+    /* Winner's photo on the final results screen, for the two nominees the
+       engine hosts no portrait of. Same shape as the chains above — thumb,
+       then the full-size original — with one extra hop on the end: the
+       election's own no_electoral_majority_image, which is precisely what
+       overallResultsHtml() substitutes for a winning candidate whose
+       image_url is empty. Read off election_json rather than retyped, so it
+       cannot drift from the value the engine would have used. The floor of
+       this chain is therefore the engine's own no-portrait behaviour, not a
+       broken frame.
+
+       Only one of these can ever be requested in a given run, and only on a
+       run the player lost to that nominee — but the listener is shared and
+       walks whichever chain the failing src belongs to. */
+    [
+        NM_COMMONS_JEB,
+        "https://upload.wikimedia.org/wikipedia/commons/9/9e/Jeb_Bush_%2816686581821%29_%28cropped%29.jpg",
+        NM_NO_PORTRAIT
+    ],
+    [
+        NM_COMMONS_TUCKER,
+        "https://upload.wikimedia.org/wikipedia/commons/9/93/Tucker_Carlson_2020_%28cropped%29.jpg",
+        NM_NO_PORTRAIT
     ]
 ];
 

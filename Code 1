@@ -53,12 +53,21 @@ campaignTrail_temp.candidate_json = [
            "The Republicans" is what makes the opposition read as a party
            rather than a person.
 
-           nmSetNominee() overwrites first_name, last_name, state, image_url
-           and description here, in place. The pk never changes: every
-           candidate_issue_score, candidate_state_multiplier and opponents_*
-           entry in the mod is keyed to 301, and PROPS.CANDIDATES is a getter
-           that rebuilds from candidate_json on every read, so the rename
-           lands on the next paint with nothing to invalidate. */
+           nmSetNominee() overwrites first_name, last_name and state here, in
+           place. The pk never changes: every candidate_issue_score,
+           candidate_state_multiplier and opponents_* entry in the mod is keyed
+           to 301, and PROPS.CANDIDATES is a getter that rebuilds from
+           candidate_json on every read, so the rename lands on the next paint
+           with nothing to invalidate.
+
+           description and image_url are empty, the three ending messages are
+           left exactly as the base 2020 scenario wrote them, and the cascade
+           touches none of the five. An opponent in this engine has no bio
+           screen and no portrait — descHTML() renders only the player's
+           candidate and running mate — and the ending messages are read off
+           the *player's* record, so on a ticket locked to Biden they are
+           unreachable text either way. Nothing on this record reaches a screen
+           except the name, so nothing on it is written but the name. */
         "fields": {
             "first_name": "",
             "last_name": "The Republicans",
@@ -66,13 +75,13 @@ campaignTrail_temp.candidate_json = [
             "party": "Republican",
             "state": "",
             "priority": 2,
-            "description": "<p>The Republican Party has not settled on a nominee, and until it does it is less a candidate than a mood. Donald Trump never conceded 2016 and never went home. Paul Ryan is running a House that would rather investigate you than legislate. The donors want the fever to break; the base is the fever.</p><p>Whoever they send at you in 2020, they will be running against your record. That is still being written.</p>",
+            "description": "",
             "color_hex": "#FF0000",
             "secondary_color_hex": "#FFA0A0",
             "is_active": 0,
             "image_url": "",
-            "electoral_victory_message": "<h3>Congratulations! You have won the 2020 election.</h3><p>Four years ago the party was written off as a spent force. Whatever the analysts say now, the country has handed it the White House. Where do you take things from here?</p>",
-            "electoral_loss_message": "<h3>Sorry! You have lost the 2020 election.</h3><p>After an election in which many of your opponent's supporters claimed democracy itself was at stake, what happens now? Many analysts believe the party will need to go in a completely different direction next time.</p>",
+            "electoral_victory_message": "<h3>Congratulations! You have won the 2020 election.</h3><p>For the second time in a row, many analysts saw a victory for you as practically impossible. But whatever they say, it is clear that your Make America Great Again agenda has been vindicated. Where do you take things from here?</p>",
+            "electoral_loss_message": "<h3>Sorry! You have lost the 2020 election.</h3><p>After an election in which many of your supporters claimed democracy itself was at stake, what happens now? Many analysts believe the party will need to go in a completely different direction next time. As for yourself, will you take these results sitting down, or will you prepare yourself for an epic political comeback in 2024?</p>",
             "no_electoral_majority_message": "<h3>Congratulations! You have won the 2020 election.</h3><p>In spite of the 269-269 tie in the electoral college, Republicans control a majority of state delegations in the House of Representatives. A lot of liberals are absolutely distraught and outraged that the election came down to such a technicality, but hey, those are the rules!</p>",
             "description_as_running_mate": "",
             "candidate_score": 1,
@@ -1194,73 +1203,58 @@ function nmBuildTracker() {
    Colors follow the mod scheme: GOP #FF0000 / #FFA0A0, applied by
    nmSetNominee so a roster row never has to restate them.
 
-   TODO (art): Jeb Bush and Tucker Carlson have no portrait. The
-   other seven use images the engine already hosts. Wikimedia has
-   usable free photos of both — Gage Skidmore's campaign-trail
-   series for Jeb, and a CPAC portrait for Carlson — but the exact
-   Commons filenames could not be verified from the build
-   environment, and a guessed URL is a broken frame on the ending
-   screen. Left empty deliberately: the engine falls back to the
-   election's no_electoral_majority_image for a winner with no
-   image_url, which is wrong-looking but never broken.
+   A row is a name, a home state, and a gate — nothing else, on
+   purpose. An opponent in this engine has no bio and no portrait to
+   fill. `description` is a genuinely dead field on this record:
+   descHTML() is only ever called for the player's own candidate and
+   running mate, and there is no opponent bio screen to reach.
+   `image_url` has exactly one consumer, the winner's photo on the
+   final results screen, which the opposition only reaches by beating
+   you; left empty it falls back to the election's
+   no_electoral_majority_image, the same way the base game handles
+   any candidate without a portrait. Neither is worth nine rows of
+   prose and nine sourced photographs. If a later build gives the
+   pivot a screen that introduces the nominee properly, that screen
+   brings its own copy and art with it.
    ============================================================ */
 var NM_GOP_PK = 301;
 var NM_GOP_COLORS = { color_hex: "#FF0000", secondary_color_hex: "#FFA0A0" };
-var NM_GOP_IMG = "https://www.jetsimon.com/public/static/images/";
 var NM_GOP_ROSTER = [
     {
         key: "trump", first_name: "Donald", last_name: "Trump", state: "Florida",
-        gate: function () { return nm.delivery <= 0 && !nm.norms_weaponized; },
-        image_url: NM_GOP_IMG + "donald-trump-2020.jpg",
-        description: "<p>He never conceded. Not in November 2016, not in the four years since. The fraud was massive, the machines were rigged, the whole thing was a disgrace, and he has said so at a rally roughly every eleven days since you took the oath.</p><p>It should have been a punchline. Instead he spent your presidency doing the one thing he has always been genuinely good at: standing next to a failure and pointing at it. Every bill that died in Ryan's House, every promise that came out of conference smaller than it went in, he read aloud to a crowd in a hockey arena. You handed him the material.</p><p>He is the nominee because nobody could give the party a reason to move on, and you were supposed to be that reason.</p>"
+        gate: function () { return nm.delivery <= 0 && !nm.norms_weaponized; }
     },
     {
         key: "christie", first_name: "Chris", last_name: "Christie", state: "New Jersey",
-        gate: function () { return nm.delivery <= 0 && nm.norms_weaponized; },
-        image_url: NM_GOP_IMG + "chris-christie-2016.jpg",
-        description: "<p>You put Donald Trump in the dock. The Republican Party answered with the only man in it who can say he did that first — the U.S. Attorney who perp-walked a hundred and thirty public officials in New Jersey and never lost a case.</p><p>That is the whole argument, and it is a better one than you would like. Christie does not defend Trump; he barely mentions him. He talks about a Justice Department that decided who to indict by watching the polling, and he talks about it in the register of a man who used to run one. Then he turns to your record, which did not deliver, and asks what exactly the country got in exchange for the precedent.</p><p>He is loud, he is quick, and he is the first opponent of your presidency who is not obviously beatable on temperament.</p>"
+        gate: function () { return nm.delivery <= 0 && nm.norms_weaponized; }
     },
     {
         key: "jeb", first_name: "Jeb", last_name: "Bush", state: "Florida",
-        gate: function () { return nm.delivery >= 11; },
-        image_url: "",
-        description: "<p>The fever broke. Four years of a president who actually passed things drained the insurgency of the one thing it ran on, and when the party went looking for someone who could govern, it did what it has done in six of the last eleven cycles and reached for the family.</p><p>He is low-energy. He knows he is low-energy; he has made a kind of peace with it, and in a general election against a record as long as yours it is not obviously a weakness. His pitch is not that Washington is broken. His pitch is that it works now, that it works because a Republican House made it work, and that the country might like the competence without the rest of it.</p><p>Please clap.</p>"
+        gate: function () { return nm.delivery >= 11; }
     },
     {
         key: "rubio", first_name: "Marco", last_name: "Rubio", state: "Florida",
-        gate: function () { return nm.rec_progressive >= 3 && nm.rec_social >= 1; },
-        image_url: NM_GOP_IMG + "marco-rubio-2012.jpg",
-        description: "<p>You governed from the left, and the party decided the answer was not to shout louder but to look younger. Rubio is forty-nine, speaks Spanish on Univision without a script, and has spent two years building a case that the country did not vote for a revolution in 2016 — it voted for a nice old man from Scranton, and got Elizabeth Warren's agenda with his signature on it.</p><p>The line writes itself and he has been rehearsing it since the midterms. He is disciplined, he is fluent, and he does not repeat himself when he is rattled anymore.</p><p>The problem for you is that he is not running against Joe Biden. He is running against your record, which is long, expensive, and further left than anything an American president has signed since Johnson.</p>"
+        gate: function () { return nm.rec_progressive >= 3 && nm.rec_social >= 1; }
     },
     {
         key: "haley", first_name: "Nikki", last_name: "Haley", state: "South Carolina",
-        gate: function () { return nm.rec_foreign <= -2 && nm.rec_progressive >= 0; },
-        image_url: NM_GOP_IMG + "nikki-haley-2020.jpg",
-        description: "<p>You pulled America back, and the party found the one Republican who can say so without sounding like she is asking for another war. Two terms as governor of South Carolina, the flag off the statehouse grounds after Charleston, and a foreign policy delivered in the vocabulary of a woman explaining something patiently to a room that ought to have known better.</p><p>Her case is that the world noticed. Allies who used to call Washington first now call somebody else, adversaries have stopped bothering to lie, and the president who spent forty years telling everyone he was the foreign policy guy turned out to be the one who blinked.</p><p>She is the hardest opponent on this list to caricature, which is precisely the problem.</p>"
+        gate: function () { return nm.rec_foreign <= -2 && nm.rec_progressive >= 0; }
     },
     {
         key: "paul", first_name: "Rand", last_name: "Paul", state: "Kentucky",
-        gate: function () { return nm.rec_foreign >= 2 && nm.rec_progressive <= 0; },
-        image_url: NM_GOP_IMG + "rand-paul-2012.jpg",
-        description: "<p>You used the military, and the libertarian got his opening. Rand Paul has been waiting a decade for a Democratic president to hand him an authorization nobody voted on, and you obliged.</p><p>He is running a coalition that should not hold together and somehow does: his father's people, the war-weary, the young men who found him through three-hour podcasts, and a slice of the antiwar left who cannot believe what they are about to do. He will filibuster anything. He will read your own 2007 floor speeches back to you on live television, and they are good speeches, and they are about a president who took the country to war without asking.</p><p>He cannot win a Republican primary in a normal year. This has not been a normal four years.</p>"
+        gate: function () { return nm.rec_foreign >= 2 && nm.rec_progressive <= 0; }
     },
     {
         key: "pence", first_name: "Mike", last_name: "Pence", state: "Indiana",
-        gate: function () { return nm.rec_social >= 2 && nm.rec_progressive >= 2; },
-        image_url: NM_GOP_IMG + "mike-pence-2020.jpg",
-        description: "<p>He waited. Through the loss, through the wilderness, through four years of a president who moved the country left on guns and on the Court and did not seem to notice how much of it was still out there — Mike Pence sat still and let the fever run its course, and when the party wanted someone who had never once wavered, there he was.</p><p>He is not exciting. He has never been exciting. He is the last man in American politics who says grace before a fundraiser and means it, and against an administration that governed as far left on the culture as yours did, that is not a liability to the people voting in Iowa.</p><p>You have made this a war about who America is. He is delighted to have it.</p>"
+        gate: function () { return nm.rec_social >= 2 && nm.rec_progressive >= 2; }
     },
     {
         key: "carlson", first_name: "Tucker", last_name: "Carlson", state: "Maine",
-        gate: function () { return nm.rec_progressive <= -3 && nm.hosts_burned < 2; },
-        image_url: "",
-        description: "<p>You governed as a moderate. The rage that put Donald Trump on a debate stage did not go anywhere; it simply stopped having a candidate, and for four years it had a television show instead, at eight o'clock, five nights a week, to an audience that grew every quarter of your presidency.</p><p>He has never held office. He does not want to talk about the deficit. What he has is three million people a night and a theory of the case — that both parties sold the country out, that yours did it with a smile and a story about Scranton, and that the men who used to build things here know exactly who did it to them.</p><p>The consultants think he is unelectable. They thought that last time, too.</p>"
+        gate: function () { return nm.rec_progressive <= -3 && nm.hosts_burned < 2; }
     },
     {
         key: "cruz", first_name: "Ted", last_name: "Cruz", state: "Texas",
-        gate: null, // the `else` row — must stay last
-        image_url: NM_GOP_IMG + "ted-cruz-2016.jpg",
-        description: "<p>Nobody's first choice. Everybody's second.</p><p>The party spent a year looking for a nominee who was one thing in particular — the war candidate, the peace candidate, the culture candidate, the competence candidate — and your presidency never handed it a clean enough case for any of them. So it settled, the way it usually does, on the man who had been running the entire time and was still standing when the money ran out for everyone else.</p><p>Do not mistake settled for weak. Cruz is the best debater in his party, he has been preparing for this since he was in high school, and he has a genuine gift for making a fight about a principle at the exact moment he is losing it on the facts. His colleagues in the Senate cannot stand him. Sixty million people are going to vote for him anyway.</p>"
+        gate: null // the `else` row — must stay last
     }
 ];
 
@@ -1276,18 +1270,22 @@ function nmGopFields() {
     return null;
 }
 
-/* Names the opposition. Writes only the identity fields — the ending messages,
-   priority, party, is_active, candidate_score and the two color hexes on pk 301
-   are the party's, not the nominee's, and every score row in Code 2 is keyed to
-   the pk, which does not move. */
+/* Names the opposition, and does nothing else. The name is the only thing on
+   this record a player ever sees, so it is the only thing worth writing: no
+   bio, no portrait, no per-nominee ending text. state comes along because it
+   is identity rather than prose, and costs one assignment.
+
+   Everything left alone is the party's rather than the nominee's — priority,
+   party, is_active, candidate_score, the ending messages — and every score row
+   in Code 2 is keyed to the pk, which does not move. The colors are rewritten
+   even though pk 301 already carries them, so the opposition is GOP-red at
+   election night whatever else has touched the record by then. */
 function nmSetNominee(row) {
     var f = nmGopFields();
     if (!f) return;
     f.first_name = row.first_name;
     f.last_name = row.last_name;
     f.state = row.state;
-    f.image_url = row.image_url;
-    f.description = row.description;
     f.color_hex = NM_GOP_COLORS.color_hex;
     f.secondary_color_hex = NM_GOP_COLORS.secondary_color_hex;
     nm.gop_nominee = row.key;

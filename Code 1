@@ -176,7 +176,7 @@ campaignTrail_temp.global_parameter_json = [
             "issue_stance_6_max": 0.71,
             "global_variance": 0.01,
             "state_variance": 0.005,
-            "question_count": 18,
+            "question_count": 19,
             "default_map_color_hex": "#C9C9C9",
             "no_state_map_color_hex": "#999999"
         }
@@ -226,7 +226,7 @@ jet_data = {
 //#startcode
 
 /* ============================================================
-   NO MALARKEY — govern-phase engine (Q1–Q14)
+   NO MALARKEY — govern-phase engine (Q1–Q15)
    Source: scenario bible v0.9 + drafted questions doc.
    Tally tiers per bible §2; FX blocks per the doc's A-lines.
 
@@ -265,6 +265,14 @@ jet_data = {
        Q14 A2         +11      -8        +6
        end of govern  +13      -9        +8
 
+   Q15 The Ticket is drafted as of this pass and does not move the ledger:
+   all four of its answers are declared partials and pay delivery 0, so the
+   three columns above are the same figures at the end of Q15 as at the end
+   of Q14. Jeb's +11 nomination gate is still measured against +13. What Q15
+   does move is rec_progressive (A1 +1, A2 -1), which several nominee gates
+   read — so the cascade now runs at the end of Q15 rather than Q14. See
+   nmEndGovern().
+
    §A's three desyncs are desyncs in the *document*, not here: the mod has only
    ever carried one favreau_senate block and has gated it at hosts_burned >= 2
    since v0.8, Q7 A2 has no dangling fourth branch (see case 8102), and its
@@ -282,8 +290,14 @@ jet_data = {
        delivery +1, which would raise floor_safe and re-derive the whole ladder
        — so it belongs with §H, not here. Both are marked at their case below.
      - §L, the freed immigration slot. Still undrafted, and gated on §A.3.
-     - Q14 Immigration is drafted and locked (§6); The Ticket (Q15) is specced
-       but undrafted, so the govern phase still ends at Q14.
+
+   Q14 Immigration is drafted and locked (§6). The Ticket (Q15) is drafted in
+   this pass from the doc's "Running Mate Selection" section, so the govern
+   phase now ends at Q15. Its only new state is vp_status, which no drafted
+   question reads — like harris_scotus it is banked for the pivot build. The
+   engine's running-mate record is fixed at ticket selection and Q15 does not
+   touch it: replacing Liz sets the flag, and the banner photo stays Warren's
+   until the pivot build has a screen that can say otherwise.
    ============================================================ */
 
 campaignTrail_temp.cyoa = true;
@@ -294,8 +308,8 @@ campaignTrail_temp.cyoa = true;
    6 Q4 Infrastructure · 7 Q5 TPP · 8 Q6 Afghanistan · 9 Q7 North Korea ·
    10 Q8 Guns · 11 Q9 RBG vacancy · 12 Q10 Crossfire Hurricane ·
    13 Q11 Executive Time · 14 Q12 Warren Relationship · 15 Q13 Midterms ·
-   16 Q14 Immigration ·
-   17 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
+   16 Q14 Immigration · 17 Q15 The Ticket ·
+   18 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
 
    The engine labels every screen "Question {question_number+1} of
    {question_count}", but question_number is an index into questions_json.
@@ -305,9 +319,9 @@ campaignTrail_temp.cyoa = true;
    denominator. nmPaintProgress() below relabels it from NM_DISPLAY, purely
    as display: no jump target or question_count changes.
 
-   Do NOT change question_count to 14 without also removing the branch
+   Do NOT change question_count to 15 without also removing the branch
    indices; election night requires question_number === question_count
-   exactly, and jumps target 16/17 against an 18-slot array. */
+   exactly, and jumps target 17/18 against a 19-slot array. */
 
 var nm = {
     // Tier A — bounded positional axes (bible §2). rec_progressive clamps at
@@ -346,6 +360,12 @@ var nm = {
     congress_2019: null,
     // Q14 outcome (bible §3.1): "win" (a law) | "partial" (the pen) | "loss"
     immigration_result: null,
+    /* Q15 outcome: "retained" | "replaced_amicable" | "replaced_hostile".
+       Whether Liz is dropped, and whether she goes quietly — the split is
+       warren_relationship(prior), so a president who used her well can
+       replace her without making an enemy. Nothing in the govern phase
+       reads it; it is banked for the pivot build, like harris_scotus. */
+    vp_status: null,
     // Q13 addendum flag — see NM_FAVREAU_GATE; also read for Q14 prose
     favreau_senate: false,
     // RNG pre-rolls for Q3c, rolled when Q2 routes there so feedback can be pre-written
@@ -388,7 +408,7 @@ var NM_FB = {
     q4a1_win: "It takes weeks of negotiations, but you end up with a $1.2 trillion bill that includes $500 billion of new spending on top of existing federal allocations. Ryan was about to chicken out, but it turns out even Republicans hate potholes.",
     q4a1_loss: "The deficit hawks in the House continue to be a headache. After weeks of back and forth, you end up with a top-line number just under a trillion, but funded mostly by private investment via tax credits. Lovett mourns that “We're still living in Reagan's America.”",
     q4a2_win: "Ryan is hesitant at first, but is ultimately convinced by internal Republican polling showing that voters want action on infrastructure. Congress passes a bill totaling $210 billion to repair aging roads and bridges, plus another $200 billion for a “vital infrastructure fund” to finance a variety of nationally significant transportation projects. Favreau and Pfeiffer compare it unfavorably to Obama's 2009 stimulus package.",
-    q4a2_loss: "No dice. Ryan says he's more convinced than ever that Americans want free-market solutions, not more government spending. Favreau rants that you've “lost a step” as Vietor sagely nods along.",
+    q4a2_loss: "The reinvigorated Republicans have no appetite for compromise. Ryan says he's more convinced than ever that Americans want free-market solutions, not more government spending. Favreau rants that you've “lost a step” as Vietor sagely nods along.",
     q7a2_contained: "The strikes decimate Kim's nuclear program overnight, and the feared retaliation never materializes. The DIA assesses that North Korea will be unable to build another nuclear weapon “for the foreseeable future.” Vietor claims that you just got lucky.",
     q7a2_escalation: "The Air Force gets the silos, but not all the trucks. Kim empties his artillery into the Seoul suburbs before Beijing can drag both sides to a ceasefire. Three days, thousands dead, markets in freefall, and Congress demanding to know who authorized a war. Keepin' It 1600 starts featuring a recurring guest named Will Menaker, who seems angrier than the hosts and keeps calling you “the Butcher of Scranton.” Was he one of Barack's guys?",
     q7a2_terminal: "The Air Force…they didn't get all the trucks. It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
@@ -397,7 +417,7 @@ var NM_FB = {
     q8a2_failure: "No dice. The NRA matches your push with a backlash so fierce that even frontline Republicans are cowed. Your proposals meet the same fate as Barack's did: a slow, agonizing death in the House. Vietor angrily notes that you apparently learned nothing in your time in the Obama administration.",
     q9a3_win: "Senate Republicans, even the moderates, are apoplectic when you announce Alexander's nomination. Nevertheless, your base is thrilled, and Schumer gets Alexander through by the skin of her teeth - with Vice President Warren breaking the tie.",
     q9a3_sunk: "Even Schumer can't save you on this one. Republicans blast Alexander as completely unqualified and manage to enlist Joe Manchin in sinking her nomination. Tail between your legs, you offer up Sri Srinivasan as a replacement, and he is confirmed. Favreau mourns a “lost opportunity” for progressive change.",
-    q12a4_viral: "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she finds herself able to go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”",
+    q12a4_viral: "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she can go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”",
     q12a4_resentful: "Liz clearly resents selling your disappointing record to progressives, and it starts to show in various passive-aggressive comments she makes on her media tour. On Keepin' It 1600, Favreau asks what keeps her energized. She cryptically replies, “the future.”",
     q13a1_hold: "Your administration has delivered on progressive priorities despite the Republicans controlling the House, and those voters haven't forgotten. High Democratic turnout saves vulnerable incumbents in red states. The elections again return a Democratic Senate majority and a Republican House majority, but the Congressional Progressive Caucus is larger than ever.",
     q13a1_wave: "You flub your way through a disastrous interview on Rachel Maddow, vomiting up half-digested word salad when lobbed softball questions about your failed agenda. Democratic turnout plummets, and 2019 welcomes a reinvigorated Republican Congressional majority not seen since the likes of Newt Gingrich.",
@@ -406,7 +426,7 @@ var NM_FB = {
     q13a3_hold: "The public is largely content with your presidency, and many voters are still disturbed by Trump or unconvinced by Ryan. Democrats successfully retain the Senate but fall just short in the House.",
     q13a3_wave: "You avoid making the midterms a referendum about yourself, but at the same time, you aren't able to lift Democrats in tough races. Republicans make gains in the House and capture the Senate, imperiling your agenda through 2020.",
     q13a4_hold: "With Trump in jail, people know you're serious about the threat that he and his movement pose to the country. The ensuing campaign is extremely ugly, but Democratic partisans motivated by your imprisonment of their biggest villain keep midterm losses to a minimum.",
-    q13a4_wave: "This cuts both ways. You're able to help increase Democratic turnout by leaning into the specter of Donald Trump, but not doing much to sell your administration's accomplishments. The American people respond by sending Republicans to Washington in 2019 with a slim majority in both houses.",
+    q13a4_wave: "This cuts both ways. You help increase Democratic turnout by leaning into the specter of Donald Trump, but don't do much to sell your administration's accomplishments. The American people respond by sending Republicans to Washington in 2019 with a slim majority in both houses.",
     q13_favreau_addendum: " To your shock and horror, Keepin' It 1600 host Jon Favreau successfully challenged octogenarian Senator Dianne Feinstein and will represent California in the Senate starting in the 116th Congress.",
     q14a1_win: "Republicans, having been sufficiently chastened by the last decade of election results, are finally willing to play ball. Speaker Pelosi ushers the Comprehensive Immigration Reform Act of 2019 through the House, and McConnell lets it pass the Senate with minimal fuss. The law beefs up border security while streamlining pathways to legal immigration. You've landed the white whale.",
     // bible §9.10: splitting this into status_quo vs gop_senate variants is
@@ -609,8 +629,12 @@ function nmAfterQ13() {
     nmSetFeedback(8183, nm.rec_progressive >= 2 ? NM_FB.q14a3_win : NM_FB.q14a3_loss);
 }
 
-/* End of the govern phase. Every exit from it comes through here: the four Q14
+/* End of the govern phase. Every exit from it comes through here: the four Q15
    answers, and the House of Dynamite terminal, which ends the phase early.
+   It moved from Q14 to Q15 when The Ticket was drafted, because Q15 A1 and A2
+   write rec_progressive and three nominee gates read it — leaving the call at
+   Q14 would resolve the opposition against a record the player had not
+   finished writing.
 
    The one thing it does today is run the nominee cascade, which is what turns
    the opposition from "The Republicans" into a person — see NM_GOP_ROSTER
@@ -710,7 +734,7 @@ cyoAdventure = function (a) {
             // The doc's dangling fourth FX-ELSE is dead code and is dropped per bible §9.4
             if (nm.rec_foreign >= 2) {
                 nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
-                campaignTrail_temp.question_number = 16; // next shown = index 17 (terminal)
+                campaignTrail_temp.question_number = 17; // next shown = index 18 (terminal)
             } else if (nm.delivery >= NM_GATE.q7_failure_check) {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
             } else {
@@ -755,8 +779,11 @@ cyoAdventure = function (a) {
         /* OPEN (bible §I.2, must-clear item 6): A2 is worse than the ungated A1
            on every single term and buys no flag in exchange — the only answer
            in the mod dominated on every axis with nothing hidden behind it
-           (A4 is also a partial, but at least buys harris_scotus, which Q15 A4
-           reads). §I recommends rec_legitimacy +1: Srinivasan is the
+           (A4 is also a partial, but at least buys harris_scotus). §I's note
+           that Q15 A4 would read that flag did not survive the drafting: The
+           Ticket's shortlist is Whitmer, Rice and Brown, and none of its four
+           answers reads harris_scotus.
+           §I recommends rec_legitimacy +1: Srinivasan is the
            bipartisan-confirmation answer and the fiction fits exactly. It is
            held with §I.1 so the node is decided once, deliberately, either way
            — as a compensation or as a documented punish. */
@@ -767,7 +794,10 @@ cyoAdventure = function (a) {
             break;
         case 8124:
             nmAdd("rec_social", 1); nmAdd("rec_legitimacy", -1); nm.scotus_result = "partial";
-            nm.harris_scotus = true; // bible §3.1 — feeds the Q16 VP shortlist; the doc's FX line omits this
+            // bible §3.1; the doc's FX line omits this. No drafted question
+            // reads it — Q15's shortlist does not include Harris — so it is
+            // banked for the pivot build alongside vp_status.
+            nm.harris_scotus = true;
             break;
 
         // ---- Q10 — Crossfire Hurricane ----
@@ -867,21 +897,18 @@ cyoAdventure = function (a) {
             nmAfterQ13();
             break;
 
-        // ---- Q14 — Immigration (last drafted question; ends the run) ----
-        // Positional-write principle (bible §6.5): rec_progressive records the
-        // position and so fires on both branches of an answer, while delivery
-        // records whether it worked. A1 and A3 win through a record-gated branch
-        // and pay +2; A2's win is partly ungated by the gop_senate relief, so it
-        // stays at +1 (bible §2.1, Q14 A2 exception).
-        // Jump lands question_number on 17, which the engine increments to 18 =
-        // question_count — election night fires only on strict equality, and the
-        // jump also steps over the terminal question parked at index 17.
-        //
-        // nmEndGovern() runs before the jump on every branch: it is where the
-        // Republicans stop being "The Republicans" and acquire a nominee. It has
-        // to come after this answer's own nmAdd calls, because the last of them
-        // can be the point that clears Jeb's +11 or drops the run to the
-        // delivery <= 0 band that hands the nomination back to Trump.
+        /* ---- Q14 — Immigration (index 16, flows into Q15 at index 17) ----
+           Positional-write principle (bible §6.5): rec_progressive records the
+           position and so fires on both branches of an answer, while delivery
+           records whether it worked. A1 and A3 win through a record-gated branch
+           and pay +2; A2's win is partly ungated by the gop_senate relief, so it
+           stays at +1 (bible §2.1, Q14 A2 exception).
+
+           No jump: Q15 is the next slot, so the natural increment is correct.
+           Until The Ticket was drafted these four answers ended the run — they
+           jumped over the parked terminal to question_count — and that jump is
+           now Q15's job. nmEndGovern() moved with it, for the reason given at
+           that function: Q15 still writes an axis the nominee cascade reads. */
         case 8181:
             if (nm.congress_2019 === "dem_house") {
                 nmAdd("delivery", 2); nmAdd("rec_immigration", 2); nm.immigration_result = "win";
@@ -889,8 +916,6 @@ cyoAdventure = function (a) {
                 nmAdd("delivery", -1); nm.immigration_result = "loss";
             }
             nmAdd("rec_progressive", 1); // both branches
-            nmEndGovern();
-            campaignTrail_temp.question_number = 17;
             break;
         case 8182:
             if (nm.delivery >= NM_GATE.q14_muscle || nm.congress_2019 === "gop_senate") {
@@ -899,8 +924,6 @@ cyoAdventure = function (a) {
                 nmAdd("delivery", -1); nm.immigration_result = "loss";
             }
             nmAdd("rec_progressive", -1); // both branches
-            nmEndGovern();
-            campaignTrail_temp.question_number = 17;
             break;
         case 8183:
             // Nixon-to-China: the moderate-coded answer needs a progressive record.
@@ -910,8 +933,6 @@ cyoAdventure = function (a) {
                 nmAdd("delivery", -1); nm.immigration_result = "loss";
             }
             nmAdd("rec_progressive", -1); // both branches
-            nmEndGovern();
-            campaignTrail_temp.question_number = 17;
             break;
         case 8184:
             // The duck: no gate, and the pen costs legitimacy. Bible §9.9 notes
@@ -919,13 +940,60 @@ cyoAdventure = function (a) {
             // the prose gets teeth in a later pass.
             nmAdd("rec_immigration", 1); nmAdd("rec_legitimacy", -1);
             nm.immigration_result = "partial";
+            break;
+
+        /* ---- Q15 — The Ticket (index 17; last question; ends the run) ----
+           Every answer is a declared partial and pays delivery 0 (bible §2.1),
+           so the phase's delivery ledger closes where Q14 left it. What the
+           four answers actually decide is vp_status, and for the three that
+           drop Liz the split is warren_relationship(prior) — the axis Q6 A3,
+           Q11 A2 and all four Q12 answers have been writing all game. A1 is
+           the only answer that reads nothing.
+
+           A3's threshold is >= 0 where A2's and A4's are >= +1, and that is
+           the doc's spec, not a slip: Rice is the promotion of a sitting
+           cabinet secretary rather than a swap for a rival, so it takes less
+           standing with Liz to make the parting an amicable one.
+
+           nmEndGovern() runs after this answer's own nmAdd calls on every
+           branch, then the jump. Order matters both ways: the cascade reads
+           rec_progressive, which A1 and A2 have just moved, and it must run
+           before the engine paints anything else — election night follows
+           immediately and an unnamed opponent on the final map is a bug.
+
+           Jump lands question_number on 18, which the engine increments to
+           19 = question_count — election night fires only on strict equality,
+           and the jump also steps over the terminal parked at index 18. */
+        case 8191:
+            nmAdd("delivery", 0); nmAdd("warren_relationship", 1); nmAdd("rec_progressive", 1);
+            nm.vp_status = "retained";
             nmEndGovern();
-            campaignTrail_temp.question_number = 17;
+            campaignTrail_temp.question_number = 18;
+            break;
+        case 8192:
+            nmAdd("delivery", 0);
+            nm.vp_status = nm.warren_relationship >= 1 ? "replaced_amicable" : "replaced_hostile";
+            nmAdd("rec_progressive", -1); // both branches
+            nmEndGovern();
+            campaignTrail_temp.question_number = 18;
+            break;
+        case 8193:
+            nmAdd("delivery", 0);
+            nm.vp_status = nm.warren_relationship >= 0 ? "replaced_amicable" : "replaced_hostile";
+            nmEndGovern();
+            campaignTrail_temp.question_number = 18;
+            break;
+        case 8194:
+            nmAdd("delivery", 0);
+            nm.vp_status = nm.warren_relationship >= 1 ? "replaced_amicable" : "replaced_hostile";
+            nmAdd("rec_labor", 1); // both branches
+            nmEndGovern();
+            campaignTrail_temp.question_number = 18;
             break;
 
         // ---- A HOUSE OF DYNAMITE terminal ----
-        // No jump needed: index 17 + 1 = 18 = question_count, so the game ends.
-        // The govern phase ends here too, seven questions early, and the cascade
+        // No jump needed: index 18 + 1 = 19 = question_count, so the game ends.
+        // The govern phase ends here too, eight questions early, and the cascade
         // still has to run: election night follows this answer, and an unnamed
         // opponent on the final map is a bug, not a mood. The record is short
         // and the axes are barely moved, so this route lands on the roster's
@@ -940,17 +1008,17 @@ cyoAdventure = function (a) {
 /* ============================================================
    Progress bar — display-only relabelling.
 
-   The player plays fourteen questions. questions_json holds eighteen slots,
+   The player plays fifteen questions. questions_json holds nineteen slots,
    because Q3 is one question with four mutually exclusive branch slots and
    the terminal is parked at the end. NM_DISPLAY maps a question's pk to the
    number the player should actually see.
    ============================================================ */
-var NM_SPINE_TOTAL = 14;
+var NM_SPINE_TOTAL = 15;
 var NM_DISPLAY = {
     801: 1, 802: 2,
     803: 3, 804: 3, 805: 3, 806: 3,   // Q3a-d — one question, four variants
     807: 4, 808: 5, 809: 6, 810: 7, 811: 8, 812: 9,
-    813: 10, 814: 11, 816: 12, 817: 13, 818: 14
+    813: 10, 814: 11, 816: 12, 817: 13, 818: 14, 819: 15
     // 815, A HOUSE OF DYNAMITE, is a terminal and not on the spine
 };
 
@@ -1025,6 +1093,7 @@ var NM_TRACKER = {
         { key: "scotus_result",      label: "Court" },
         { key: "congress_2019",      label: "Congress" },
         { key: "immigration_result", label: "Immigration" },
+        { key: "vp_status",          label: "Ticket" },
         /* Appears only once the cascade has fired, which is the point: until
            then the row is absent and the opponent is "The Republicans"
            everywhere the player can look. The gate that selected the nominee
@@ -1049,6 +1118,7 @@ var NM_TRACKER = {
 var NM_OUTCOME_LABEL = {
     win: "won", partial: "partial", loss: "lost",
     dem_house: "Dem House", status_quo: "split", gop_senate: "GOP sweep",
+    retained: "Warren", replaced_amicable: "replaced", replaced_hostile: "replaced (sour)",
     trump: "Trump", christie: "Christie", jeb: "Bush", rubio: "Rubio",
     haley: "Haley", paul: "Paul", pence: "Pence", carlson: "Carlson",
     cruz: "Cruz"

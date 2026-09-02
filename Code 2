@@ -154,9 +154,18 @@ campaignTrail_temp.questions_json = [
     },
     {
         "model": "campaign_trail.question",
-        "pk": 815,
+        "pk": 819,
         "fields": {
             "priority": 17,
+            "description": "The Biden 2020 re-election campaign is ready to go. You'll kickstart the effort next week at a rally in Philadelphia. Klain, in one of your many meetings with him in the White House, clears his throat uncomfortably. “Mr. President,” he starts, “just so you know, if you're having any second thoughts about the Vice President, now would be the time to replace her. Could be a good way to show the public that we're blazing a new path in your second term, if you think that's what we need.”",
+            "likelihood": 1
+        }
+    },
+    {
+        "model": "campaign_trail.question",
+        "pk": 815,
+        "fields": {
+            "priority": 18,
             "description": "The Air Force…they didn't get all the trucks. It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
             "likelihood": 1
         }
@@ -193,7 +202,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8014,
         "fields": {
             "question": 801,
-            "description": "It's time to go big. I want an FDR-sized presidency. Let's aim high and advocate for an expansion of the welfare state and tangible progress on social issues."
+            "description": "It's time to go big. I want an FDR-sized presidency. Let's aim high and advocate for expanding the welfare state and tangible progress on social issues."
         }
     },
     {
@@ -297,7 +306,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8052,
         "fields": {
             "question": 805,
-            "description": "Y'know, I think King Solomon once said something about splitting the baby. Let's put in all the easy stuff and then say states can pursue public options. Hell, California and New York alone could insure millions."
+            "description": "Y'know, I think King Solomon once said something about splitting the baby. Let's put in all the easy stuff and then say states can pursue public options. California and New York alone could insure millions."
         }
     },
     {
@@ -305,7 +314,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8053,
         "fields": {
             "question": 805,
-            "description": "Hell, let's get the whole enchilada. Don't stop at saying states can pursue public options. Invoke Bayh-Dole march-in rights to break patents on federally-funded drugs and lower their prices. Why should the taxpayer be on the hook for something that they can't even afford?"
+            "description": "Hell, let's get the whole enchilada. Don't stop at saying states can pursue public options. Invoke Bayh-Dole march-in rights to break patents on federally funded drugs and lower their prices. Why should the taxpayer be on the hook for something that they can't even afford?"
         }
     },
     {
@@ -473,7 +482,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8121,
         "fields": {
             "question": 812,
-            "description": "We have the Senate, don't we? It's time to stick it to all those Republicans that have been slow-walking my whole agenda. Let's nominate Ketanji Brown Jackson - she was on Barack's shortlist to replace Scalia, and she'll make history as the first Black woman on the Court. It doesn't hurt that she's progressive, too."
+            "description": "We have the Senate, don't we? It's time to stick it to all those Republicans that have been slow-walking my whole agenda. Let's nominate Ketanji Brown Jackson - she was on Barack's shortlist to replace Scalia, and she'll make history as the first black woman on the Court. It doesn't hurt that she's progressive, too."
         }
     },
     {
@@ -521,7 +530,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8133,
         "fields": {
             "question": 813,
-            "description": "This is a political hot potato. No way am I touching this so close to the midterms. Just announce that we're combating foreign interference in our elections as a result of this investigation and forget about prosecuting Trump for anything, at least for now."
+            "description": "This is a political live wire. No way am I touching this so close to the midterms. Just announce that we're combating foreign interference in our elections as a result of this investigation and forget about prosecuting Trump for anything, at least for now."
         }
     },
     {
@@ -666,6 +675,38 @@ campaignTrail_temp.answers_json = [
         "fields": {
             "question": 818,
             "description": "Are you nuts? We can't risk this blowing up with reelection on the horizon. Just tee up some executive orders for me to sign. Easy wins for the base."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8191,
+        "fields": {
+            "question": 819,
+            "description": "Are you kidding me? Liz has done everything we've asked of her. Plus, she's really in touch with younger folks. We'll need them next fall. No, she stays on the ticket."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8192,
+        "fields": {
+            "question": 819,
+            "description": "We gotta moderate our image a bit. Liz can be…what's the word…anyways. I always liked that Gretchen Whitmer out in Michigan. It'll be like trading in an old jalopy for a new model."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8193,
+        "fields": {
+            "question": 819,
+            "description": "Susan Rice has been an incredible Secretary of State. She gets how things work around here and how to govern. Plus, we need some more black representation."
+        }
+    },
+    {
+        "model": "campaign_trail.answer",
+        "pk": 8194,
+        "fields": {
+            "question": 819,
+            "description": "I don't buy that gender balance is as important as people say it is. Gender balance on the ticket, that is. Sherrod Brown out of Ohio, now there's a guy who people can relate to. Talks like a regular person, you know? Plus the Bernie folks like him."
         }
     }
 ]
@@ -6588,7 +6629,7 @@ campaignTrail_temp.answer_feedback_json = [
         "fields": {
             "answer": 8011,
             "candidate": 300,
-            "answer_feedback": "Favreau is unimpressed. “I mean, look, we all loved Obama. Obviously. I mean, we worked for him. But at some point, Biden has to put his own stamp on things.”"
+            "answer_feedback": "Favreau is unimpressed. “I mean, look, we all loved Obama. Obviously, I mean, we worked for him. But at some point, Biden has to put his own stamp on things.”"
         }
     },
     {
@@ -6849,7 +6890,7 @@ campaignTrail_temp.answer_feedback_json = [
         "fields": {
             "answer": 8093,
             "candidate": 300,
-            "answer_feedback": "Rhodes changes his Twitter profile picture to a peace symbol. During your weekly lunches, Warren confides that she's disappointed in your decision. “People trusted us, Mr. President.” Whatever. You've been doing this much longer than her."
+            "answer_feedback": "Rhodes changes his Twitter profile picture to a peace symbol. In your weekly lunches, Warren confides that she's disappointed in your decision. “People trusted us, Mr. President.” Whatever. You've been doing this much longer than her."
         }
     },
     {
@@ -6975,7 +7016,7 @@ campaignTrail_temp.answer_feedback_json = [
         "fields": {
             "answer": 8132,
             "candidate": 300,
-            "answer_feedback": "Perez gets the message, and the DOJ formally charges Trump with several counts of obstruction of justice. His trial consumes the nation, and his still-sizable MAGA movement is enraged. A federal jury eventually sentences him to five years in federal prison, but polls show that about 40% of the country thinks he was the victim of political retaliation."
+            "answer_feedback": "Perez gets the message, and the DOJ formally charges Trump with several counts of obstruction of justice. His trial consumes the nation, and the still-sizable MAGA movement is enraged. A federal jury eventually sentences him to five years in federal prison, but polls show that about 40% of the country thinks he was the victim of political retaliation."
         }
     },
     {
@@ -7074,7 +7115,7 @@ campaignTrail_temp.answer_feedback_json = [
         "fields": {
             "answer": 8164,
             "candidate": 300,
-            "answer_feedback": "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she finds herself able to go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”"
+            "answer_feedback": "Liz is unenthusiastic at first, but her appearance on Last Week Tonight defending the administration's record goes viral. After that, her attitude changes, and she can go viral on demand. Pfeiffer notes that she excels at “explaining what Biden himself isn't good at explaining.”"
         }
     },
     {
@@ -7147,6 +7188,42 @@ campaignTrail_temp.answer_feedback_json = [
             "answer": 8184,
             "candidate": 300,
             "answer_feedback": "Your staff finds a few things for you to sign, but unfortunately, Barack already picked most of the low-hanging fruit. Pfeiffer shares a poll in his Message Box newsletter which shows that a majority of voters favor major reform to the immigration system."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9064,
+        "fields": {
+            "answer": 8191,
+            "candidate": 300,
+            "answer_feedback": "At one of your weekly lunches, Warren tells you she is looking forward to serving a second term with you. Part of you feels bad for her. You know what wants to be president, but is she really going to secure the fifth straight Democratic term in 2024 at the age of 75?"
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9065,
+        "fields": {
+            "answer": 8192,
+            "candidate": 300,
+            "answer_feedback": "“Really?” Vietor asks incredulously not long after the announcement. “A cheap knockoff of Warren? It's like trading a David Ortiz rookie card for a commemorative card of Tom Yawkey.” As usual, you have no idea what the hell he's talking about."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9066,
+        "fields": {
+            "answer": 8193,
+            "candidate": 300,
+            "answer_feedback": "In an appearance on “Black on the Air,” Lovett tells Larry Wilmore that voters are smart enough to know the difference between representation and pandering. “So you like the Rice pick?” Wilmore asks. “Oh, I didn't say that,” Lovett responds."
+        }
+    },
+    {
+        "model": "campaign_trail.answer_feedback",
+        "pk": 9067,
+        "fields": {
+            "answer": 8194,
+            "candidate": 300,
+            "answer_feedback": "Pfeiffer accuses you of sexism. “The old, white, male president fired a woman employee to give her job to his old, white, male friend. That's just how voters are going to see it.”"
         }
     }
 ]

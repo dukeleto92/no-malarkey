@@ -7196,7 +7196,7 @@ campaignTrail_temp.answer_feedback_json = [
         "fields": {
             "answer": 8191,
             "candidate": 300,
-            "answer_feedback": "At one of your weekly lunches, Warren tells you she is looking forward to serving a second term with you. Part of you feels bad for her. You know what wants to be president, but is she really going to secure the fifth straight Democratic term in 2024 at the age of 75?"
+            "answer_feedback": "At one of your weekly lunches, Warren tells you she is looking forward to serving a second term with you. Part of you feels bad for her. You know she wants to be president, but is she really going to secure the fifth straight Democratic term in 2024 at the age of 75?"
         }
     },
     {

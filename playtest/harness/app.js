@@ -10,6 +10,7 @@
 
 import { listMods, fetchMod, inspectMod } from './loader.js';
 import { validateMod } from './validate.js';
+import { checkMapTargets } from './maptargets.js';
 import { GameSession } from './runner.js';
 import { buildDump, writeDump, stableStringify } from './dump.js';
 
@@ -310,6 +311,19 @@ function setBusy(on, why) {
   if (on && why) log('info', why);
 }
 
+// CLAUDE.md, via the server's read-only route. A 204 means the project has no
+// CLAUDE.md at all; either way a failure here must not stop validation, so it
+// degrades to '' and checkMapTargets() skips itself.
+async function fetchTargets() {
+  try {
+    const res = await fetch('/api/targets', { cache: 'no-store' });
+    if (res.status === 204 || !res.ok) return '';
+    return await res.text();
+  } catch {
+    return '';
+  }
+}
+
 async function reloadAndValidate() {
   const name = $('mod-select').value;
   if (!name) return log('error', 'No mod selected.');
@@ -322,6 +336,15 @@ async function reloadAndValidate() {
 
     const { temp, problems } = inspectMod(mod);
     const report = validateMod(temp);
+
+    // Map targets are a separate assertion with its own data source, folded
+    // into the same report so there is one place to look. A project with no
+    // CLAUDE.md targets table skips it and contributes nothing.
+    const map = checkMapTargets(temp, await fetchTargets());
+    state.map = map;
+    report.errors.push(...map.errors);
+    report.notes.push(...map.notes);
+
     state.report = report;
     renderReport(report, problems);
 

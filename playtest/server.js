@@ -189,6 +189,39 @@ function serveModFile(req, res, modName, which) {
   });
 }
 
+// CLAUDE.md holds the electoral map targets the validator asserts against. It
+// sits in PROJECT_DIR, one level above the static root, so it needs its own
+// route — serveStatic() is confined to PLAYTEST_DIR and would 403 it. Read
+// only, like the mod files: nothing in this server writes outside runs/.
+// A missing CLAUDE.md is a 204, not a 404 — a mod without map targets is a
+// normal mod, and the harness skips the assertion rather than reporting a fault.
+function serveTargets(res) {
+  const abs = path.join(PROJECT_DIR, 'CLAUDE.md');
+
+  let st;
+  try {
+    st = fs.statSync(abs);
+  } catch {
+    res.writeHead(204, { 'Cache-Control': 'no-store, no-cache, must-revalidate' });
+    return res.end();
+  }
+
+  let text;
+  try {
+    text = fs.readFileSync(abs, 'utf8');
+  } catch (err) {
+    return sendJson(res, 500, { error: `Could not read CLAUDE.md: ${err.message}` });
+  }
+
+  return sendText(res, 200, text, {
+    'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+    Pragma: 'no-cache',
+    Expires: '0',
+    ETag: `"${st.mtimeMs}-${st.size}"`,
+    'X-Targets-Path': path.relative(PROJECT_DIR, abs),
+  });
+}
+
 function receiveRun(req, res) {
   let raw = '';
   let tooBig = false;
@@ -318,6 +351,7 @@ const server = http.createServer((req, res) => {
 
   if (pathname === '/api/mods') return sendJson(res, 200, { mods: discoverMods(), projectDir: PROJECT_DIR });
   if (pathname === '/api/runs') return listRuns(res);
+  if (pathname === '/api/targets') return serveTargets(res);
   if (pathname === '/api/run' && req.method === 'POST') return receiveRun(req, res);
 
   const modMatch = pathname.match(/^\/api\/mod\/(.+)\/([123])$/);

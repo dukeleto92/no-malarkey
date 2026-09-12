@@ -139,16 +139,60 @@ Runs automatically on load. The rule is:
 Repeated findings are grouped. One leftover candidate id across 112 score rows is
 one warning with a count, not 112 lines.
 
+### Map targets
+
+A second assertion runs alongside the schema check: **does the starting map
+match the design?** It lives in `harness/maptargets.js`, not `validate.js`,
+because `validate.js` is mod-agnostic by contract and a table of state margins
+is the opposite of that.
+
+The targets are read from the **`## Electoral map targets` table in the
+project's `CLAUDE.md`**, which that section declares authoritative. There is no
+second copy in the harness — edit the table, reload, and the assertion moves
+with it. A project with no such table skips the check silently, so the harness
+stays usable for any other mod.
+
+It fails when either:
+
+- a targeted state's margin at starting popularity is more than **1.5 points**
+  off its target, or
+- the tipping-point state is not **Iowa or North Carolina**.
+
+A target written with a trailing `+` (`R+20+`) is a floor, not a band: deeper
+passes, shallower fails. States with no row in the table are not checked, and
+the report says which ones those are.
+
+"Starting popularity" pins the run to zero answers, zero visits, RNG at its
+mean, difficulty 1.0, and the `opponents_default_json` matchup. The engine's
+`A()` only exists inside the game iframe, which is not booted at validation
+time, so `maptargets.js` mirrors its arithmetic — the header comment there
+records exactly what is mirrored and what would have to be re-diffed if the
+pinned engine is ever re-pinned.
+
+Headless, for scripting or CI:
+
+```sh
+node playtest/harness/checkmap.mjs          # exits 1 if the map is off target
+```
+
 ### What it says about your mod today
 
-Zero errors, six warnings:
+Two errors, six warnings.
+
+The two errors are both the map assertion, and both are **expected** — the v0.10
+targets describe where the map is going, not where it is. Ten of the twenty
+targeted states are outside tolerance (Maine-02 is the worst at 10.7 points),
+and the tipping point is Pennsylvania rather than Iowa or North Carolina. They
+will clear as the remaining map passes land.
+
+The six warnings:
 
 - Score rows for candidates `302` and `303`, which are not in `candidate_json`
   (5 + 5 issue scores, 56 + 56 state multipliers). Almost certainly leftovers
   from the base 2020 scenario. Inert — the engine filters them out — but they
   would join the race the moment something added those candidates.
 - Running mate `309` has no issue scores while `308` has all five.
-- Ten fields still hold a bare `'` placeholder, across candidates 301, 308, 309.
+- Nine fields still hold a bare `'` placeholder, across candidates 308 and 309.
 - A standing note that all three `answer_score_*` arrays are empty, so no answer
   moves a vote and a results diff will legitimately come back empty.
 
@@ -338,7 +382,9 @@ playtest/
 │   ├── index.html          the harness page
 │   ├── app.js              UI wiring
 │   ├── runner.js           drives the real engine (clicks; no simulation)
-│   ├── validate.js         forward-compatible validator
+│   ├── validate.js         forward-compatible validator (mod-agnostic)
+│   ├── maptargets.js       starting-map assertion against CLAUDE.md targets
+│   ├── checkmap.mjs        the same assertion, headless, for scripting/CI
 │   ├── loader.js           reads mod files; sandbox for pre-flight validation
 │   ├── rng.js              seeded Math.random, and why ordering matters
 │   ├── dump.js             diff-stable result dumps

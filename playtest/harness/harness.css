@@ -161,7 +161,9 @@ pre.report {
 .item.note { border-left-color: var(--accent); }
 .item.new { border-left-color: var(--new); }
 .item .where { font-family: var(--mono); font-size: 11px; color: var(--text); font-weight: 600; }
-.item .msg { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+/* pre-wrap so a multi-line message (the map-target failure list) keeps its
+   line breaks; long single lines still wrap normally. */
+.item .msg { font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: pre-wrap; }
 
 table.res { border-collapse: collapse; width: 100%; font-size: 12.5px; }
 table.res th, table.res td { text-align: left; padding: 5px 9px; border-bottom: 1px solid var(--line); }

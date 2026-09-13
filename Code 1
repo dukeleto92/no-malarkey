@@ -176,7 +176,7 @@ campaignTrail_temp.global_parameter_json = [
             "issue_stance_6_max": 0.71,
             "global_variance": 0.01,
             "state_variance": 0.005,
-            "question_count": 19,
+            "question_count": 20,
             "default_map_color_hex": "#C9C9C9",
             "no_state_map_color_hex": "#999999"
         }
@@ -265,13 +265,32 @@ jet_data = {
        Q14 A2         +11      -8        +6
        end of govern  +13      -9        +8
 
-   Q15 The Ticket is drafted as of this pass and does not move the ledger:
-   all four of its answers are declared partials and pay delivery 0, so the
-   three columns above are the same figures at the end of Q15 as at the end
-   of Q14. Jeb's +11 nomination gate is still measured against +13. What Q15
-   does move is rec_progressive (A1 +1, A2 -1), which several nominee gates
-   read — so the cascade now runs at the end of Q15 rather than Q14. See
-   nmEndGovern().
+   Q15 The Ticket does not move the ledger: all four of its answers are
+   declared partials and pay delivery 0, so the three columns above are the
+   same figures at the end of Q15 as at the end of Q14. What Q15 does move is
+   rec_progressive (A1 +1, A2 -1), which several nominee gates read.
+
+   Q16 COVID, drafted in this pass, does not move it either, and moves nothing
+   else the phase reads: it writes only covid_response and covid_posture, plus
+   a rec_legitimacy -1 on one branch of A1. So the cascade now runs at the end
+   of Q16 (see nmEndGovern()) and Jeb's +11 nomination gate is still measured
+   against +13.
+
+   The three FX corrections this pass takes from the doc leave the ledger
+   standing as printed, which is the whole reason they could be taken at once:
+
+     - Q2 A2 rec_progressive +2 -> +1 and Q2 A4 -1 -> 0 (§H option (b), see
+       case 8022). Q2 writes no delivery at all, and the accumulator-blind
+       line still clears the two rec_progressive gates it banks on.
+     - Q4 A3 and Q14 A4 regain the delivery -1 the doc and §9.8 item 2 have
+       both always carried and this file never transcribed. Neither moves the
+       floor: the sibling branches a floor path would take instead already
+       pay -1.
+     - Q9 A2 gains rec_legitimacy +1 (§I.2, now decided). Not a delivery
+       source; it raises the rec_legitimacy ceiling +5 -> +6.
+
+   Verified by the same exhaustive walk: ceiling +13, floor -9, floor_safe +8
+   on both sides of all three. NM_GATE re-derives to the identical ladder.
 
    §A's three desyncs are desyncs in the *document*, not here: the mod has only
    ever carried one favreau_senate block and has gated it at hosts_burned >= 2
@@ -280,24 +299,28 @@ jet_data = {
    apply; §A.3's prerequisite for §L is satisfied on this side. §C adds a
    fourth of the same kind, and that one WAS live — see case 8163.
 
-   Deliberately NOT in this pass:
-     - §H, rec_progressive saturation. The axis rails by Q2-Q3, not Q6-Q8, so
-       Q13 A1's >= +1 and Q14 A3's >= +2 are close to free. The bible holds the
-       fix back explicitly: two difficulty levers moving together is how v0.8
-       produced a result nobody could attribute. Land this, play it, then move
-       the axis.
-     - §I, the two dominated answers (Q8 A3, Q9 A2). Q8 A3's proposed fix is a
-       delivery +1, which would raise floor_safe and re-derive the whole ladder
-       — so it belongs with §H, not here. Both are marked at their case below.
+   §H and §I both move in this pass, and neither is the pass's own judgement —
+   the doc decided them and this file follows:
+     - §H, rec_progressive saturation, at option (b): Q2's magnitudes are cut
+       and the +-3 clamp stands. §H's standing warning is against landing it
+       beside §D and §E, and those landed in v0.9, so the levers are not moving
+       together. The axis now rails around Q4-Q6 rather than by the end of Q2,
+       and the Favreau moderate floor is no longer two writes deep.
+     - §I.2, Q9 A2, closed as a compensation rather than a punish.
+   Still deliberately NOT in this pass:
+     - §I.1, Q8 A3. Its proposed fix is a delivery +1, which WOULD raise
+       floor_safe and re-derive the whole ladder. The doc has not moved it and
+       neither does this. Marked at its case below.
      - §L, the freed immigration slot. Still undrafted, and gated on §A.3.
 
-   Q14 Immigration is drafted and locked (§6). The Ticket (Q15) is drafted in
-   this pass from the doc's "Running Mate Selection" section, so the govern
-   phase now ends at Q15. Its only new state is vp_status, which no drafted
-   question reads — like harris_scotus it is banked for the pivot build. The
-   engine's running-mate record is fixed at ticket selection and Q15 does not
-   touch it: replacing Liz sets the flag, and the banner photo stays Warren's
-   until the pivot build has a screen that can say otherwise.
+   Q14 Immigration is drafted and locked (§6). The Ticket (Q15) is drafted, and
+   COVID (Q16) is drafted in this pass from the doc's "COVID" section, so the
+   govern phase now ends at Q16. Q15's vp_status is still banked for the pivot
+   build, and the engine's running-mate record is fixed at ticket selection:
+   replacing Liz sets the flag, and the banner photo stays Warren's until the
+   pivot build has a screen that can say otherwise. Q16's covid_response and
+   covid_posture are banked the same way. harris_scotus, banked since Q9 was
+   written, is no longer: Q16 A1 is its first consumer.
    ============================================================ */
 
 campaignTrail_temp.cyoa = true;
@@ -308,8 +331,8 @@ campaignTrail_temp.cyoa = true;
    6 Q4 Infrastructure · 7 Q5 TPP · 8 Q6 Afghanistan · 9 Q7 North Korea ·
    10 Q8 Guns · 11 Q9 RBG vacancy · 12 Q10 Crossfire Hurricane ·
    13 Q11 Executive Time · 14 Q12 Warren Relationship · 15 Q13 Midterms ·
-   16 Q14 Immigration · 17 Q15 The Ticket ·
-   18 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
+   16 Q14 Immigration · 17 Q15 The Ticket · 18 Q16 COVID ·
+   19 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
 
    The engine labels every screen "Question {question_number+1} of
    {question_count}", but question_number is an index into questions_json.
@@ -319,9 +342,9 @@ campaignTrail_temp.cyoa = true;
    denominator. nmPaintProgress() below relabels it from NM_DISPLAY, purely
    as display: no jump target or question_count changes.
 
-   Do NOT change question_count to 15 without also removing the branch
+   Do NOT change question_count to 16 without also removing the branch
    indices; election night requires question_number === question_count
-   exactly, and jumps target 17/18 against a 19-slot array. */
+   exactly, and jumps target 18/19 against a 20-slot array. */
 
 var nm = {
     // Tier A — bounded positional axes (bible §2). rec_progressive clamps at
@@ -366,6 +389,17 @@ var nm = {
        replace her without making an enemy. Nothing in the govern phase
        reads it; it is banked for the pivot build, like harris_scotus. */
     vp_status: null,
+    /* Q16 COVID. covid_response is a graded accumulator like delivery, but it
+       has exactly one source — this question — so it needs no clamp: the
+       reachable range is its four answers, -2..+2. It is the pandemic's
+       counterpart to delivery and nothing in the govern phase reads it; the
+       pivot build is where it is spent.
+       covid_posture: "federal" | "guidance" | "production" | "shielding" —
+       which instrument the president reached for, kept separately from how
+       well it went, so the pivot can say what he did as well as how it
+       landed. Both are written on every branch of every answer. */
+    covid_response: 0,
+    covid_posture: null,
     // Q13 addendum flag — see NM_FAVREAU_GATE; also read for Q14 prose
     favreau_senate: false,
     // RNG pre-rolls for Q3c, rolled when Q2 routes there so feedback can be pre-written
@@ -436,8 +470,12 @@ var NM_FB = {
     // The {Senator} insertion is filled by nmQ14A2Loss() below (bible §9.10).
     q14a2_loss_pre: "“He's a failed president. He just is,” podcaster Bill Simmons opines in an interview with ",
     q14a2_loss_post: "Favreau. “No way Obama lets a bill like this fall apart. It's almost like Biden wants Trump back in the picture.”",
-    q14a3_win: "It takes some cajoling, but you have enough progressive bona fides at this point to get the most liberal members of the Democratic caucus on board with this proposal. The Freedom Caucus, predictably, tries to blow up the whole thing, but enough establishment Republicans are on board that the bill is never seriously threatened.",
-    q14a3_loss: "“He wants to build Trump's wall for him?” Rhodes asks incredulously. “Tell me what the difference is between these two guys again, because it's getting increasingly difficult to tell.” The bill doesn't make it out of committee."
+    q14a3_win: "It takes some cajoling, but you have enough progressive credibility at this point to get the most liberal members of the Democratic caucus on board with this proposal. The Freedom Caucus, predictably, tries to blow up the whole thing, but enough establishment Republicans are on board that the bill is never seriously threatened.",
+    q14a3_loss: "“He wants to build Trump's wall for him?” Rhodes asks incredulously. “Tell me what the difference is between these two guys again, because it's getting increasingly difficult to tell.” The bill doesn't make it out of committee.",
+    q16a1_harris: "A dozen red state attorneys general immediately file a lawsuit to challenge your order implementing minimum required quarantine measures. At the Supreme Court, Justice Harris comes through, penning the majority opinion in Texas v. Biden, which upholds your order.",
+    q16a1_struck: "Even you are shocked by the ferocity of the backlash to the order. It is fast-tracked to the Supreme Court, which overturns it in a 5-4 order. Justice Garland joins in the majority opinion. All you wanted to do was keep folks safe.",
+    q16a2_rally: "To your surprise, the guidelines are much more effective than you anticipated. People are scared and, like many other world leaders, you are enjoying a “rally around the flag” boost to your support. Rhodes nevertheless compares you unfavorably to Jacinda Ardern.",
+    q16a2_patchwork: "As you suspected, this is a mixed bag. The blue states do their part, but Governor Abbott in Texas and Governor Putnam in Florida seem to relish defying your recommendations."
 };
 
 /* Q14 A2's failure text names Favreau, who on the secret path has been a
@@ -454,15 +492,18 @@ function nmQ14A2Loss() {
    hard-gated the secret path on the Q2 healthcare route. Lowering it to 2 opens
    several combinations.
 
-   The second condition does NOT do the independent work §5 claimed for it, and
+   The second condition did NOT do the independent work §5 claimed for it, and
    §H.3 is where that fell over. The argument was that on the widened +-3 clamp,
-   reaching -3 takes at least one further moderate move beyond the burns. It
-   does not: Q1 A3 and Q2 A4 alone put a player at -2 and any third moderate
-   write rails them, which on a twelve-source axis is nothing to arrange. The
-   moderate floor is close to a freebie here for the same reason Q13 A1's >= +1
-   and Q14 A3's >= +2 are. Fixing it is §H's job — the widening moved the rail
-   by about one question, not the six §9.8 assumed — and §H is deliberately not
-   in this pass, so the threshold stands as-is and this comment is the record. */
+   reaching -3 takes at least one further moderate move beyond the burns. It did
+   not: Q1 A3 and Q2 A4 alone put a player at -2 and any third moderate write
+   railed them, which on a twelve-source axis was nothing to arrange.
+
+   §H has since landed (option (b), see case 8022) and Q2 A4 now pays 0. That
+   removes half of the two-write floor the argument fell to: reaching -3 takes
+   three moderate writes from the remaining sources, and Q1 A3 is the only one
+   of them that is also a burn. The second condition is doing real work again,
+   which is what §5 wanted from it and what the +-3 widening was supposed to
+   buy. The threshold stands at 2 and this comment is the record. */
 var NM_FAVREAU_GATE = { hosts_burned_min: 2, progressive_max: -3 };
 
 /* Gate ladder (bible v0.9 §E.1): each delivery(prior) gate sits at
@@ -536,7 +577,18 @@ var NM_GATE = {
        not read it, or needed the point at Q14. It was mechanically null for
        two revisions. At 2 the flag is worth net +1. See the note above on why
        it does not also buy a reach-free clear of Q13. */
-    q13_push_discount: 2
+    q13_push_discount: 2,
+    /* Q16 A2's gate reads rec_legitimacy(prior), not delivery, so §E's ladder
+       rule does not derive it and adding it does not disturb the six gates
+       above — the rule is about delivery sources and Q16 writes none.
+
+       It behaves like Q8's gate rather than the later ones: +3 is clearable by
+       safe play (Q1 A1's +1 and Q10 A1's +2 are both ungated), against a
+       reachable ceiling that Q9 A2's new +1 raises to +6. That is the right
+       shape for the answer — trusting the CDC to carry the country works if
+       the country still trusts you, and a president who has spent the whole
+       phase husbanding legitimacy should not then have to gamble on it. */
+    q16_rally: 3
 };
 
 /* Q13 A2/A3's gate, in full: the tally band OR the midterm_push relief band.
@@ -629,12 +681,30 @@ function nmAfterQ13() {
     nmSetFeedback(8183, nm.rec_progressive >= 2 ? NM_FB.q14a3_win : NM_FB.q14a3_loss);
 }
 
-/* End of the govern phase. Every exit from it comes through here: the four Q15
+/* After Q15: pre-write the two conditional Q16 variants. A1 branches on
+   harris_scotus, final since Q9, and A2 on rec_legitimacy(prior) >= +3.
+
+   rec_legitimacy is final once Q14 has resolved — no Q15 answer writes it —
+   so "prior" here is the same number whether it is read before or after The
+   Ticket. Pre-writing at Q15 is still where it belongs: feedback is rendered
+   before cyoAdventure runs for the answer, so a variant chosen at Q16 itself
+   would be chosen a screen too late. */
+function nmAfterQ15() {
+    nmSetFeedback(8201, nm.harris_scotus ? NM_FB.q16a1_harris : NM_FB.q16a1_struck);
+    nmSetFeedback(8202, nm.rec_legitimacy >= NM_GATE.q16_rally ? NM_FB.q16a2_rally : NM_FB.q16a2_patchwork);
+}
+
+/* End of the govern phase. Every exit from it comes through here: the four Q16
    answers, and the House of Dynamite terminal, which ends the phase early.
-   It moved from Q14 to Q15 when The Ticket was drafted, because Q15 A1 and A2
-   write rec_progressive and three nominee gates read it — leaving the call at
-   Q14 would resolve the opposition against a record the player had not
-   finished writing.
+   It moved from Q14 to Q15 when The Ticket was drafted, and from Q15 to Q16
+   when COVID was — the standing rule being that it runs after the phase's last
+   write, and the phase's last write is whatever the last question makes.
+   Q15's move had a sharper reason than Q16's: Q15 A1 and A2 write
+   rec_progressive and three nominee gates read it. Q16 writes nothing the
+   cascade reads, so leaving the call at Q15 would still have named the same
+   opponent; it moves anyway, because "the last question resolves the phase" is
+   a cheaper invariant to keep than a case-by-case argument about which axes
+   the cascade happens to consult this revision.
 
    The one thing it does today is run the nominee cascade, which is what turns
    the opposition from "The Republicans" into a person — see NM_GOP_ROSTER
@@ -659,8 +729,26 @@ cyoAdventure = function (a) {
         // ---- Q2 — Healthcare I: routes Q3 ----
         // NOTE: the engine increments question_number AFTER cyoAdventure runs,
         // so a jump to index X is written as question_number = X - 1.
+        /* A2 pays rec_progressive +1, not +2, and A4 pays 0, not -1 — the doc's
+           Q2 FX as of this pass. This is §H's lever, landed on its own: §H.1
+           measured the axis railing "by the end of Q2" on the old writes
+           (maximal progressive Q1 A4 +1 then Q2 A2 +2), and §H.2 showed the
+           Favreau moderate floor collapsing because "Q1 A3 and Q2 A4 alone put
+           a player at -2". Both readings were of Q2's magnitudes, and both are
+           what these two numerals move.
+
+           It is option (b) of §H.3, not (a): the +-3 clamp stands. §H's warning
+           about not moving two difficulty levers at once is satisfied — §D and
+           §E landed in v0.9 and are not touched here.
+
+           The delivery ledger does not move, which is the property worth
+           stating: Q2 writes no delivery, and the accumulator-blind line still
+           clears both rec_progressive gates it depends on (Q1 A4 +1, Q2 A2 +1
+           = +2 entering Q3, against Q13 A1's >= +1 and Q14 A3's >= +2). An
+           exhaustive walk confirms ceiling +13 / floor -9 / floor_safe +8 on
+           both sides of this change, so NM_GATE re-derives to the same ladder. */
         case 8021: nmAdd("rec_progressive", 1); nm.route = "3a"; campaignTrail_temp.question_number = 1; break;
-        case 8022: nmAdd("rec_progressive", 2); nm.route = "3b"; campaignTrail_temp.question_number = 2; break;
+        case 8022: nmAdd("rec_progressive", 1); nm.route = "3b"; campaignTrail_temp.question_number = 2; break;
         case 8023:
             nm.route = "3c";
             // Pre-roll the Q3c RNG beats so the correct feedback can be written now
@@ -670,7 +758,7 @@ cyoAdventure = function (a) {
             nmSetFeedback(8053, nm.q3c_a3_success ? NM_FB.q3c_a3_win : NM_FB.q3c_a3_fail);
             campaignTrail_temp.question_number = 3;
             break;
-        case 8024: nmAdd("rec_progressive", -1); nm.route = "3d"; campaignTrail_temp.question_number = 4; break;
+        case 8024: nmAdd("rec_progressive", 0); nm.route = "3d"; campaignTrail_temp.question_number = 4; break;
 
         // ---- Q3a — Public Option ----
         case 8031: nmAdd("delivery", 1); nmAdd("rec_healthcare", 1); nmAdd("rec_progressive", -1); nm.healthcare_result = "win"; nmAfterQ3(); break;
@@ -708,7 +796,13 @@ cyoAdventure = function (a) {
             if (nm.healthcare_result === "win") { nmAdd("delivery", 1); nmAdd("rec_infrastructure", 1); nmAdd("rec_progressive", -1); }
             else { nmAdd("delivery", -1); nmAdd("rec_progressive", -1); }
             break;
-        case 8073: nmAdd("rec_infrastructure", 1); nmAdd("rec_progressive", -1); break;
+        /* A3 carries delivery -1. The doc has always had it and so has the
+           bible — §9.8 item 2 counts Q4 A3 among the six flat -1 sources, and
+           §C's correction of record says it is "already -1" in the live
+           document — but the write was never transcribed here. Restoring it
+           does not move the floor: every sibling branch a floor path could take
+           instead (Q4 A2's ELSE) already pays -1. */
+        case 8073: nmAdd("delivery", -1); nmAdd("rec_infrastructure", 1); nmAdd("rec_progressive", -1); break;
 
         // ---- Q5 — TPP ----
         case 8081: nmAdd("delivery", 1); nmAdd("rec_trade", 1); nmAdd("rec_labor", 1); break;
@@ -734,7 +828,7 @@ cyoAdventure = function (a) {
             // The doc's dangling fourth FX-ELSE is dead code and is dropped per bible §9.4
             if (nm.rec_foreign >= 2) {
                 nm.terminal = "HOUSE_OF_DYNAMITE"; // no tallies, hard stop (bible §8)
-                campaignTrail_temp.question_number = 17; // next shown = index 18 (terminal)
+                campaignTrail_temp.question_number = 18; // next shown = index 19 (terminal)
             } else if (nm.delivery >= NM_GATE.q7_failure_check) {
                 nmAdd("rec_foreign", 2); nmAdd("delivery", 1); nmAfterQ7(); // CONTAINED
             } else {
@@ -768,7 +862,10 @@ cyoAdventure = function (a) {
            positional cost for nothing at all. §I recommends giving A3 a
            delivery +1 ("a narrow bill that's guaranteed to pass" is exactly the
            safe-delivery answer), but that raises floor_safe by one and
-           re-derives the ladder with it — so it lands with §H, not here. */
+           re-derives the ladder with it. §I.2 is now closed (see case 8122) and
+           §H has landed, leaving this the last of the three open — and open
+           precisely because it is the only one of them that moves floor_safe.
+           The doc has not made the change, so neither does this. */
         case 8113: nmAdd("rec_progressive", -1); nm.guns_result = "partial"; nmAfterQ8(); break;
         // A4's prose (the Safe Kids and Schools Act) overshoots its partial flag;
         // bible §9.5 item 9 keeps the flag and revises the prose down later.
@@ -776,27 +873,30 @@ cyoAdventure = function (a) {
 
         // ---- Q9 — RBG vacancy ----
         case 8121: nmAdd("delivery", 1); nmAdd("rec_social", 1); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; break;
-        /* OPEN (bible §I.2, must-clear item 6): A2 is worse than the ungated A1
-           on every single term and buys no flag in exchange — the only answer
-           in the mod dominated on every axis with nothing hidden behind it
-           (A4 is also a partial, but at least buys harris_scotus). §I's note
-           that Q15 A4 would read that flag did not survive the drafting: The
-           Ticket's shortlist is Whitmer, Rice and Brown, and none of its four
-           answers reads harris_scotus.
-           §I recommends rec_legitimacy +1: Srinivasan is the
-           bipartisan-confirmation answer and the fiction fits exactly. It is
-           held with §I.1 so the node is decided once, deliberately, either way
-           — as a compensation or as a documented punish. */
-        case 8122: nmAdd("rec_progressive", -1); nmAdd("rec_social", -1); nm.scotus_result = "partial"; break;
+        /* CLOSED (bible §I.2, must-clear item 6). A2 was the only answer in the
+           mod dominated by a sibling on every axis with no hidden flag behind
+           it: against the ungated A1 it was worse on delivery, rec_social and
+           rec_progressive alike, and unlike A4 it bought nothing. §I gave two
+           acceptable outs — compensate it, or keep it and document it as a
+           deliberate punish — and asked only that it be decided on purpose.
+           The doc decides it: rec_legitimacy +1. Srinivasan is the
+           bipartisan-confirmation answer and the fiction fits exactly.
+
+           It is not a delivery source, so the ladder does not re-derive. What
+           it does move is the rec_legitimacy ceiling, +5 to +6, which is now a
+           read: Q16 A2 gates on rec_legitimacy(prior) >= +3. */
+        case 8122: nmAdd("rec_progressive", -1); nmAdd("rec_social", -1); nmAdd("rec_legitimacy", 1); nm.scotus_result = "partial"; break;
         case 8123:
             if (nm.delivery >= NM_GATE.q9_confirmed) { nmAdd("delivery", 2); nmAdd("rec_social", 2); nmAdd("rec_progressive", 1); nm.scotus_result = "win"; }
             else { nmAdd("delivery", -1); nmAdd("rec_progressive", 1); nm.scotus_result = "loss"; }
             break;
         case 8124:
             nmAdd("rec_social", 1); nmAdd("rec_legitimacy", -1); nm.scotus_result = "partial";
-            // bible §3.1; the doc's FX line omits this. No drafted question
-            // reads it — Q15's shortlist does not include Harris — so it is
-            // banked for the pivot build alongside vp_status.
+            // bible §3.1; the doc's FX line still omits this, and the flag is
+            // no longer banked: Q16 A1 reads it to decide whether the federal
+            // stay-at-home order survives the Court. Putting Harris on the
+            // bench in 2019 is what makes the 2020 lockdown stick, which is
+            // also what finally pays for A4 being a partial.
             nm.harris_scotus = true;
             break;
 
@@ -938,11 +1038,18 @@ cyoAdventure = function (a) {
             // The duck: no gate, and the pen costs legitimacy. Bible §9.9 notes
             // the drafted prose does not yet earn that -1; the write stands and
             // the prose gets teeth in a later pass.
-            nmAdd("rec_immigration", 1); nmAdd("rec_legitimacy", -1);
+            //
+            // delivery -1 restored alongside Q4 A3 — same omission, same
+            // sources: the doc's FX line, and §9.8 item 2's count of six flat
+            // -1 sources, which names Q14 A4. It is the one answer whose grant
+            // does not follow its result flag (a partial paying a loss's -1),
+            // and that is deliberate on both sides: signing what Barack left
+            // behind is the phase's declared way of ending on nothing.
+            nmAdd("delivery", -1); nmAdd("rec_immigration", 1); nmAdd("rec_legitimacy", -1);
             nm.immigration_result = "partial";
             break;
 
-        /* ---- Q15 — The Ticket (index 17; last question; ends the run) ----
+        /* ---- Q15 — The Ticket (index 17, flows into Q16 at index 18) ----
            Every answer is a declared partial and pays delivery 0 (bible §2.1),
            so the phase's delivery ledger closes where Q14 left it. What the
            four answers actually decide is vp_status, and for the three that
@@ -955,45 +1062,88 @@ cyoAdventure = function (a) {
            cabinet secretary rather than a swap for a rival, so it takes less
            standing with Liz to make the parting an amicable one.
 
-           nmEndGovern() runs after this answer's own nmAdd calls on every
-           branch, then the jump. Order matters both ways: the cascade reads
-           rec_progressive, which A1 and A2 have just moved, and it must run
-           before the engine paints anything else — election night follows
-           immediately and an unnamed opponent on the final map is a bug.
-
-           Jump lands question_number on 18, which the engine increments to
-           19 = question_count — election night fires only on strict equality,
-           and the jump also steps over the terminal parked at index 18. */
+           No jump: Q16 is the next slot, so the natural increment is correct.
+           Until COVID was drafted these four answers ended the run — they
+           jumped over the parked terminal to question_count — and that jump is
+           now Q16's job, as is nmEndGovern(). nmAfterQ15 runs last in each
+           case, as the pre-write hooks always do; here it happens to read only
+           state Q15 cannot touch, but keeping the position uniform is what
+           stops the next question from having to re-establish it. */
         case 8191:
             nmAdd("delivery", 0); nmAdd("warren_relationship", 1); nmAdd("rec_progressive", 1);
             nm.vp_status = "retained";
-            nmEndGovern();
-            campaignTrail_temp.question_number = 18;
+            nmAfterQ15();
             break;
         case 8192:
             nmAdd("delivery", 0);
             nm.vp_status = nm.warren_relationship >= 1 ? "replaced_amicable" : "replaced_hostile";
             nmAdd("rec_progressive", -1); // both branches
-            nmEndGovern();
-            campaignTrail_temp.question_number = 18;
+            nmAfterQ15();
             break;
         case 8193:
             nmAdd("delivery", 0);
             nm.vp_status = nm.warren_relationship >= 0 ? "replaced_amicable" : "replaced_hostile";
-            nmEndGovern();
-            campaignTrail_temp.question_number = 18;
+            nmAfterQ15();
             break;
         case 8194:
             nmAdd("delivery", 0);
             nm.vp_status = nm.warren_relationship >= 1 ? "replaced_amicable" : "replaced_hostile";
             nmAdd("rec_labor", 1); // both branches
+            nmAfterQ15();
+            break;
+
+        /* ---- Q16 — COVID (index 18; last question; ends the run) ----
+           The phase's first question that writes neither delivery nor any Tier
+           A axis. It settles covid_response and covid_posture and nothing
+           else, so it cannot disturb the ledger or any gate behind it — which
+           is what lets a sixteenth question land without re-deriving NM_GATE.
+
+           A1 reads harris_scotus, the flag Q9 A4 has been banking since it was
+           written: put Harris on the Court and the stay-at-home order survives
+           Texas v. Biden; leave the seat to Srinivasan or Jackson and the same
+           order is struck down 5-4, costing a point of legitimacy on the way
+           out. The posture is "federal" either way — the president reached for
+           the same instrument, and only the Court differs.
+
+           A2 reads rec_legitimacy(prior) >= +3 (NM_GATE.q16_rally). A3 and A4
+           are ungated: the Defense Production Act works at a fixed +1 whatever
+           the record, and the Swedish answer fails at -2 the same way.
+
+           nmEndGovern() runs after this answer's own writes on every branch,
+           then the jump. It must run before the engine paints anything else —
+           election night follows immediately and an unnamed opponent on the
+           final map is a bug.
+
+           Jump lands question_number on 19, which the engine increments to
+           20 = question_count — election night fires only on strict equality,
+           and the jump also steps over the terminal parked at index 19. */
+        case 8201:
+            if (nm.harris_scotus) { nm.covid_response += 2; }
+            else { nm.covid_response -= 1; nmAdd("rec_legitimacy", -1); }
+            nm.covid_posture = "federal"; // both branches
             nmEndGovern();
-            campaignTrail_temp.question_number = 18;
+            campaignTrail_temp.question_number = 19;
+            break;
+        case 8202:
+            if (nm.rec_legitimacy >= NM_GATE.q16_rally) { nm.covid_response += 1; }
+            nm.covid_posture = "guidance";
+            nmEndGovern();
+            campaignTrail_temp.question_number = 19;
+            break;
+        case 8203:
+            nm.covid_response += 1; nm.covid_posture = "production";
+            nmEndGovern();
+            campaignTrail_temp.question_number = 19;
+            break;
+        case 8204:
+            nm.covid_response -= 2; nm.covid_posture = "shielding";
+            nmEndGovern();
+            campaignTrail_temp.question_number = 19;
             break;
 
         // ---- A HOUSE OF DYNAMITE terminal ----
-        // No jump needed: index 18 + 1 = 19 = question_count, so the game ends.
-        // The govern phase ends here too, eight questions early, and the cascade
+        // No jump needed: index 19 + 1 = 20 = question_count, so the game ends.
+        // The govern phase ends here too, nine questions early, and the cascade
         // still has to run: election night follows this answer, and an unnamed
         // opponent on the final map is a bug, not a mood. The record is short
         // and the axes are barely moved, so this route lands on the roster's
@@ -1008,17 +1158,17 @@ cyoAdventure = function (a) {
 /* ============================================================
    Progress bar — display-only relabelling.
 
-   The player plays fifteen questions. questions_json holds nineteen slots,
+   The player plays sixteen questions. questions_json holds twenty slots,
    because Q3 is one question with four mutually exclusive branch slots and
    the terminal is parked at the end. NM_DISPLAY maps a question's pk to the
    number the player should actually see.
    ============================================================ */
-var NM_SPINE_TOTAL = 15;
+var NM_SPINE_TOTAL = 16;
 var NM_DISPLAY = {
     801: 1, 802: 2,
     803: 3, 804: 3, 805: 3, 806: 3,   // Q3a-d — one question, four variants
     807: 4, 808: 5, 809: 6, 810: 7, 811: 8, 812: 9,
-    813: 10, 814: 11, 816: 12, 817: 13, 818: 14, 819: 15
+    813: 10, 814: 11, 816: 12, 817: 13, 818: 14, 819: 15, 820: 16
     // 815, A HOUSE OF DYNAMITE, is a terminal and not on the spine
 };
 
@@ -1094,6 +1244,13 @@ var NM_TRACKER = {
         { key: "congress_2019",      label: "Congress" },
         { key: "immigration_result", label: "Immigration" },
         { key: "vp_status",          label: "Ticket" },
+        /* Posture, not score. covid_response is the graded read and belongs
+           with delivery in Record — but it is absent until Q16 runs, and the
+           Record section prints every row from turn one, so a "Pandemic 0"
+           sitting there for fifteen questions would advertise a question the
+           player has not reached. The posture tag carries it instead, on the
+           same rule as every other outcome row: rendered once written. */
+        { key: "covid_posture",      label: "Pandemic" },
         /* Appears only once the cascade has fired, which is the point: until
            then the row is absent and the opponent is "The Republicans"
            everywhere the player can look. The gate that selected the nominee
@@ -1119,6 +1276,7 @@ var NM_OUTCOME_LABEL = {
     win: "won", partial: "partial", loss: "lost",
     dem_house: "Dem House", status_quo: "split", gop_senate: "GOP sweep",
     retained: "Warren", replaced_amicable: "replaced", replaced_hostile: "replaced (sour)",
+    federal: "lockdown", guidance: "CDC guidance", production: "DPA", shielding: "shielding",
     trump: "Trump", christie: "Christie", jeb: "Bush", rubio: "Rubio",
     haley: "Haley", paul: "Paul", pence: "Pence", carlson: "Carlson",
     cruz: "Cruz"

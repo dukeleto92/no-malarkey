@@ -177,24 +177,22 @@ node playtest/harness/checkmap.mjs          # exits 1 if the map is off target
 
 ### What it says about your mod today
 
-Two errors, six warnings.
+One error, one warning.
 
-The two errors are both the map assertion, and both are **expected** — the v0.10
-targets describe where the map is going, not where it is. Ten of the twenty
-targeted states are outside tolerance (Maine-02 is the worst at 10.7 points),
-and the tipping point is Pennsylvania rather than Iowa or North Carolina. They
-will clear as the remaining map passes land.
+The error is the map assertion's tipping-point check. All twenty targeted
+states now land on their v0.10 margins exactly, but the tipping point is
+Wisconsin, not Iowa or North Carolina — and that is the target table itself,
+not the multipliers: on this map's 2016 apportionment, the states the table
+places above Iowa (through Pennsylvania and Wisconsin at D+3) already total 278
+electoral votes. It clears only when the table or the tipping-point rule moves.
 
-The six warnings:
+The warning is running mate `309` having no issue scores. Leave it that way:
+the engine indexes `running_mate_issue_score_json` by issue alone
+(`campaign_trail.js` `runningMateByIssue`), so adding Pence rows would overwrite
+Warren's and change the player's blended issue scores.
 
-- Score rows for candidates `302` and `303`, which are not in `candidate_json`
-  (5 + 5 issue scores, 56 + 56 state multipliers). Almost certainly leftovers
-  from the base 2020 scenario. Inert — the engine filters them out — but they
-  would join the race the moment something added those candidates.
-- Running mate `309` has no issue scores while `308` has all five.
-- Nine fields still hold a bare `'` placeholder, across candidates 308 and 309.
-- A standing note that all three `answer_score_*` arrays are empty, so no answer
-  moves a vote and a results diff will legitimately come back empty.
+There is also a standing note that all three `answer_score_*` arrays are empty,
+so no answer moves a vote and a results diff will legitimately come back empty.
 
 ---
 

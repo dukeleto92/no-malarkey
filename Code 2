@@ -94,7 +94,7 @@ campaignTrail_temp.questions_json = [
         "pk": 811,
         "fields": {
             "priority": 10,
-            "description": "It feels like losing Beau all over again - all those poor kids in Parkland, killed by a disturbed classmate. You can't fail the way that Barack did after Sandy Hook. In a White House meeting with bereaved parents and traumatized students, they look to you for answers. What will you tell these tormented survivors and families?",
+            "description": "It feels like losing Beau all over again—all those poor kids in Parkland, killed by a disturbed classmate. You can't fail the way that Barack did after Sandy Hook. In a White House meeting with bereaved parents and traumatized students, they look to you for answers. What will you tell these tormented survivors and families?",
             "likelihood": 1
         }
     },
@@ -747,7 +747,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8204,
         "fields": {
             "question": 820,
-            "description": "We can't afford to let Republicans fearmonger on this. I saw some joker on Fox News calling for a nationwide quarantine. Let's just focus on sequestering the nursing homes and the vulnerable, but minimize other disruptions. Heck, this is the approach Sweden is taking, and they're as progressive as it gets."
+            "description": "We can't afford to let Republicans fearmonger on this. I saw some joker on Fox News calling for a nationwide quarantine. Let's just focus on sequestering the nursing homes and the most vulnerable, but minimize other disruptions. Heck, this is the approach Sweden is taking, and they're as progressive as it gets."
         }
     }
 ]
@@ -6148,7 +6148,7 @@ campaignTrail_temp.answer_feedback_json = [
         "fields": {
             "answer": 8192,
             "candidate": 300,
-            "answer_feedback": "“Really?” Vietor asks incredulously not long after the announcement. “A cheap knockoff of Warren? It's like trading a David Ortiz rookie card for a commemorative card of Tom Yawkey.” As usual, you have no idea what the hell he's talking about."
+            "answer_feedback": "“Really?” Vietor asks incredulously not long after the announcement. “A cheap knockoff of Warren? It's like trading a David Ortiz rookie card for a Tom Yawkey bobblehead.” As usual, you have no idea what the hell he's talking about."
         }
     },
     {

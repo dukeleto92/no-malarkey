@@ -285,7 +285,8 @@ jet_data = {
      - Q4 A3 and Q14 A4 regain the delivery -1 the doc and §9.8 item 2 have
        both always carried and this file never transcribed. Neither moves the
        floor: the sibling branches a floor path would take instead already
-       pay -1.
+       pay -1. (Q14 A4's has since come back out: the doc now pays it 0, see
+       case 8184. Same reasoning, same ledger.)
      - Q9 A2 gains rec_legitimacy +1 (§I.2, now decided). Not a delivery
        source; it raises the rec_legitimacy ceiling +5 -> +6.
 
@@ -475,7 +476,7 @@ var NM_FB = {
     q14a3_win: "It takes some cajoling, but you have enough progressive credibility at this point to get the most liberal members of the Democratic caucus on board with this proposal. The Freedom Caucus, predictably, tries to blow up the whole thing, but enough establishment Republicans are on board that the bill is never seriously threatened.",
     q14a3_loss: "“He wants to build Trump's wall for him?” Rhodes asks incredulously. “Tell me what the difference is between these two guys again, because it's getting increasingly difficult to tell.” The bill doesn't make it out of committee.",
     q16a1_harris: "A dozen red state attorneys general immediately file a lawsuit to challenge your order implementing minimum required quarantine measures. At the Supreme Court, Justice Harris comes through, penning the majority opinion in Texas v. Biden, which upholds your order.",
-    q16a1_struck: "Even you are shocked by the ferocity of the backlash to the order. It is fast-tracked to the Supreme Court, which overturns it in a 5-4 order. Justice Garland joins in the majority opinion. All you wanted to do was keep folks safe.",
+    q16a1_struck: "Even you are shocked by the ferocity of the backlash to the order. It is fast-tracked to the Supreme Court, which overturns it in a 5-4 decision. Justice Garland joins in the majority opinion. All you wanted to do was keep folks safe.",
     q16a2_rally: "To your surprise, the guidelines are much more effective than you anticipated. People are scared and, like many other world leaders, you are enjoying a “rally around the flag” boost to your support. Rhodes nevertheless compares you unfavorably to Jacinda Ardern.",
     q16a2_patchwork: "As you suspected, this is a mixed bag. The blue states do their part, but Governor Abbott in Texas and Governor Putnam in Florida seem to relish defying your recommendations."
 };
@@ -1041,13 +1042,15 @@ cyoAdventure = function (a) {
             // the drafted prose does not yet earn that -1; the write stands and
             // the prose gets teeth in a later pass.
             //
-            // delivery -1 restored alongside Q4 A3 — same omission, same
-            // sources: the doc's FX line, and §9.8 item 2's count of six flat
-            // -1 sources, which names Q14 A4. It is the one answer whose grant
-            // does not follow its result flag (a partial paying a loss's -1),
-            // and that is deliberate on both sides: signing what Barack left
-            // behind is the phase's declared way of ending on nothing.
-            nmAdd("delivery", -1); nmAdd("rec_immigration", 1); nmAdd("rec_legitimacy", -1);
+            // delivery 0: the doc's FX line now pays the partial a partial's
+            // grant, so the -1 restored alongside Q4 A3 comes back out and
+            // this answer follows its result flag like every other. §9.8 item
+            // 2's count of six flat -1 sources still names Q14 A4 and is now
+            // one short; that is the bible's to update. The ledger does not
+            // move: the floor path takes a sibling's -1 at Q14 either way, the
+            // ceiling runs through A1's +2, and floor_safe's blind line clears
+            // +2 here through A3, so 0 is still not its best.
+            nmAdd("delivery", 0); nmAdd("rec_immigration", 1); nmAdd("rec_legitimacy", -1);
             nm.immigration_result = "partial";
             break;
 
@@ -1059,10 +1062,11 @@ cyoAdventure = function (a) {
            Q11 A2 and all four Q12 answers have been writing all game. A1 is
            the only answer that reads nothing.
 
-           A3's threshold is >= 0 where A2's and A4's are >= +1, and that is
-           the doc's spec, not a slip: Rice is the promotion of a sitting
-           cabinet secretary rather than a swap for a rival, so it takes less
-           standing with Liz to make the parting an amicable one.
+           All three replacements split at >= +1. A3 used to split at >= 0, on
+           the argument that Rice is the promotion of a sitting cabinet
+           secretary rather than a swap for a rival; the doc has since brought
+           it level with A2 and A4, so promoting Rice takes the same standing
+           with Liz as any other swap to part on good terms.
 
            No jump: Q16 is the next slot, so the natural increment is correct.
            Until COVID was drafted these four answers ended the run — they
@@ -1084,7 +1088,7 @@ cyoAdventure = function (a) {
             break;
         case 8193:
             nmAdd("delivery", 0);
-            nm.vp_status = nm.warren_relationship >= 0 ? "replaced_amicable" : "replaced_hostile";
+            nm.vp_status = nm.warren_relationship >= 1 ? "replaced_amicable" : "replaced_hostile";
             nmAfterQ15();
             break;
         case 8194:

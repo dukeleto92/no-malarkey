@@ -1653,6 +1653,10 @@ try {
         /* Long description screens (mod summary, candidate bios) scroll instead of
            growing into text walls */
         "#election_description_window, .person_description_window, .description_window_small { height: fit-content !important; max-height: 420px; overflow-y: auto; }" +
+        /* Election-select thumbnail: the engine hard-codes the <img> at 300x160,
+           which stretches any photo not already 15:8. Crop to that box instead,
+           anchored high so the speaker's head stays in frame. */
+        "#election_image img { width: 300px; height: 160px; object-fit: cover; object-position: center 20%; }" +
         "#results_container { color: #000000; }" +
         /* Variable tracker: pinned to the right of the game window */
         "#nm_tracker { position: fixed; top: 12px; right: 12px; width: 218px; z-index: 9999;" +

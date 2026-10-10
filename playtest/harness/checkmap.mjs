@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkMapTargets, DEFAULT_TOLERANCE, DEFAULT_TIPPING_POINT } from './maptargets.js';
+import { checkMapTargets, DEFAULT_TOLERANCE } from './maptargets.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIR = path.resolve(HERE, '..', '..');
@@ -49,7 +49,7 @@ if (result.skipped) {
   process.exit(0);
 }
 
-console.log(`Tolerance +-${DEFAULT_TOLERANCE} points; tipping point must be ${DEFAULT_TIPPING_POINT.join(' or ')}.`);
+console.log(`Tolerance +-${DEFAULT_TOLERANCE} points; tipping point must be ${(result.wantedTippingPoint || []).join(' or ')}.`);
 if (result.tippingPoint) {
   const ev = result.electoralVotes;
   console.log(`Tipping point: ${result.tippingPoint.name} (${result.tippingPoint.abbr}) at ${fmt(result.tippingPoint.margin)}`);

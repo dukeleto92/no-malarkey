@@ -113,8 +113,8 @@ different seeds or different engine commits is not telling you about your edit.
 
 The dump leads with the narrative (answer path, per-turn answer text, the advisor
 feedback that was shown, and any mod state object found on the game window),
-because with all three `answer_score_*` arrays empty that is the part your edits
-move. Vote totals follow underneath.
+because that is usually the part an edit moves. Vote totals follow underneath —
+they move too now that `Code 1` projects the tallies onto the map.
 
 ---
 
@@ -148,15 +148,19 @@ is the opposite of that.
 
 The targets are read from the **`## Electoral map targets` table in the
 project's `CLAUDE.md`**, which that section declares authoritative. There is no
-second copy in the harness — edit the table, reload, and the assertion moves
-with it. A project with no such table skips the check silently, so the harness
+second copy in the harness. For this mod the section is itself generated — by
+`node tools/baseline/fit-baseline.js --write`, from the 2012/2016 formula it
+documents — so change the formula there and re-run it rather than editing the
+table. A project with no such table skips the check silently, so the harness
 stays usable for any other mod.
 
 It fails when either:
 
 - a targeted state's margin at starting popularity is more than **1.5 points**
   off its target, or
-- the tipping-point state is not **Iowa or North Carolina**.
+- the tipping-point state is not the one the section's **`Tipping point:`**
+  line names (several may be given, separated by commas or "or"; with no such
+  line it falls back to Pennsylvania).
 
 A target written with a trailing `+` (`R+20+`) is a floor, not a band: deeper
 passes, shallower fails. States with no row in the table are not checked, and
@@ -177,22 +181,19 @@ node playtest/harness/checkmap.mjs          # exits 1 if the map is off target
 
 ### What it says about your mod today
 
-One error, one warning.
-
-The error is the map assertion's tipping-point check. All twenty targeted
-states now land on their v0.10 margins exactly, but the tipping point is
-Wisconsin, not Iowa or North Carolina — and that is the target table itself,
-not the multipliers: on this map's 2016 apportionment, the states the table
-places above Iowa (through Pennsylvania and Wisconsin at D+3) already total 278
-electoral votes. It clears only when the table or the tipping-point rule moves.
+Zero errors, one warning, and the map assertion passes: every state within
+tolerance, Pennsylvania the tipping point.
 
 The warning is running mate `309` having no issue scores. Leave it that way:
 the engine indexes `running_mate_issue_score_json` by issue alone
 (`campaign_trail.js` `runningMateByIssue`), so adding Pence rows would overwrite
 Warren's and change the player's blended issue scores.
 
-There is also a standing note that all three `answer_score_*` arrays are empty,
-so no answer moves a vote and a results diff will legitimately come back empty.
+There is also a standing note that all three `answer_score_*` arrays are empty.
+That is true of the *file* and no longer true of the *run*: `Code 1` rebuilds
+all three from the `nm` tallies after every answer (`nmSyncElectorate`), so
+answers do move votes and a results diff will not come back empty. The
+validator only ever sees the static file, so the note stays.
 
 ---
 

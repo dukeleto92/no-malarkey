@@ -112,6 +112,30 @@ export function parseTargets(markdown) {
   return { targets, heading };
 }
 
+/**
+ * The tipping point the targets section names, as a list of acceptable state
+ * names, from a line such as "**Tipping point:** Pennsylvania" or
+ * "Tipping point: Pennsylvania or Wisconsin" inside that section. Returns
+ * null when the section names none, so the caller can fall back.
+ *
+ * @param {string} markdown
+ * @returns {string[]|null}
+ */
+export function parseTippingPoint(markdown) {
+  if (typeof markdown !== 'string' || !markdown) return null;
+  const lines = markdown.split(/\r?\n/);
+  let i = lines.findIndex((l) => /^#{1,6}\s+.*electoral map targets/i.test(l));
+  if (i === -1) return null;
+  for (i += 1; i < lines.length; i += 1) {
+    if (/^#{1,6}\s/.test(lines[i])) break;
+    const m = lines[i].match(/^\s*\**\s*tipping point\s*:?\s*\**\s*:?\s*(.+)$/i);
+    if (!m) continue;
+    const names = m[1].replace(/\*/g, '').split(/,|\bor\b/i).map((n) => n.replace(/\(.*?\)/g, '').trim()).filter(Boolean);
+    return names.length ? names : null;
+  }
+  return null;
+}
+
 /* --------------------------------------------------------------- the mirror */
 
 function assertEngineShape(temp) {
@@ -248,7 +272,8 @@ export function startingMargins(temp) {
 /* ------------------------------------------------------------- the assertion */
 
 export const DEFAULT_TOLERANCE = 1.5;
-export const DEFAULT_TIPPING_POINT = ['Iowa', 'North Carolina'];
+// Used only when CLAUDE.md's targets section names no tipping point.
+export const DEFAULT_TIPPING_POINT = ['Pennsylvania'];
 
 /**
  * Assert the starting map against the CLAUDE.md targets.
@@ -260,13 +285,14 @@ export const DEFAULT_TIPPING_POINT = ['Iowa', 'North Carolina'];
  * @param {string} targetsText - the contents of CLAUDE.md, or '' / null
  * @param {object} [opts]
  * @param {number} [opts.tolerance]     - points, default 1.5
- * @param {string[]} [opts.tippingPoint]- acceptable tipping-point state names
+ * @param {string[]} [opts.tippingPoint]- acceptable tipping-point state names;
+ *                                        default is the section's "Tipping point:" line
  * @returns {{errors: Array, notes: Array, skipped: boolean, rows: Array,
  *            tippingPoint: object|null, electoralVotes: object|null}}
  */
 export function checkMapTargets(temp, targetsText, opts = {}) {
   const tolerance = opts.tolerance ?? DEFAULT_TOLERANCE;
-  const wanted = opts.tippingPoint ?? DEFAULT_TIPPING_POINT;
+  const wanted = opts.tippingPoint ?? parseTippingPoint(targetsText) ?? DEFAULT_TIPPING_POINT;
   const errors = [];
   const notes = [];
   const WHERE = 'map targets';
@@ -390,5 +416,5 @@ export function checkMapTargets(temp, targetsText, opts = {}) {
     });
   }
 
-  return { errors, notes, skipped: false, rows, tippingPoint, electoralVotes };
+  return { errors, notes, skipped: false, rows, tippingPoint, electoralVotes, wantedTippingPoint: wanted };
 }

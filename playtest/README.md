@@ -141,12 +141,10 @@ one warning with a count, not 112 lines.
 
 ### What it says about your mod today
 
-Zero errors, six warnings:
+Zero errors, two warnings, plus a note. (The leftover score rows for the base
+2020 scenario's third-party candidates `302`/`303` went with the baseline refit
+in `tools/baseline/`.)
 
-- Score rows for candidates `302` and `303`, which are not in `candidate_json`
-  (5 + 5 issue scores, 56 + 56 state multipliers). Almost certainly leftovers
-  from the base 2020 scenario. Inert — the engine filters them out — but they
-  would join the race the moment something added those candidates.
 - Running mate `309` has no issue scores while `308` has all eight.
 - Ten fields still hold a bare `'` placeholder, across candidates 301, 308, 309.
 - A standing note that all three `answer_score_*` arrays are empty. That is

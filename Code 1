@@ -633,19 +633,147 @@ cyoAdventure = function (a) {
    (bible §9.5), and `success` is only computed at the pivot.
    Colors follow the mod scheme: GOP #FF0000 / #FFA0A0.
    TODO: image_url + description for the six new candidates.
+
+   PROFILES. Picking a nominee rewrites everything the engine reads for
+   pk 301, not just the name, so each nominee plays differently:
+
+     issues   — the 8-issue stance vector, in issues_json order:
+                [Overall, Progressive, Health, Foreign, Social, Labor,
+                 Infrastructure, Trade]. Liberal-positive like every axis
+                here; Foreign is dove-positive, Trade is free-trade-positive.
+                This does most of the regional work on its own: the engine
+                scores each state by distance from its issue leans, so a
+                protectionist gains in Michigan (Trade -0.55) and loses in
+                Nebraska (+0.40) without any hand-placed multiplier.
+     strength — national pull, multiplies his score in every state.
+                0.04 is worth about one point of national share.
+     regions  — personal appeal the issues cannot express, as
+                [group, multiplier]. Groups come from NM_STATE_GROUPS or
+                NM_NOMINEE_GROUPS; a state in several groups takes all of
+                them.
+     home     — home-state abbreviation, +5%.
+     running_mate — the GOP VP (candidate pk 309). Cosmetic: the engine
+                only blends a running mate into the PLAYER's stances.
+                Picks are placeholders until the doc names them.
+
+     break_even — difficulty target: the delivery a player needs, on top
+                of the start-of-term record, to reach 270 against him.
+                `strength` is SOLVED from it, never hand-set:
+                node tools/baseline/measure-nominees.js --write
+                (generic Republican, the stock pk 301 in Code 2 that the map
+                is fitted against, breaks even at -0.8.)
+
+   PROVISIONAL: the break_even values below rank the nominees by absolute
+   strength (Jeb easiest, Trump hardest). The agreed rule is different —
+   difficulty is the win rate on the records that SUMMON each nominee
+   (failure paths ~20-30%, triumph paths ~85%, the rest 45-60%) — and it
+   cannot be met until `success`, FAIL_FLOOR and TRIUMPH_CEILING exist.
+   It will invert the extremes: Trump only meets failing records, so he
+   must be beatable from one (break_even well below 0), and Jeb only meets
+   triumphant ones, so he must be strong enough to beat some of them. Once
+   the thresholds are set, each target becomes a quantile of its
+   nominee's summoning records and the solver does the rest.
    ============================================================ */
 var NM_GOP_COLORS = { color_hex: "#FF0000", secondary_color_hex: "#FFA0A0" };
 var NM_GOP_ROSTER = [
-    { first_name: "Donald",  last_name: "Trump",    state: "Florida",        gate: "success <= FAIL_FLOOR && !norms_weaponized", image_url: "https://www.jetsimon.com/public/static/images/donald-trump-2020.jpg" },
-    { first_name: "Chris",   last_name: "Christie", state: "New Jersey",     gate: "success <= FAIL_FLOOR && norms_weaponized",  image_url: "" },
-    { first_name: "Jeb",     last_name: "Bush",     state: "Florida",        gate: "success >= TRIUMPH_CEILING",                 image_url: "" },
-    { first_name: "Marco",   last_name: "Rubio",    state: "Florida",        gate: "rec_progressive >= PROGRESSIVE_CEILING",     image_url: "" },
-    { first_name: "Mike",    last_name: "Pence",    state: "Indiana",        gate: "rec_social >= SOCIAL_CEILING",               image_url: "https://www.jetsimon.com/public/static/images/mike-pence-2020.jpg" },
-    { first_name: "Nikki",   last_name: "Haley",    state: "South Carolina", gate: "rec_foreign <= DOVE_FLOOR",                  image_url: "https://www.jetsimon.com/public/static/images/nikki-haley-2020.jpg" },
-    { first_name: "Rand",    last_name: "Paul",     state: "Kentucky",       gate: "rec_foreign >= HAWK_CEILING",                image_url: "" },
-    { first_name: "Tucker",  last_name: "Carlson",  state: "Maine",          gate: "rec_progressive <= MODERATE_FLOOR",          image_url: "" },
-    { first_name: "Ted",     last_name: "Cruz",     state: "Texas",          gate: "else",                                       image_url: "" }
+    { first_name: "Donald",  last_name: "Trump",    state: "Florida",        gate: "success <= FAIL_FLOOR && !norms_weaponized", image_url: "https://www.jetsimon.com/public/static/images/donald-trump-2020.jpg",
+      issues: [-0.45, -0.05, -0.35, -0.10, -0.55, -0.05, 0.10, -0.75], break_even: +4.5, strength: 1.048, home: "FL",
+      regions: [["rust_belt", 1.05], ["gun_country", 1.03], ["sunbelt_suburbs", 0.97], ["campus_young", 0.97]],
+      running_mate: { first_name: "Mike", last_name: "Pence", state: "Indiana" } },
+    { first_name: "Chris",   last_name: "Christie", state: "New Jersey",     gate: "success <= FAIL_FLOOR && norms_weaponized",  image_url: "",
+      issues: [-0.45, -0.20, -0.40, -0.30, -0.50, -0.30, -0.05, -0.30], break_even: +1.5, strength: 0.949, home: "NJ",
+      regions: [["northeast_suburbs", 1.04], ["evangelical_south", 0.98]],
+      running_mate: { first_name: "John", last_name: "Kasich", state: "Ohio" } },
+    { first_name: "Jeb",     last_name: "Bush",     state: "Florida",        gate: "success >= TRIUMPH_CEILING",                 image_url: "",
+      issues: [-0.47, -0.15, -0.40, -0.35, -0.58, -0.22, -0.10, -0.05], break_even: -4.0, strength: 0.915, home: "FL",
+      regions: [["hispanic_sunbelt", 1.03], ["rust_belt", 0.98], ["gun_country", 0.98]],
+      running_mate: { first_name: "Rob", last_name: "Portman", state: "Ohio" } },
+    { first_name: "Marco",   last_name: "Rubio",    state: "Florida",        gate: "rec_progressive >= PROGRESSIVE_CEILING",     image_url: "",
+      issues: [-0.45, -0.30, -0.45, -0.50, -0.50, -0.30, -0.10, 0.20], break_even: +3.0, strength: 1.066, home: "FL",
+      regions: [["hispanic_sunbelt", 1.03], ["sunbelt_suburbs", 1.02]],
+      running_mate: { first_name: "Joni", last_name: "Ernst", state: "Iowa" } },
+    { first_name: "Mike",    last_name: "Pence",    state: "Indiana",        gate: "rec_social >= SOCIAL_CEILING",               image_url: "https://www.jetsimon.com/public/static/images/mike-pence-2020.jpg",
+      issues: [-0.50, -0.12, -0.40, -0.28, -0.70, -0.22, -0.10, -0.35], break_even: -0.5, strength: 1.046, home: "IN",
+      regions: [["evangelical_south", 1.03], ["sunbelt_suburbs", 0.97], ["campus_young", 0.97]],
+      running_mate: { first_name: "Tim", last_name: "Scott", state: "South Carolina" } },
+    { first_name: "Nikki",   last_name: "Haley",    state: "South Carolina", gate: "rec_foreign <= DOVE_FLOOR",                  image_url: "https://www.jetsimon.com/public/static/images/nikki-haley-2020.jpg",
+      issues: [-0.47, -0.15, -0.40, -0.50, -0.60, -0.25, -0.10, 0.05], break_even: +1.5, strength: 1.042, home: "SC",
+      regions: [["sunbelt_suburbs", 1.03], ["military", 1.02]],
+      running_mate: { first_name: "Tom", last_name: "Cotton", state: "Arkansas" } },
+    { first_name: "Rand",    last_name: "Paul",     state: "Kentucky",       gate: "rec_foreign >= HAWK_CEILING",                image_url: "",
+      issues: [-0.45, -0.30, -0.50, 0.35, -0.40, -0.40, -0.35, 0.20], break_even: -0.5, strength: 0.960, home: "KY",
+      regions: [["libertarian_west", 1.04], ["campus_young", 1.02], ["military", 0.96], ["evangelical_south", 0.98]],
+      running_mate: { first_name: "Mike", last_name: "Lee", state: "Utah" } },
+    { first_name: "Tucker",  last_name: "Carlson",  state: "Maine",          gate: "rec_progressive <= MODERATE_FLOOR",          image_url: "",
+      issues: [-0.45, 0.00, -0.35, -0.05, -0.62, -0.05, 0.05, -0.70], break_even: +3.0, strength: 1.067, home: "M2",
+      regions: [["rust_belt", 1.05], ["gun_country", 1.03], ["sunbelt_suburbs", 0.95], ["campus_young", 0.96]],
+      running_mate: { first_name: "J.D.", last_name: "Vance", state: "Ohio" } },
+    { first_name: "Ted",     last_name: "Cruz",     state: "Texas",          gate: "else",                                       image_url: "",
+      issues: [-0.52, -0.12, -0.42, -0.28, -0.70, -0.28, -0.20, -0.35], break_even: -1.5, strength: 1.025, home: "TX",
+      regions: [["gun_country", 1.01], ["sunbelt_suburbs", 0.98]],
+      running_mate: { first_name: "Carly", last_name: "Fiorina", state: "Virginia" } }
 ];
+
+// Groups only nominee profiles use; the record's groups live in NM_STATE_GROUPS.
+var NM_NOMINEE_GROUPS = {
+    northeast_suburbs: ["NJ", "NH", "PA", "CT", "NY", "DE", "MD", "M1"],
+    evangelical_south: ["AL", "MS", "TN", "AR", "OK", "KY", "SC", "GA", "LA", "WV", "MO", "IN"],
+    libertarian_west:  ["NH", "CO", "NV", "AK", "MT", "WY", "ID", "AZ", "ME", "M2"],
+    hispanic_sunbelt:  ["FL", "TX", "AZ", "NV", "NM", "CO"]
+};
+var NM_NOMINEE_ISSUES = [110, 111, 112, 113, 114, 115, 116, 117];
+var NM_HOME_STATE_BONUS = 1.05;
+
+/* Rewrites candidate 301 (and his running mate, 309) from a roster entry.
+   Idempotent: every value is computed from the profile, never from what
+   301 held before, so the pivot can call it more than once. */
+function nmApplyNominee(entry) {
+    var t = campaignTrail_temp, i;
+    for (i = 0; i < t.candidate_json.length; i++) {
+        var c = t.candidate_json[i];
+        if (c.pk === 301) {
+            c.fields.first_name = entry.first_name;
+            c.fields.last_name = entry.last_name;
+            c.fields.state = entry.state;
+            if (entry.image_url) c.fields.image_url = entry.image_url;
+            c.fields.color_hex = NM_GOP_COLORS.color_hex;
+            c.fields.secondary_color_hex = NM_GOP_COLORS.secondary_color_hex;
+        } else if (c.pk === 309 && entry.running_mate) {
+            c.fields.first_name = entry.running_mate.first_name;
+            c.fields.last_name = entry.running_mate.last_name;
+            c.fields.state = entry.running_mate.state;
+        }
+    }
+
+    var cis = t.candidate_issue_score_json;
+    for (i = 0; i < cis.length; i++) {
+        if (cis[i].fields.candidate !== 301) continue;
+        var at = NM_NOMINEE_ISSUES.indexOf(cis[i].fields.issue);
+        if (at >= 0) cis[i].fields.issue_score = entry.issues[at];
+    }
+
+    var mult = {};
+    var addGroup = function (abbrs, m) {
+        for (var j = 0; j < abbrs.length; j++) {
+            var pk = nmStatePk(abbrs[j]);
+            if (pk !== undefined) mult[pk] = (mult[pk] || 1) * m;
+        }
+    };
+    for (i = 0; i < (entry.regions || []).length; i++) {
+        var name = entry.regions[i][0];
+        addGroup(NM_NOMINEE_GROUPS[name] || NM_STATE_GROUPS[name] || [], entry.regions[i][1]);
+    }
+    if (entry.home) addGroup([entry.home], NM_HOME_STATE_BONUS);
+
+    var csm = t.candidate_state_multiplier_json;
+    for (i = 0; i < csm.length; i++) {
+        if (csm[i].fields.candidate !== 301) continue;
+        var s = csm[i].fields.state;
+        csm[i].fields.state_multiplier = Number(((entry.strength || 1) * (mult[s] || 1)).toFixed(4));
+    }
+}
+window.nmApplyNominee = nmApplyNominee; // console debugging
+window.NM_GOP_ROSTER = NM_GOP_ROSTER;
 
 /* ============================================================
    Electorate model — how the govern-phase record moves the map.

@@ -7,7 +7,7 @@ campaignTrail_temp.election_json = [
             "summary": "<p>Defying conventional political expectations, Vice President Joe Biden entered the race for the 2016 Democratic presidential nomination on October 21, 2015. Speaking from the Rose Garden, he framed his candidacy as a response to the passing of his son Beau and the growth of right-wing populism. This decision triggered a fierce, three-way contest against Senator Bernie Sanders and former Secretary of State Hillary Clinton.</p><p>Concurrently, the political establishment was upended when businessman and reality TV personality Donald Trump captured the Republican presidential nomination, naming Indiana Governor Mike Pence as his vice-presidential running mate. Trump ran on fierce opposition to free trade and immigration, directly appealing to voters affected by American deindustrialization.</p><p>Biden, meanwhile, ran as a tribune of the working class, picking up critical union endorsements across the Midwest. Key proposals of his campaign included a public option for the Affordable Care Act, a massive trillion-dollar investment in infrastructure, comprehensive reform of the immigration system, and the renegotiation of the controversial Trans-Pacific Partnership.</p><p>Maintaining his polling lead over the course of the election cycle, Biden secured a comfortable victory over Trump on election night. As he prepares to assume the presidency in 2017, he will need to navigate an increasingly fragmented Democratic coalition and manage a highly combative, radicalized Republican opposition.</p>",
             "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Joe_Biden_%2848554152307%29.jpg/960px-Joe_Biden_%2848554152307%29.jpg",
             "winning_electoral_vote_number": 270,
-            "advisor_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg/960px-Speakers_at_a_canvass_launch_for_the_Kamala_Harris_for_President_campaign_in_Phoenix%2C_Arizona_on_November_2%2C_2024_-_46.jpg",
+            "advisor_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Jon_Favreau_Canvassing_%28cropped%29.jpg/960px-Jon_Favreau_Canvassing_%28cropped%29.jpg",
             "recommended_reading": "<ul>\n<li><a href=https://www.chicagotribune.com/opinion/editorials/ct-edit-chicago-tribune-biden-endorsement-20200925-lnyxsb5qvrftnjjmj3rnzj33jy-story.html>Our Case For Joe Biden</a></li>\n<li><a href=https://nationalinterest.org/feature/case-trump-166808>The Case For Trump</a></li>\n<li><a href=https://www.npr.org/2020/11/18/935730100/how-biden-won-ramping-up-the-base-and-expanding-margins-in-the-suburbs>How Biden Won: Ramping Up The Base And Expanding Margins In The Suburbs</a></li>\n<li><a href=https://www.prospectmagazine.co.uk/politics/donald-trump-joe-biden-us-election-almost-win-votes-concede>Why Did Trump Almost Win?</a></li>\n<li><a href=https://www.hoover.org/research/no-evidence-voter-fraud-guide-statistical-claims-about-2020-election>No Evidence For Voter Fraud: A Guide To Statistical Claims About The 2020 Election</a></li>\n</ul>",
             "has_visits": 1,
             "no_electoral_majority_image": "https://www.jetsimon.com/public/static/images/2012-no-majority.jpg",
@@ -133,12 +133,21 @@ campaignTrail_temp.running_mate_json = [
 
 campaignTrail_temp.credits = "alexd9229"
 
+/* vote_variable is 0.85 rather than the usual 1.125 because this mod now
+   scores eight issues instead of five. Each issue adds vote_variable to
+   every candidate's raw score before the distance penalties come off, so
+   three more issues inflate the shared constant faster than they add
+   signal, and every margin in the country flattens — deep-red states came
+   out single digits. 0.85 restores the pre-change margins almost exactly
+   (Alabama -19 against -21, Wyoming -29 against -36, the swing states
+   within a point or two). Adding or removing an issue means re-checking
+   this number. */
 campaignTrail_temp.global_parameter_json = [
     {
         "model": "campaign_trail.global_parameter",
         "pk": 1,
         "fields": {
-            "vote_variable": 1.125,
+            "vote_variable": 0.85,
             "max_swing": 0.12,
             "start_point": 0.94,
             "candidate_issue_weight": 10,
@@ -216,13 +225,17 @@ campaignTrail_temp.cyoa = true;
    13 Q11 Executive Time · 14 Q12 Warren Relationship · 15 Q13 Midterms ·
    16 A HOUSE OF DYNAMITE (terminal, reached only via Q7 A2)
 
-   --- SKETCH: progress bar ("Question N of 16" lies after Q3) ---
+   --- PROGRESS BAR NOTE (implemented below) ---
    Cause: the engine labels questions as question_number+1 of question_count.
    Exclusive Q3 branches occupy indices 2–5, so after healthcare the UI jumps
    to "Question 7 of 16" for what the player experiences as Q4. Terminal and
    unused branches also inflate the denominator.
 
-   Preferred fix (display-only, no jump retargeting):
+   The display-only fix keeps the engine's 17 internal slots and all jump
+   targets intact, but maps each visible question pk onto the 13-question
+   content spine. See nmPaintProgress() beside the questionHTML wrapper.
+
+   Original implementation sketch:
 
      1. Content spine (what players actually play on a normal run):
           NM_SPINE = [801, 802, (one of 803-806), 807, 808, 809, 810,
@@ -340,7 +353,7 @@ var NM_FB = {
     q4a1_win: "It takes weeks of negotiations, but you end up with a $1.2 trillion bill that includes $500 billion of new spending on top of existing federal allocations. Ryan was about to chicken out, but it turns out even Republicans hate potholes.",
     q4a1_loss: "The deficit hawks in the House continue to be a headache. After weeks of back and forth, you end up with a top-line number just under a trillion, but funded mostly by private investment via tax credits. Lovett mourns that “We're still living in Reagan's America.”",
     q4a2_win: "Ryan is hesitant at first, but is ultimately convinced by internal Republican polling showing that voters want action on infrastructure. Congress passes a bill totaling $210 billion to repair aging roads and bridges, plus another $200 billion for a “vital infrastructure fund” to finance a variety of nationally significant transportation projects. Favreau and Pfeiffer compare it unfavorably to Obama's 2009 stimulus package.",
-    q4a2_loss: "No dice. Ryan says he's more convinced than ever that Americans want free-market solutions, not more government spending. Favreau rants that you've “lost a step” as Vietor sagely nods along.",
+    q4a2_loss: "The reinvigorated Republicans have no appetite for compromise. Ryan says he's more convinced than ever that Americans want free-market solutions, not more government spending. Favreau rants that you've “lost a step” as Vietor sagely nods along.",
     q7a2_contained: "The strikes decimate Kim's nuclear program overnight, and the feared retaliation never materializes. The DIA assesses that North Korea will be unable to build another nuclear weapon “for the foreseeable future.” Vietor claims that you just got lucky.",
     q7a2_escalation: "The Air Force gets the silos, but not all the trucks. Kim empties his artillery into the Seoul suburbs before Beijing can drag both sides to a ceasefire. Three days, thousands dead, markets in freefall, and Congress demanding to know who authorized a war. Keepin' It 1600 starts featuring a recurring guest named Will Menaker, who seems angrier than the hosts and keeps calling you “the Butcher of Scranton.” Was he one of Barack's guys?",
     q7a2_terminal: "The Air Force…they didn't get all the trucks. It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
@@ -429,8 +442,11 @@ function nmAfterQ12() {
     nmSetFeedback(8174, (nm.norms_weaponized   ? NM_FB.q13a4_hold : NM_FB.q13a4_wave) + add);
 }
 
-cyoAdventure = function (a) {
-    var ans = campaignTrail_temp.player_answers[campaignTrail_temp.player_answers.length - 1];
+/* The body of cyoAdventure, split out so it can be run twice: once for
+   real, and once against a copy of the record by the Benefit Checker
+   preview further down. Nothing in here reads player_answers, so it is
+   safe to call with any answer pk. */
+function nmApplyAnswer(ans) {
     switch (ans) {
         // ---- Q1 — Inaugural Address ----
         case 8011: nmAdd("rec_legitimacy", 1); break;
@@ -600,6 +616,13 @@ cyoAdventure = function (a) {
         // TODO: replace election night with a proper ending screen at the pivot build.
         case 8151: break;
     }
+}
+
+cyoAdventure = function (a) {
+    var ans = campaignTrail_temp.player_answers[campaignTrail_temp.player_answers.length - 1];
+    nmApplyAnswer(ans);
+    // The record just changed, so the map's three tables are stale.
+    nmSyncElectorate();
 };
 
 /* ============================================================
@@ -623,6 +646,277 @@ var NM_GOP_ROSTER = [
     { first_name: "Tucker",  last_name: "Carlson",  state: "Maine",          gate: "rec_progressive <= MODERATE_FLOOR",          image_url: "" },
     { first_name: "Ted",     last_name: "Cruz",     state: "Texas",          gate: "else",                                       image_url: "" }
 ];
+
+/* ============================================================
+   Electorate model — how the govern-phase record moves the map.
+
+   The base engine knows three tables and no others: answer_score_issue
+   (where a candidate stands), answer_score_global (national standing)
+   and answer_score_state (standing in one state). A CYOA mod that keeps
+   its state in tallies never touches them, which is why this mod's map
+   used to sit frozen — with all three empty, no answer moved a vote, and
+   the Benefit Checker had nothing to print either.
+
+   Static rows cannot express this mod's answers: half of them branch on
+   the tallies at the time they are taken (Q4 reads healthcare_result, Q8
+   and Q9 read delivery, Q13 reads rec_progressive), so "what this answer
+   is worth" is not a property of the answer. So the three tables are
+   REBUILT from `nm` after every answer instead, by nmSyncElectorate().
+   The record stays the single source of truth and the tables are its
+   projection — which also means the map can never disagree with The
+   Record, and the Benefit Checker can quote both.
+
+   Every generated row is attached to player_answers[0], the Q1 answer.
+   The engine only counts a row whose `answer` is one the player actually
+   gave; Q1 is answered exactly once on every path, so that pk is a
+   stable carrier for "the state of the presidency" with no risk of a row
+   being double-counted or dropped.
+   ============================================================ */
+
+/* -- 1. Where you stand: the eight issues -------------------------------
+
+   State summaries (and the map's issue maths) run on issues_json, which
+   is now the same eight axes The Record shows, so a player can read a
+   state's summary and their own Record in the same vocabulary:
+
+     Overall · Progressive Agenda · Health Care · Foreign Policy ·
+     Social Issues · Labor & Wages · Infrastructure · Trade
+
+   Delivery, Institutions and Vice President Warren are deliberately NOT
+   issues. They are not positions a state holds — they are competence and
+   standing, so they move the national multiplier below instead.
+
+   The engine blends a candidate's stance as
+
+       final = (candidate*10 + running_mate*3 + Σ score*importance)
+               / (13 + Σ importance)
+
+   (candidate_issue_weight 10, running_mate_issue_weight 3). With exactly
+   one generated row per issue at importance 13 that reduces to
+
+       final = blend/2 + score/2,   blend = (candidate*10 + mate*3)/13
+
+   so writing score = blend + 2*delta lands `final` exactly on
+   blend + delta. That is why the numbers below are readable as "stance
+   shift per point of tally" rather than as tuning fudge. */
+
+var NM_ISSUE_IMPORTANCE = 13;
+
+var NM_ISSUE_FX = [
+    // rec_foreign counts hawkishness, but the engine's issue axis is
+    // liberal-positive (Trump is negative on every issue), so it inverts.
+    { issue: 110, label: "Overall",            record: "your whole record", per: null },
+    { issue: 111, label: "Progressive Agenda", record: "Progressive Wing",  key: "rec_progressive",     per: 0.030 },
+    { issue: 112, label: "Health Care",        record: "Healthcare",        key: "rec_healthcare",      per: 0.025 },
+    { issue: 113, label: "Foreign Policy",     record: "Foreign Policy",    key: "rec_foreign",         per: -0.030 },
+    { issue: 114, label: "Social Issues",      record: "Social Policy",     key: "rec_social",          per: 0.030 },
+    { issue: 115, label: "Labor & Wages",      record: "Labor",             key: "rec_labor",           per: 0.025 },
+    { issue: 116, label: "Infrastructure",     record: "Infrastructure",    key: "rec_infrastructure",  per: 0.025 },
+    { issue: 117, label: "Trade",              record: "Trade",             key: "rec_trade",           per: 0.035 }
+];
+
+/* Overall is the composite read on the presidency, so it moves with all
+   of the positional axes at once, weighted by how much of the country's
+   general left-right impression each one actually drives. Kept small:
+   Overall carries weight 4 in every state, four times any other issue. */
+function nmOverallShift() {
+    return 0.006 * nm.rec_progressive
+         + 0.004 * nm.rec_social
+         + 0.002 * (nm.rec_healthcare + nm.rec_labor + nm.rec_infrastructure)
+         - 0.003 * nm.rec_foreign;
+}
+
+/* -- 2. National standing ----------------------------------------------
+
+   answer_score_global scales the player's multiplier in every state:
+   the engine uses 1 + Σ global_multiplier. This is where the two Tier B
+   accumulators live, plus the result flags that read as competence
+   rather than as a position — a state has no opinion on whether you are
+   any good at the job, it just turns out or it doesn't.
+
+   Scale: +0.01 here is worth roughly a quarter point of national vote
+   share. A strong term lands near +0.20 (about +4 points and a landslide
+   map), a failing one near -0.25.
+
+   One hard floor to respect when changing these: the engine replaces the
+   player's multiplier with a flat 0.6 once the sum drops below -0.4, which
+   would turn a bad term into a cliff. Every tally at its worst reachable
+   value sums to about -0.34, so the cliff is unreachable — raising any
+   negative coefficient here needs that re-checked. */
+var NM_GLOBAL_FX = {
+    delivery: 0.020,            // exhaustive walk: -8 .. +11
+    rec_legitimacy: 0.025,      // exhaustive walk:  -4 .. +5
+    warren_relationship: 0.01,  // an active, trusted VP is worth turnout
+    healthcare_win: 0.025,
+    guns_win: 0.020,
+    scotus_win: 0.015,
+    nato_tour: 0.010,
+    norms_weaponized: -0.020,   // prosecuting Trump costs you with the middle
+    congress: { dem_house: 0.04, status_quo: 0, gop_senate: -0.04 }
+};
+
+/* -- 3. Standing state by state ----------------------------------------
+
+   answer_score_state adds directly to the player's multiplier in one
+   state (base multipliers sit around 1.0, so 0.03 is a real move, and
+   these stack). Groups are named for what makes the states react
+   together, not for their partisanship — the point of the table is that
+   a decision lands somewhere specific and costs somewhere else. */
+var NM_STATE_GROUPS = {
+    rust_belt:        ["MI", "OH", "PA", "WI", "IA", "MN", "IN", "MO", "WV", "M2"],
+    farm_belt:        ["IA", "NE", "N1", "N3", "KS", "SD", "ND", "MN", "IL", "MO"],
+    sunbelt_suburbs:  ["AZ", "GA", "NC", "TX", "FL", "VA", "CO", "NV", "N2"],
+    progressive_base: ["VT", "MA", "WA", "OR", "MN", "ME", "M1", "HI", "CA", "NY", "RI", "CT", "NM", "DC", "CO", "WI"],
+    gun_country:      ["WV", "KY", "TN", "AR", "MT", "WY", "ID", "AK", "OK", "ND", "SD", "M2", "MO", "NH"],
+    military:         ["VA", "NC", "GA", "TX", "FL", "AK", "HI", "SC", "CO", "WA"],
+    campus_young:     ["MI", "PA", "WI", "GA", "NC", "AZ", "NV", "CO", "VA", "MN", "NH", "ME", "MA", "CA", "NY", "IL", "N2", "M1"]
+};
+
+/* Each row returns the multiplier delta for every state in its group.
+   `label` is what the Benefit Checker calls the effect. */
+var NM_STATE_FX = [
+    { label: "Trade",              group: "rust_belt",        amount: function () { return -0.020 * nm.rec_trade; } },
+    { label: "Trade",              group: "farm_belt",        amount: function () { return  0.015 * nm.rec_trade; } },
+    { label: "Labor",              group: "rust_belt",        amount: function () { return  0.012 * nm.rec_labor; } },
+    { label: "Infrastructure",     group: "rust_belt",        amount: function () { return  0.010 * nm.rec_infrastructure; } },
+    { label: "Foreign policy",     group: "military",         amount: function () { return  0.012 * nm.rec_foreign; } },
+    { label: "Foreign policy",     group: "progressive_base", amount: function () { return -0.015 * nm.rec_foreign; } },
+    { label: "Vice President",     group: "progressive_base", amount: function () { return  0.010 * nm.warren_relationship; } },
+    { label: "Guns",               group: "sunbelt_suburbs",  amount: function () { return nm.guns_result === "win" ? 0.040 : (nm.guns_result === "partial" ? 0.015 : 0); } },
+    { label: "Guns",               group: "gun_country",      amount: function () { return nm.guns_result === "win" ? -0.045 : (nm.guns_result === "partial" ? -0.015 : 0); } },
+    { label: "Student debt",       group: "campus_young",     amount: function () { return nm.debt_relief ? 0.030 : 0; } },
+    { label: "Prosecuting Trump",  group: "progressive_base", amount: function () { return nm.norms_weaponized ? 0.020 : 0; } },
+    { label: "Prosecuting Trump",  group: "sunbelt_suburbs",  amount: function () { return nm.norms_weaponized ? -0.020 : 0; } },
+    { label: "Harris on the Court", states: ["CA"],           amount: function () { return nm.harris_scotus ? 0.030 : 0; } }
+];
+
+/* abbr -> state pk, so the tables above can be written in abbreviations.
+   Built on first use, not now: Code 1 is executed at the mod-loader screen
+   and Code 2 — which carries states_json — is not read until the
+   questionset loads, so there is nothing to index yet. */
+var NM_STATE_PK = null;
+function nmStatePk(abbr) {
+    if (NM_STATE_PK === null) {
+        NM_STATE_PK = {};
+        var states = campaignTrail_temp.states_json || [];
+        for (var i = 0; i < states.length; i++) NM_STATE_PK[states[i].fields.abbr] = states[i].pk;
+    }
+    return NM_STATE_PK[abbr];
+}
+
+// blend = (candidate*10 + running_mate*3)/13, the stance the engine would
+// land on with no answers at all. Read fresh so it never drifts from the data.
+function nmIssueBlend(issue) {
+    var gp = campaignTrail_temp.global_parameter_json[0].fields;
+    var cw = gp.candidate_issue_weight, rw = gp.running_mate_issue_weight;
+    var cand = 0, mate = 0, i;
+    var cis = campaignTrail_temp.candidate_issue_score_json;
+    for (i = 0; i < cis.length; i++) {
+        if (cis[i].fields.candidate === campaignTrail_temp.candidate_id && cis[i].fields.issue === issue) cand = cis[i].fields.issue_score;
+    }
+    var ris = campaignTrail_temp.running_mate_issue_score_json;
+    for (i = 0; i < ris.length; i++) {
+        if (ris[i].fields.issue === issue) mate = ris[i].fields.issue_score;
+    }
+    return (cand * cw + mate * rw) / (cw + rw);
+}
+
+/* The projection itself: `nm` in, the three tables' worth of numbers out.
+   Pure — it reads nm and the data files and touches nothing, which is what
+   lets the Benefit Checker run it twice (now, and as-if-answered) and
+   subtract. nmSyncElectorate() below is the only thing that writes. */
+function nmElectorate() {
+    var out = { global: 0, issues: [], states: {}, state_fx: [] };
+    var i, j;
+
+    var g = NM_GLOBAL_FX;
+    out.global = g.delivery * nm.delivery
+        + g.rec_legitimacy * nm.rec_legitimacy
+        + g.warren_relationship * nm.warren_relationship
+        + (nm.healthcare_result === "win" ? g.healthcare_win : 0)
+        + (nm.guns_result === "win" ? g.guns_win : 0)
+        + (nm.scotus_result === "win" ? g.scotus_win : 0)
+        + (nm.nato_tour ? g.nato_tour : 0)
+        + (nm.norms_weaponized ? g.norms_weaponized : 0)
+        + (nm.congress_2019 ? (g.congress[nm.congress_2019] || 0) : 0);
+
+    for (i = 0; i < NM_ISSUE_FX.length; i++) {
+        var fx = NM_ISSUE_FX[i];
+        var delta = fx.per === null ? nmOverallShift() : fx.per * nm[fx.key];
+        var blend = nmIssueBlend(fx.issue);
+        // Clamp the landing stance, not the delta: stance_7 starts at 0.71,
+        // so there is nothing to gain past ~0.95 and the signed-square term
+        // in the engine's scoring grows fast out there.
+        var landed = Math.max(-0.95, Math.min(0.95, blend + delta));
+        out.issues.push({
+            issue: fx.issue, label: fx.label, record: fx.record,
+            delta: landed - blend,
+            score: blend + 2 * (landed - blend)
+        });
+    }
+
+    for (i = 0; i < NM_STATE_FX.length; i++) {
+        var row = NM_STATE_FX[i];
+        var amount = row.amount();
+        var group = row.states || NM_STATE_GROUPS[row.group];
+        if (amount) out.state_fx.push({ label: row.label, group: row.group || "states", amount: amount });
+        for (j = 0; j < group.length; j++) {
+            var pk = nmStatePk(group[j]);
+            if (pk === undefined) continue; // a group naming a state this election does not have
+            out.states[pk] = (out.states[pk] || 0) + amount;
+        }
+    }
+    return out;
+}
+
+/* Writes the projection into the three tables the engine reads. Called at
+   the end of every cyoAdventure, which is the only moment `nm` changes. */
+function nmSyncElectorate() {
+    var t = campaignTrail_temp;
+    t.answer_score_global_json = [];
+    t.answer_score_issue_json = [];
+    t.answer_score_state_json = [];
+
+    var carrier = (t.player_answers || [])[0];
+    if (carrier === undefined || carrier === null) return; // nothing decided yet
+
+    var el = nmElectorate();
+    var pk = 9500;
+
+    t.answer_score_global_json.push({
+        model: "campaign_trail.answer_score_global", pk: pk++,
+        fields: {
+            answer: carrier, candidate: t.candidate_id, affected_candidate: t.candidate_id,
+            global_multiplier: Number(el.global.toFixed(5))
+        }
+    });
+
+    for (var i = 0; i < el.issues.length; i++) {
+        t.answer_score_issue_json.push({
+            model: "campaign_trail.answer_score_issue", pk: pk++,
+            fields: {
+                answer: carrier, candidate: t.candidate_id, state: null, tag: "CANDIDATE",
+                issue: el.issues[i].issue,
+                issue_score: Number(el.issues[i].score.toFixed(5)),
+                issue_importance: NM_ISSUE_IMPORTANCE
+            }
+        });
+    }
+
+    for (var statePk in el.states) {
+        if (!el.states.hasOwnProperty(statePk)) continue;
+        if (!el.states[statePk]) continue;
+        t.answer_score_state_json.push({
+            model: "campaign_trail.answer_score_state", pk: pk++,
+            fields: {
+                answer: carrier, candidate: t.candidate_id, affected_candidate: t.candidate_id,
+                state: Number(statePk),
+                state_multiplier: Number(el.states[statePk].toFixed(5))
+            }
+        });
+    }
+}
+window.nmSyncElectorate = nmSyncElectorate; // console debugging
 
 /* ============================================================
    Variable tracker — player-facing "The Record" panel.
@@ -698,6 +992,13 @@ function nmTrackerHTML() {
                 "</div>";
     }
     if (openGroup !== null) html += "</div>";
+    /* Ties the panel to the map: every row above except Delivery,
+       Institutions and the Vice President is also an issue in issues_json,
+       so a state's summary is scored on the same axes the player is. */
+    html += "<p class=\"nm_track_note\">Every state's summary on the map is " +
+            "scored on these same issues. Delivery, Institutions and the Vice " +
+            "President are not positions a state holds — they move your standing " +
+            "everywhere at once.</p>";
     return html;
 }
 
@@ -740,6 +1041,31 @@ function nmInjectTrackerButton() {
     });
 }
 
+/* Internal array positions include four mutually exclusive Q3 slots and the
+   terminal crisis slot. Translate those positions back to the content spine
+   so players see real progress without changing the engine's routing maths. */
+var NM_DISPLAY_QUESTION = {
+    801: 1, 802: 2, 803: 3, 804: 3, 805: 3, 806: 3,
+    807: 4, 808: 5, 809: 6, 810: 7, 811: 8, 812: 9,
+    813: 10, 814: 11, 816: 12, 817: 13
+};
+var NM_DISPLAY_TOTAL = 13;
+
+function nmPaintProgress() {
+    var t = campaignTrail_temp;
+    var question = (t.questions_json || [])[t.question_number];
+    var heading = document.querySelector("#progress_bar h3");
+    if (!question || !heading) return;
+
+    if (question.pk === 815 || nm.terminal) {
+        heading.textContent = "Crisis";
+        return;
+    }
+
+    var shown = NM_DISPLAY_QUESTION[question.pk];
+    if (shown) heading.textContent = "Question " + shown + " of " + NM_DISPLAY_TOTAL;
+}
+
 /* Wrapping a global the same way cyoAdventure is replaced above: the engine is
    a classic script, so its unqualified questionHTML() calls resolve through
    window and pick up the wrapper. Guarded so a failed injection can never stop
@@ -749,6 +1075,7 @@ if (typeof questionHTML === "function") {
     questionHTML = function () {
         var result = nmBaseQuestionHTML.apply(this, arguments);
         try {
+            nmPaintProgress();
             nmInjectTrackerButton();
         } catch (nmTrackerErr) {
             try {
@@ -756,6 +1083,258 @@ if (typeof questionHTML === "function") {
             } catch (e) { /* console unavailable */ }
         }
         return result;
+    };
+}
+
+/* ============================================================
+   Benefit Checker support.
+
+   cheats.js builds its window from the three answer_score tables, so
+   before the electorate model above existed it printed nothing at all
+   for this mod — every answer looked identical and free. It still cannot
+   see `nm`, and it never will: the tallies are not in any table it reads.
+
+   So each answer is *previewed* instead. nmPreviewAnswer() runs the real
+   cyoAdventure body against a copy of the current state and diffs the
+   result, which means the Benefit Checker is never a second description
+   of the rules that can drift out of step with them — it is the rules,
+   executed. It also means conditional answers report the branch that
+   will actually be taken from where the player is standing, which a
+   static table could not do at all.
+
+   Everything the preview touches is restored afterwards: `nm`, the
+   feedback strings nmAfterQ* rewrites, question_number, and Math.random
+   (stubbed, so opening the window cannot consume a seeded draw and shift
+   every number after it).
+   ============================================================ */
+
+var NM_GROUP_LABEL = {
+    rust_belt: "the Rust Belt",
+    farm_belt: "the farm states",
+    sunbelt_suburbs: "Sun Belt suburbs",
+    progressive_base: "progressive states",
+    gun_country: "gun country",
+    military: "military states",
+    campus_young: "college towns",
+    states: "California"
+};
+
+/* Result flags worth naming in the preview. hosts_burned and the Q3c
+   pre-rolls are left out on purpose — the bible marks them hidden, and
+   the tracker hides them too. */
+var NM_FLAG_LABEL = {
+    healthcare_result: "Healthcare",
+    guns_result: "Guns",
+    scotus_result: "Supreme Court",
+    congress_2019: "116th Congress",
+    norms_weaponized: "Trump prosecuted",
+    harris_scotus: "Harris on the Court",
+    nato_tour: "NATO tour",
+    debt_relief: "Student debt relief",
+    terminal: "Crisis"
+};
+
+function nmSnapshotRecord() {
+    var copy = {};
+    for (var k in nm) if (nm.hasOwnProperty(k)) copy[k] = nm[k];
+    return copy;
+}
+
+function nmRestoreRecord(snap) {
+    for (var k in snap) if (snap.hasOwnProperty(k)) nm[k] = snap[k];
+}
+
+function nmSnapshotFeedback() {
+    var fb = campaignTrail_temp.answer_feedback_json, out = [];
+    for (var i = 0; i < fb.length; i++) out.push(fb[i].fields.answer_feedback);
+    return out;
+}
+
+function nmRestoreFeedback(snap) {
+    var fb = campaignTrail_temp.answer_feedback_json;
+    for (var i = 0; i < fb.length; i++) fb[i].fields.answer_feedback = snap[i];
+}
+
+/* Runs one answer against a copy of the world and returns what changed.
+   Returns null if the answer is not one of ours. */
+function nmPreviewAnswer(answerPk) {
+    if (typeof answerPk !== "number" || isNaN(answerPk)) return null;
+
+    var record = nmSnapshotRecord();
+    var feedback = nmSnapshotFeedback();
+    var questionNumber = campaignTrail_temp.question_number;
+    var before = nmElectorate();
+    var realRandom = Math.random;
+
+    var after, jumped;
+    try {
+        Math.random = function () { return 0.5; };
+        nmApplyAnswer(answerPk);
+        after = nmElectorate();
+        jumped = campaignTrail_temp.question_number !== questionNumber;
+    } catch (err) {
+        Math.random = realRandom;
+        nmRestoreRecord(record);
+        nmRestoreFeedback(feedback);
+        campaignTrail_temp.question_number = questionNumber;
+        return null;
+    }
+
+    var moved = nmSnapshotRecord();
+    Math.random = realRandom;
+    nmRestoreRecord(record);
+    nmRestoreFeedback(feedback);
+    campaignTrail_temp.question_number = questionNumber;
+
+    return { before: record, after: moved, electorate_before: before, electorate_after: after, jumped: jumped };
+}
+window.nmPreviewAnswer = nmPreviewAnswer; // console debugging
+
+function nmSign(n) {
+    var rounded = Math.round(n * 100) / 100;
+    return (rounded > 0 ? "+" : "−") + Math.abs(rounded);
+}
+
+/* The tally lines, in the same order and the same words as The Record, so
+   a player can read the two side by side. Bands are shown only when the
+   answer actually crosses one — a +1 that stays inside "Mixed" says so by
+   not claiming otherwise. */
+function nmPreviewRecordHTML(p) {
+    var parts = [], i;
+    for (i = 0; i < NM_TRACKER_ROWS.length; i++) {
+        var row = NM_TRACKER_ROWS[i];
+        var from = p.before[row.key], to = p.after[row.key];
+        if (from === to) continue;
+        var text = row.label + " " + nmSign(to - from);
+        var bandFrom = nmBand(from, row.bands), bandTo = nmBand(to, row.bands);
+        if (bandFrom !== bandTo) text += " (" + bandFrom + " → " + bandTo + ")";
+        parts.push(text);
+    }
+    return parts;
+}
+
+function nmPreviewFlagsHTML(p) {
+    var parts = [];
+    for (var key in NM_FLAG_LABEL) {
+        if (!NM_FLAG_LABEL.hasOwnProperty(key)) continue;
+        if (p.before[key] === p.after[key]) continue;
+        var value = p.after[key];
+        if (value === true) parts.push(NM_FLAG_LABEL[key]);
+        else if (value === false || value === null) continue;
+        else parts.push(NM_FLAG_LABEL[key] + ": " + String(value).replace(/_/g, " "));
+    }
+    return parts;
+}
+
+/* Map effects, in the units a player can act on: the national standing
+   multiplier as a percentage, and each state group that moved. */
+function nmPreviewMapHTML(p) {
+    var parts = [], i;
+    var dGlobal = p.electorate_after.global - p.electorate_before.global;
+    if (Math.abs(dGlobal) >= 0.0005) {
+        parts.push("national standing " + (dGlobal > 0 ? "+" : "−") + Math.abs(dGlobal * 100).toFixed(1) + "%");
+    }
+
+    var keyOf = function (fx) { return fx.label + "|" + fx.group; };
+    var beforeFx = {}, afterFx = {};
+    for (i = 0; i < p.electorate_before.state_fx.length; i++) beforeFx[keyOf(p.electorate_before.state_fx[i])] = p.electorate_before.state_fx[i].amount;
+    for (i = 0; i < p.electorate_after.state_fx.length; i++) afterFx[keyOf(p.electorate_after.state_fx[i])] = p.electorate_after.state_fx[i].amount;
+    for (var k in afterFx) {
+        if (!afterFx.hasOwnProperty(k)) continue;
+        var delta = afterFx[k] - (beforeFx[k] || 0);
+        if (Math.abs(delta) < 0.0005) continue;
+        var bits = k.split("|");
+        parts.push(bits[0] + " in " + (NM_GROUP_LABEL[bits[1]] || bits[1]) + " " +
+            (delta > 0 ? "+" : "−") + Math.abs(delta * 100).toFixed(1) + "%");
+    }
+    for (var k2 in beforeFx) {
+        if (!beforeFx.hasOwnProperty(k2) || afterFx.hasOwnProperty(k2)) continue;
+        var bits2 = k2.split("|");
+        parts.push(bits2[0] + " in " + (NM_GROUP_LABEL[bits2[1]] || bits2[1]) + " " +
+            (beforeFx[k2] > 0 ? "−" : "+") + Math.abs(beforeFx[k2] * 100).toFixed(1) + "%");
+    }
+
+    // Where you stand, as the states read it. Only issues this answer moved.
+    for (i = 0; i < p.electorate_after.issues.length; i++) {
+        var a = p.electorate_after.issues[i], b = p.electorate_before.issues[i];
+        var d = a.delta - b.delta;
+        if (Math.abs(d) < 0.005) continue;
+        parts.push(a.label + " stance " + (d > 0 ? "+" : "−") + Math.abs(d).toFixed(2));
+    }
+    return parts;
+}
+
+/* Which answers read the record before they act, in the words of the
+   matching case in nmApplyAnswer. Only used to caption the preview —
+   the numbers themselves come from running the case, not from here. */
+var NM_BRANCH_NOTE = {
+    8052: "Rides on a 85% roll, already made.",
+    8053: "Rides on a 55% roll, already made.",
+    8071: "Pays off only if healthcare landed as a win.",
+    8072: "Pays off only if healthcare landed as a win.",
+    8102: "Reads Foreign Policy first, then Delivery.",
+    8112: "Reads Delivery: Effective, Mixed, or worse.",
+    8123: "Needs Delivery at Effective or better to confirm.",
+    8164: "Needs Delivery at Effective or better to land well.",
+    8171: "Needs the progressive wing on side.",
+    8172: "Needs Delivery at Effective or better.",
+    8173: "Needs Delivery at Effective or better.",
+    8174: "Reads whether you prosecuted Trump."
+};
+
+function nmBenefitHTML(answerPk) {
+    var p = nmPreviewAnswer(answerPk);
+    if (!p) return "";
+
+    var record = nmPreviewRecordHTML(p);
+    var flags = nmPreviewFlagsHTML(p);
+    var map = nmPreviewMapHTML(p);
+    var html = "";
+
+    if (record.length) html += "<br><em>The Record:</em> " + record.join(" · ");
+    if (flags.length) html += "<br><em>Outcome:</em> " + flags.join(" · ");
+    if (map.length) html += "<br><em>Map:</em> " + map.join(" · ");
+    if (!record.length && !flags.length && !map.length) html += "<br><em>The Record:</em> nothing moves.";
+    if (p.jumped) html += "<br><em>Path:</em> branches to a different question.";
+    if (NM_BRANCH_NOTE[answerPk]) html += "<br><em>Conditional:</em> " + NM_BRANCH_NOTE[answerPk] +
+        " The figures above are the branch you would get right now.";
+    return html;
+}
+
+/* The generated rows all hang off the Q1 answer, so the base checker
+   prints the entire projection — one global line and fifty state lines —
+   against whichever Q1 answer the player took, as though that one answer
+   were worth all of it. It is not: it is the whole presidency, restated.
+   Those lines are dropped from that one answer's entry, and the block
+   above says what the answer itself is worth instead.
+
+   Only rows this file generates are ever stripped, and only on the
+   carrier answer, so a hand-written row on any other answer still shows
+   up in the base checker exactly as it always did. */
+function nmStripProjectionRows(html) {
+    return html.replace(/<br><em>(Global|State|Issue):<\/em>[^<]*/g, "");
+}
+
+/* Same wrapping trick as questionHTML above: cheats.js declares
+   benefitCheck as a plain global function and calls it unqualified, so
+   replacing the global is enough. Guarded twice — if the checker is not
+   on the page, or our half throws, the base output still renders. */
+if (typeof benefitCheck === "function") {
+    var nmBaseBenefitCheck = benefitCheck;
+    benefitCheck = function (inputElement) {
+        var base = nmBaseBenefitCheck.apply(this, arguments);
+        var extra = "";
+        try {
+            var answerPk = inputElement ? Number(inputElement.value) : NaN;
+            if (answerPk === (campaignTrail_temp.player_answers || [])[0]) base = nmStripProjectionRows(base);
+            extra = nmBenefitHTML(answerPk);
+        } catch (nmBenefitErr) {
+            try {
+                console.warn("No Malarkey: benefit preview failed:", nmBenefitErr);
+            } catch (e) { /* console unavailable */ }
+        }
+        if (!extra) return base;
+        return base.indexOf("</p>") === -1 ? base + extra : base.replace("</p>", extra + "</p>");
     };
 }
 
@@ -792,13 +1371,40 @@ try {
         "select { border: 2px solid #224192; border-radius: 3px; padding: 4px 8px; background: #FFFFFF; color: #224192; font-weight: 600; }" +
         /* Crop photos to their frames instead of stretching them */
         "img:not(#header) { object-fit: cover; }" +
-        /* Ticket banner photos: fixed portrait frames regardless of source image size */
-        "#candidate_pic, #running_mate_pic { width: 135px !important; height: 164px !important; object-fit: cover; }" +
+        /* --- Ticket banner (photos + campaign sign), bottom of every question screen ---
+           Three pieces the base engine lays out independently: the two photos are floats
+           with hard-coded 13em side margins, and the sign block is a centred 30%-wide box.
+           Three things had to be pinned down so the row is identical on all 17 questions:
+
+           1. Vertical anchoring. #game_window is height:fit-content with min-height:540px,
+              so on the short questions the content stopped well above 540 and the banner
+              floated wherever the text ended — 84px above the window floor on Q3b/Q3d and
+              167px on the terminal, against 3px on the long ones. Giving the question block
+              a min-height makes it absorb the slack instead, so the banner sits 3px off the
+              bottom border on every question. 305px is 540 minus the banner row and the
+              game header; it is a floor, so the long questions are untouched.
+           2. Row height. The photos were 170px tall (164 + 3px double border each side)
+              against a 166px sign block, so the three bottom edges did not line up.
+              border-box sizing plus one shared 170px height settles it.
+           3. Side margins. 13em is 169px only at this exact window width, and it left just
+              25px before the sign block. Deriving the margin from the same 35% the sign
+              block is centred on keeps the gap at 25px and makes a collision impossible. */
+        "#candidate_pic, #running_mate_pic { box-sizing: border-box !important; width: 141px !important; height: 170px !important; object-fit: cover; }" +
+        /* object-position, not just cover: Biden is a mid-shot from the Oval Office and
+           Warren is a stage shot, so each needs its own crop centre to put both faces at
+           the same height in the frame. */
+        "#candidate_pic { margin-left: calc(35% - 166px); object-position: 50% 50%; }" +
+        "#running_mate_pic { margin-right: calc(35% - 166px); object-position: 50% 20%; }" +
+        ".inner_window_sign_display { box-sizing: border-box; height: 170px; }" +
+        ".inner_window_question { min-height: 305px; }" +
         /* Campaign sign: the real Biden 2020 wordmark on the campaign-blue field with the red border */
         "#campaign_sign { background: #224192 url('https://upload.wikimedia.org/wikipedia/commons/9/96/Biden_2020_Logo_white.png') center / auto 68% no-repeat; height: 92px; border-color: #EB2026; }" +
         "#campaign_sign p { display: none; }" +
-        /* Advisor feedback photo: crop to its 208x128 box instead of squashing */
-        "#visit_content img { object-fit: cover; }" +
+        /* Advisor feedback photo: crop to its 208x128 box instead of squashing. The
+           photo is a tall portrait, so a centered crop lands on the neck — hold it
+           near the top so the face fills the frame. Every advisor overlay (question
+           feedback, election night, visits, new game) uses .overlay_window_content. */
+        ".overlay_window_content img { object-fit: cover; object-position: 50% 8%; }" +
         /* Let windows grow with their text instead of overflowing */
         /* flow-root makes the window contain the floated ticket photos so they
            stay inside its bottom border */
@@ -825,6 +1431,7 @@ try {
         ".nm_track_row { display: flex; justify-content: space-between; align-items: baseline; gap: 1em; padding: .25em 0; border-bottom: 1px solid #DCE7F8; font-weight: 400; }" +
         ".nm_track_label { color: #333333; text-align: left; }" +
         ".nm_track_value { font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; color: #224192; text-align: right; white-space: nowrap; }" +
+        "p.nm_track_note { margin: 1em 1.2em 0; font-size: .78em; line-height: 1.45; color: #555555; text-align: left; }" +
         "#nm_tracker_buttons { text-align: center; }" +
         "</style>";
 } catch (nmStyleErr) {

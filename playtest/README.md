@@ -113,8 +113,8 @@ different seeds or different engine commits is not telling you about your edit.
 
 The dump leads with the narrative (answer path, per-turn answer text, the advisor
 feedback that was shown, and any mod state object found on the game window),
-because with all three `answer_score_*` arrays empty that is the part your edits
-move. Vote totals follow underneath.
+because that is usually the part an edit moves. Vote totals follow underneath —
+they move too now that `Code 1` projects the tallies onto the map.
 
 ---
 
@@ -147,10 +147,13 @@ Zero errors, six warnings:
   (5 + 5 issue scores, 56 + 56 state multipliers). Almost certainly leftovers
   from the base 2020 scenario. Inert — the engine filters them out — but they
   would join the race the moment something added those candidates.
-- Running mate `309` has no issue scores while `308` has all five.
+- Running mate `309` has no issue scores while `308` has all eight.
 - Ten fields still hold a bare `'` placeholder, across candidates 301, 308, 309.
-- A standing note that all three `answer_score_*` arrays are empty, so no answer
-  moves a vote and a results diff will legitimately come back empty.
+- A standing note that all three `answer_score_*` arrays are empty. That is
+  true of the *file* and no longer true of the *run*: `Code 1` rebuilds all
+  three from the `nm` tallies after every answer (`nmSyncElectorate`), so
+  answers do move votes and a results diff will not come back empty. The
+  validator only ever sees the static file, so the note stays.
 
 ---
 

@@ -907,11 +907,11 @@ function nmApplyAnswer(ans) {
             break;
         case 8124:
             nmAdd("rec_social", 1); nmAdd("rec_legitimacy", -1); nm.scotus_result = "partial";
-            // bible §3.1; the doc's FX line still omits this, and the flag is
-            // no longer banked: Q16 A1 reads it to decide whether the federal
-            // stay-at-home order survives the Court. Putting Harris on the
-            // bench in 2019 is what makes the 2020 lockdown stick, which is
-            // also what finally pays for A4 being a partial.
+            // bible §3.1. The doc's FX line includes harris_scotus=true, and
+            // the flag is no longer banked: Q16 A1 reads it to decide whether
+            // the federal stay-at-home order survives the Court. Putting Harris
+            // on the bench in 2019 is what makes the 2020 lockdown stick, which
+            // is also what finally pays for A4 being a partial.
             nm.harris_scotus = true;
             break;
 

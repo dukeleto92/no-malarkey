@@ -1261,29 +1261,32 @@ var NM_TRACKER = {
             { key: "rec_trade",          label: "Trade",          clamp: 3 }
         ] }
     ],
-    // Resolved outcomes — only rendered once the question that writes them has run
+    /* Resolved outcomes: what the player won or lost, and nothing else. Every
+       row here is a win/partial/loss flag, so the column reads one way from
+       top to bottom. Rendered only once the question that writes it has run. */
     outcomes: [
         { key: "healthcare_result",  label: "Healthcare" },
         { key: "guns_result",        label: "Guns" },
         { key: "scotus_result",      label: "Court" },
-        { key: "congress_2019",      label: "Congress" },
-        { key: "immigration_result", label: "Immigration" },
+        /* midterm_result, not congress_2019: the same Q13 roll, graded the way
+           the other rows are. congress_2019 (which chamber flipped) is the
+           mechanism the later questions read, not a score. */
+        { key: "midterm_result",     label: "Midterms" },
+        { key: "immigration_result", label: "Immigration" }
+    ],
+    /* What the player chose — postures and one-off decisions, not results.
+       Tagged rows print their value; marks are booleans set by an explicit
+       choice and print as a bare label once true. */
+    choices: [
         { key: "vp_status",          label: "Ticket" },
         /* Posture, not score. covid_response is the graded read and belongs
            with delivery in Record — but it is absent until Q16 runs, and the
            Record section prints every row from turn one, so a "Pandemic 0"
            sitting there for fifteen questions would advertise a question the
            player has not reached. The posture tag carries it instead, on the
-           same rule as every other outcome row: rendered once written. */
-        { key: "covid_posture",      label: "Pandemic" },
-        /* Appears only once the cascade has fired, which is the point: until
-           then the row is absent and the opponent is "The Republicans"
-           everywhere the player can look. The gate that selected the nominee
-           is not shown — the tracker's rule is current values, never the
-           threshold a question is about to read (or has just read). */
-        { key: "gop_nominee",        label: "GOP nominee" }
+           same rule as every other tagged row: rendered once written. */
+        { key: "covid_posture",      label: "Pandemic" }
     ],
-    // Booleans the player set by an explicit choice; shown only once true
     marks: [
         { key: "nato_tour",        label: "NATO tour" },
         { key: "debt_relief",      label: "Debt relief" },
@@ -1291,15 +1294,22 @@ var NM_TRACKER = {
         { key: "norms_weaponized", label: "Trump prosecuted" },
         { key: "harris_scotus",    label: "Harris on the Court" }
     ],
+    /* Appears only once the cascade has fired, which is the point: until
+       then the row is absent and the opponent is "The Republicans"
+       everywhere the player can look. The gate that selected the nominee
+       is not shown — the tracker's rule is current values, never the
+       threshold a question is about to read (or has just read). */
+    opponent: [
+        { key: "gop_nominee",        label: "GOP nominee" }
+    ],
     open: true
 };
 
-/* Outcome values to the short tag the tracker prints. The nine nominee keys
-   share the table with the result flags; they are surnames, so a key that ever
+/* Tagged values to the short tag the tracker prints. The nine nominee keys
+   share the table with the result flags and choice postures; they are surnames, so a key that ever
    collides with a flag value would be a bug in the roster, not here. */
 var NM_OUTCOME_LABEL = {
     win: "won", partial: "partial", loss: "lost",
-    dem_house: "Dem House", status_quo: "split", gop_senate: "GOP sweep",
     retained: "Warren", replaced_amicable: "replaced", replaced_hostile: "replaced (sour)",
     federal: "lockdown", guidance: "CDC guidance", production: "DPA", shielding: "shielding",
     trump: "Trump", christie: "Christie", jeb: "Bush", rubio: "Rubio",
@@ -1321,6 +1331,18 @@ function nmTrackerBar(v, clamp) {
            ";width:" + pct + "%'></span></span>";
 }
 
+// Tagged rows (label + short value), skipping any not yet written.
+function nmTrackerTags(rows) {
+    var h = "";
+    for (var i = 0; i < rows.length; i++) {
+        var v = nm[rows[i].key];
+        if (!v) continue;
+        h += "<div class='nm_tk_row'><span class='nm_tk_label'>" + rows[i].label + "</span>" +
+             "<span class='nm_tk_tag'>" + (NM_OUTCOME_LABEL[v] || v) + "</span></div>";
+    }
+    return h;
+}
+
 function nmTrackerHTML() {
     var h = "";
     for (var s = 0; s < NM_TRACKER.sections.length; s++) {
@@ -1334,20 +1356,17 @@ function nmTrackerHTML() {
                  nmSigned(v) + "</span></div>";
         }
     }
-    var out = "";
-    for (var o = 0; o < NM_TRACKER.outcomes.length; o++) {
-        var oc = NM_TRACKER.outcomes[o], ov = nm[oc.key];
-        if (!ov) continue;
-        out += "<div class='nm_tk_row'><span class='nm_tk_label'>" + oc.label + "</span>" +
-               "<span class='nm_tk_tag'>" + (NM_OUTCOME_LABEL[ov] || ov) + "</span></div>";
-    }
+    var out = nmTrackerTags(NM_TRACKER.outcomes);
+    if (out) h += "<div class='nm_tk_head'>Outcomes</div>" + out;
+    var ch = nmTrackerTags(NM_TRACKER.choices);
     for (var m = 0; m < NM_TRACKER.marks.length; m++) {
         var mk = NM_TRACKER.marks[m];
         if (!nm[mk.key]) continue;
-        out += "<div class='nm_tk_row'><span class='nm_tk_label'>" + mk.label + "</span>" +
-               "<span class='nm_tk_tag'>yes</span></div>";
+        ch += "<div class='nm_tk_row'><span class='nm_tk_label'>" + mk.label + "</span></div>";
     }
-    if (out) h += "<div class='nm_tk_head'>Outcomes</div>" + out;
+    if (ch) h += "<div class='nm_tk_head'>Choices</div>" + ch;
+    var opp = nmTrackerTags(NM_TRACKER.opponent);
+    if (opp) h += "<div class='nm_tk_head'>Opponent</div>" + opp;
     return h;
 }
 
@@ -2222,21 +2241,32 @@ function nmPreviewRecordHTML(p) {
     return parts;
 }
 
-// Outcomes and marks, named the way the tracker names them.
+// Tagged rows that this answer writes or changes, named the way the tracker names them.
+function nmPreviewTags(p, rows) {
+    var parts = [];
+    for (var i = 0; i < rows.length; i++) {
+        var v = p.after[rows[i].key];
+        if (!v || v === p.before[rows[i].key]) continue;
+        parts.push(rows[i].label + ": " + (NM_OUTCOME_LABEL[v] || String(v).replace(/_/g, " ")));
+    }
+    return parts;
+}
+
+// Results only — the tracker's Outcomes section.
 function nmPreviewFlagsHTML(p) {
-    var parts = [], i, row;
-    for (i = 0; i < NM_TRACKER.outcomes.length; i++) {
-        row = NM_TRACKER.outcomes[i];
-        var v = p.after[row.key];
-        if (!v || v === p.before[row.key]) continue;
-        parts.push(row.label + ": " + (NM_OUTCOME_LABEL[v] || String(v).replace(/_/g, " ")));
-    }
-    for (i = 0; i < NM_TRACKER.marks.length; i++) {
-        row = NM_TRACKER.marks[i];
-        if (p.after[row.key] && !p.before[row.key]) parts.push(row.label);
-    }
+    var parts = nmPreviewTags(p, NM_TRACKER.outcomes);
     if (p.after.terminal && !p.before.terminal) parts.push("Crisis");
     return parts;
+}
+
+// Choices, marks and the nominee — everything else the tracker tags.
+function nmPreviewChoicesHTML(p) {
+    var parts = nmPreviewTags(p, NM_TRACKER.choices);
+    for (var i = 0; i < NM_TRACKER.marks.length; i++) {
+        var row = NM_TRACKER.marks[i];
+        if (p.after[row.key] && !p.before[row.key]) parts.push(row.label);
+    }
+    return parts.concat(nmPreviewTags(p, NM_TRACKER.opponent));
 }
 
 /* Map effects, in the units a player can act on: the national standing
@@ -2295,13 +2325,15 @@ function nmBenefitHTML(answerPk) {
 
     var record = nmPreviewRecordHTML(p);
     var flags = nmPreviewFlagsHTML(p);
+    var choices = nmPreviewChoicesHTML(p);
     var map = nmPreviewMapHTML(p);
     var html = "";
 
     if (record.length) html += "<br><em>Record:</em> " + record.join(" · ");
     if (flags.length) html += "<br><em>Outcome:</em> " + flags.join(" · ");
+    if (choices.length) html += "<br><em>Choice:</em> " + choices.join(" · ");
     if (map.length) html += "<br><em>Map:</em> " + map.join(" · ");
-    if (!record.length && !flags.length && !map.length) html += "<br><em>Record:</em> nothing moves.";
+    if (!record.length && !flags.length && !choices.length && !map.length) html += "<br><em>Record:</em> nothing moves.";
     if (p.jumped) html += "<br><em>Path:</em> branches to a different question.";
     var note = NM_BRANCH_NOTE[answerPk] ||
         (NM_READS_RECORD.indexOf(answerPk) >= 0 ? "Reads your record before it acts." : "");

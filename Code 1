@@ -1380,6 +1380,60 @@ function nmWatchForGameStart(box) {
     }, 400);
 }
 
+/* Drag the panel by its title bar. A press only becomes a drag after it
+   moves a few pixels, so a plain click on the bar still collapses it. Once
+   moved, the panel is placed by inline top/left (which beat the stylesheet's
+   right/bottom anchoring, narrow-viewport dock included) and is kept on
+   screen, also when the window is resized. */
+function nmMakeTrackerDraggable(box, handle, toggle, onDragged) {
+    var startX, startY, baseL, baseT, moving = false, pressed = false;
+    function clamp(l, t) {
+        var maxL = Math.max(0, window.innerWidth - box.offsetWidth);
+        var maxT = Math.max(0, window.innerHeight - handle.offsetHeight);
+        box.style.left = Math.min(Math.max(0, l), maxL) + "px";
+        box.style.top = Math.min(Math.max(0, t), maxT) + "px";
+        box.style.right = "auto";
+        box.style.bottom = "auto";
+    }
+    function move(ev) {
+        if (!pressed) return;
+        var dx = ev.clientX - startX, dy = ev.clientY - startY;
+        if (!moving) {
+            if (Math.abs(dx) + Math.abs(dy) < 4) return;
+            moving = true;
+            box.className += " nm_tk_dragging";
+        }
+        clamp(baseL + dx, baseT + dy);
+        ev.preventDefault();
+    }
+    function up() {
+        if (!pressed) return;
+        pressed = false;
+        if (moving) {
+            moving = false;
+            box.className = box.className.replace(/\s*nm_tk_dragging/g, "");
+            onDragged();
+        }
+    }
+    // Pointer capture keeps move/up coming to the bar even when the pointer
+    // leaves the game window, so a release out there still ends the drag.
+    handle.addEventListener("pointerdown", function (ev) {
+        if (ev.button !== 0 || ev.target === toggle) return;
+        var r = box.getBoundingClientRect();
+        startX = ev.clientX; startY = ev.clientY;
+        baseL = r.left; baseT = r.top;
+        pressed = true; moving = false;
+        try { handle.setPointerCapture(ev.pointerId); } catch (e) { /* older browsers */ }
+    });
+    handle.addEventListener("pointermove", move);
+    handle.addEventListener("pointerup", up);
+    handle.addEventListener("pointercancel", up);
+    handle.addEventListener("lostpointercapture", up);
+    window.addEventListener("resize", function () {
+        if (box.style.left) clamp(parseFloat(box.style.left), parseFloat(box.style.top));
+    });
+}
+
 function nmBuildTracker() {
     if (document.getElementById("nm_tracker")) return;
     var box = document.createElement("div");
@@ -1397,10 +1451,17 @@ function nmBuildTracker() {
         toggle.innerHTML = NM_TRACKER.open ? "&minus;" : "+";
         toggle.setAttribute("aria-expanded", NM_TRACKER.open ? "true" : "false");
     }
+    var dragged = false;
     toggle.onclick = function () { NM_TRACKER.open = !NM_TRACKER.open; applyOpen(); };
     document.getElementById("nm_tracker_bar").onclick = function (ev) {
+        if (dragged) return;   // the end of a drag is not a toggle
         if (ev.target !== toggle) { NM_TRACKER.open = !NM_TRACKER.open; applyOpen(); }
     };
+    // The click that ends a drag fires straight after pointerup, if at all
+    // (not when the pointer was released off the bar), so the flag only
+    // lives until the next tick and can never eat a later, real click.
+    nmMakeTrackerDraggable(box, document.getElementById("nm_tracker_bar"), toggle,
+                           function () { dragged = true; setTimeout(function () { dragged = false; }, 0); });
     applyOpen();
     nmPaintTracker();
     nmWatchForGameStart(box);
@@ -2352,6 +2413,8 @@ try {
         "#nm_tracker_toggle:hover { background: none; color: #EB2026; }" +
         "#nm_tracker_body { padding: 6px 8px 8px; max-height: 70vh; overflow-y: auto; }" +
         "#nm_tracker.nm_tk_closed #nm_tracker_body { display: none; }" +
+        "#nm_tracker_bar { cursor: move; touch-action: none; user-select: none; }" +
+        "#nm_tracker.nm_tk_dragging { opacity: .92; box-shadow: 0 6px 18px rgba(0,0,0,.45); }" +
         ".nm_tk_head { margin: 7px 0 3px; font-size: 9px; font-weight: 800; letter-spacing: .1em;" +
         "  text-transform: uppercase; color: #6B7C9E; border-bottom: 1px solid #DCE7F8; padding-bottom: 2px; }" +
         ".nm_tk_head:first-child { margin-top: 0; }" +

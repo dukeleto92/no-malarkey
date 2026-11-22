@@ -175,7 +175,7 @@ campaignTrail_temp.questions_json = [
         "pk": 815,
         "fields": {
             "priority": 19,
-            "description": "It all happens so fast. You have to decide now. “What are your orders, Mr. President?” “My…my orders?”",
+            "description": "It all happens so fast. You have to decide now. “What are your orders, Mr. President?”",
             "likelihood": 1
         }
     }
@@ -587,7 +587,7 @@ campaignTrail_temp.answers_json = [
         "pk": 8151,
         "fields": {
             "question": 815,
-            "description": "…"
+            "description": "“My…my orders?”"
         }
     },
     {

@@ -1275,8 +1275,9 @@ var NM_TRACKER = {
         { key: "immigration_result", label: "Immigration" }
     ],
     /* What the player chose — postures and one-off decisions, not results.
-       Tagged rows print their value; marks are booleans set by an explicit
-       choice and print as a bare label once true. */
+       Not rendered in the panel, which keeps to results; listed here only so
+       an answer's preview can say which of them it sets ("Choice:"). Tagged
+       rows print their value; marks are booleans that print as a bare label. */
     choices: [
         { key: "vp_status",          label: "Ticket" },
         /* Posture, not score. covid_response is the graded read and belongs
@@ -1358,13 +1359,6 @@ function nmTrackerHTML() {
     }
     var out = nmTrackerTags(NM_TRACKER.outcomes);
     if (out) h += "<div class='nm_tk_head'>Outcomes</div>" + out;
-    var ch = nmTrackerTags(NM_TRACKER.choices);
-    for (var m = 0; m < NM_TRACKER.marks.length; m++) {
-        var mk = NM_TRACKER.marks[m];
-        if (!nm[mk.key]) continue;
-        ch += "<div class='nm_tk_row'><span class='nm_tk_label'>" + mk.label + "</span></div>";
-    }
-    if (ch) h += "<div class='nm_tk_head'>Choices</div>" + ch;
     var opp = nmTrackerTags(NM_TRACKER.opponent);
     if (opp) h += "<div class='nm_tk_head'>Opponent</div>" + opp;
     return h;
@@ -2259,7 +2253,7 @@ function nmPreviewFlagsHTML(p) {
     return parts;
 }
 
-// Choices, marks and the nominee — everything else the tracker tags.
+// Choices, marks and the nominee — the preview's "Choice:" line.
 function nmPreviewChoicesHTML(p) {
     var parts = nmPreviewTags(p, NM_TRACKER.choices);
     for (var i = 0; i < NM_TRACKER.marks.length; i++) {

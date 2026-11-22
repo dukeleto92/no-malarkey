@@ -1274,27 +1274,6 @@ var NM_TRACKER = {
         { key: "midterm_result",     label: "Midterms" },
         { key: "immigration_result", label: "Immigration" }
     ],
-    /* What the player chose — postures and one-off decisions, not results.
-       Not rendered in the panel, which keeps to results; listed here only so
-       an answer's preview can say which of them it sets ("Choice:"). Tagged
-       rows print their value; marks are booleans that print as a bare label. */
-    choices: [
-        { key: "vp_status",          label: "Ticket" },
-        /* Posture, not score. covid_response is the graded read and belongs
-           with delivery in Record — but it is absent until Q16 runs, and the
-           Record section prints every row from turn one, so a "Pandemic 0"
-           sitting there for fifteen questions would advertise a question the
-           player has not reached. The posture tag carries it instead, on the
-           same rule as every other tagged row: rendered once written. */
-        { key: "covid_posture",      label: "Pandemic" }
-    ],
-    marks: [
-        { key: "nato_tour",        label: "NATO tour" },
-        { key: "debt_relief",      label: "Debt relief" },
-        { key: "midterm_push",     label: "Midterm push" },
-        { key: "norms_weaponized", label: "Trump prosecuted" },
-        { key: "harris_scotus",    label: "Harris on the Court" }
-    ],
     /* Appears only once the cascade has fired, which is the point: until
        then the row is absent and the opponent is "The Republicans"
        everywhere the player can look. The gate that selected the nominee
@@ -2253,16 +2232,6 @@ function nmPreviewFlagsHTML(p) {
     return parts;
 }
 
-// Choices, marks and the nominee — the preview's "Choice:" line.
-function nmPreviewChoicesHTML(p) {
-    var parts = nmPreviewTags(p, NM_TRACKER.choices);
-    for (var i = 0; i < NM_TRACKER.marks.length; i++) {
-        var row = NM_TRACKER.marks[i];
-        if (p.after[row.key] && !p.before[row.key]) parts.push(row.label);
-    }
-    return parts.concat(nmPreviewTags(p, NM_TRACKER.opponent));
-}
-
 /* Map effects, in the units a player can act on: the national standing
    multiplier as a percentage, and each state group that moved. */
 function nmPreviewMapHTML(p) {
@@ -2319,15 +2288,13 @@ function nmBenefitHTML(answerPk) {
 
     var record = nmPreviewRecordHTML(p);
     var flags = nmPreviewFlagsHTML(p);
-    var choices = nmPreviewChoicesHTML(p);
     var map = nmPreviewMapHTML(p);
     var html = "";
 
     if (record.length) html += "<br><em>Record:</em> " + record.join(" · ");
     if (flags.length) html += "<br><em>Outcome:</em> " + flags.join(" · ");
-    if (choices.length) html += "<br><em>Choice:</em> " + choices.join(" · ");
     if (map.length) html += "<br><em>Map:</em> " + map.join(" · ");
-    if (!record.length && !flags.length && !choices.length && !map.length) html += "<br><em>Record:</em> nothing moves.";
+    if (!record.length && !flags.length && !map.length) html += "<br><em>Record:</em> nothing moves.";
     if (p.jumped) html += "<br><em>Path:</em> branches to a different question.";
     var note = NM_BRANCH_NOTE[answerPk] ||
         (NM_READS_RECORD.indexOf(answerPk) >= 0 ? "Reads your record before it acts." : "");

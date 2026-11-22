@@ -1368,7 +1368,7 @@ function nmGameStarted() {
 }
 
 function nmWatchForGameStart(box) {
-    if (nmGameStarted()) { box.style.display = ""; nmPaintTracker(); return; }
+    if (nmGameStarted()) { box.style.display = ""; nmPaintTracker(); if (box.nmReclamp) box.nmReclamp(); return; }
     box.style.display = "none";
     var poll = setInterval(function () {
         try {
@@ -1376,6 +1376,7 @@ function nmWatchForGameStart(box) {
             clearInterval(poll);
             box.style.display = "";
             nmPaintTracker();
+            if (box.nmReclamp) box.nmReclamp();
         } catch (e) { clearInterval(poll); }
     }, 400);
 }
@@ -1384,7 +1385,11 @@ function nmWatchForGameStart(box) {
    moves a few pixels, so a plain click on the bar still collapses it. Once
    moved, the panel is placed by inline top/left (which beat the stylesheet's
    right/bottom anchoring, narrow-viewport dock included) and is kept on
-   screen, also when the window is resized. */
+   screen, also when the window is resized. The spot is remembered in
+   localStorage between loads; storage that is blocked or empty just leaves
+   the panel in its default corner. */
+var NM_TRACKER_POS_KEY = "nm_tracker_pos";
+
 function nmMakeTrackerDraggable(box, handle, toggle, onDragged) {
     var startX, startY, baseL, baseT, moving = false, pressed = false;
     function clamp(l, t) {
@@ -1412,6 +1417,10 @@ function nmMakeTrackerDraggable(box, handle, toggle, onDragged) {
         if (moving) {
             moving = false;
             box.className = box.className.replace(/\s*nm_tk_dragging/g, "");
+            try {
+                localStorage.setItem(NM_TRACKER_POS_KEY, JSON.stringify({
+                    left: parseFloat(box.style.left), top: parseFloat(box.style.top) }));
+            } catch (e) { /* storage blocked: the position just isn't kept */ }
             onDragged();
         }
     }
@@ -1429,9 +1438,17 @@ function nmMakeTrackerDraggable(box, handle, toggle, onDragged) {
     handle.addEventListener("pointerup", up);
     handle.addEventListener("pointercancel", up);
     handle.addEventListener("lostpointercapture", up);
-    window.addEventListener("resize", function () {
+    function reclamp() {
         if (box.style.left) clamp(parseFloat(box.style.left), parseFloat(box.style.top));
-    });
+    }
+    window.addEventListener("resize", reclamp);
+    // Called when the panel is first shown: while hidden it has no width to
+    // clamp against, so a restored spot is only checked against the screen then.
+    box.nmReclamp = reclamp;
+    try {
+        var saved = JSON.parse(localStorage.getItem(NM_TRACKER_POS_KEY) || "null");
+        if (saved && isFinite(saved.left) && isFinite(saved.top)) clamp(saved.left, saved.top);
+    } catch (e) { /* unreadable or blocked: keep the default corner */ }
 }
 
 function nmBuildTracker() {
